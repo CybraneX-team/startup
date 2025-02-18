@@ -57,7 +57,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
 
   return (
     <aside
-      className={`fixed left-0 top-0 z-50 flex h-screen w-[350px] flex-col overflow-y-hidden bg-white duration-300 ease-linear dark:bg-boxdark lg:translate-x-0 ${
+      className={`fixed left-0 top-0 z-50 flex h-screen w-[300px] flex-col overflow-y-hidden bg-white duration-300 ease-linear dark:bg-boxdark lg:translate-x-0 ${
         sidebarOpen ? "translate-x-0" : "-translate-x-full"
       }`}
     >
@@ -71,7 +71,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
             alt="Logo"
             priority
           />
-          <h1 className="mx-2 text-xl font-semibold text-black">
+          <h1 className="mx-2 text-xl font-semibold text-black dark:text-white">
             Startup Simulator
           </h1>
         </Link>
@@ -81,7 +81,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
       <div className="flex flex-col overflow-y-auto px-6 py-4">
         {/* Business Idea Section */}
         <div className="mb-6">
-          <h2 className="mb-3 text-sm font-semibold text-black">
+          <h2 className="mb-3 text-sm font-semibold text-black dark:text-white">
             Business Idea
           </h2>
           <p className="rounded-lg bg-gray-100 p-3 text-sm text-gray-600">
@@ -92,7 +92,9 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
 
         {/* Financials Section */}
         <div className="mb-6">
-          <h2 className="mb-4 text-base font-medium text-black">Financials</h2>
+          <h2 className="mb-4 text-base font-medium text-black dark:text-white">
+            Financials
+          </h2>
 
           {/* Donut Chart with Static Center Label */}
           <div className="relative mb-4">
@@ -104,7 +106,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                 height={200}
               />
               {/* Static center label */}
-              <div className="absolute ml-3 left-2/3 top-1/2 -translate-x-1/2 -translate-y-1/2 transform text-center">
+              <div className="absolute left-2/3 top-1/2 ml-3 -translate-x-1/2 -translate-y-1/2 transform text-center">
                 <div className="text-xs font-normal text-gray-600">Funds</div>
                 <div className="text-sm font-medium text-gray-900">
                   $100,000
@@ -151,7 +153,9 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
 
         {/* Team Section */}
         <div>
-          <h2 className="mb-4 text-sm font-semibold text-black">Team</h2>
+          <h2 className="mb-4 text-sm font-semibold text-black dark:text-white">
+            Team
+          </h2>
           <div className="grid grid-cols-3 gap-4">
             {[
               {

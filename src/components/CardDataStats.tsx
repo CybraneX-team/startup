@@ -23,7 +23,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
 }) => {
   return (
     <div
-      className={`cursor-pointer rounded-xl border p-4 shadow-sm transition-all duration-200 hover:shadow-md
+      className={`w-full cursor-pointer rounded-xl border p-4 shadow-sm transition-all duration-200 hover:shadow-md
         ${
           isCompleted
             ? "border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-900/20"
@@ -31,10 +31,10 @@ const TaskCard: React.FC<TaskCardProps> = ({
         }`}
       onClick={onToggle}
     >
-      <div className="flex items-start justify-between">
-        <div className="flex-1">
+      <div className="flex items-start justify-between gap-4">
+        <div className="min-w-0 flex-1">
           <h3
-            className={`text-md mb-4 font-semibold 
+            className={`text-md mb-4 truncate font-semibold
             ${isCompleted ? "text-green-700 dark:text-green-400" : "text-black dark:text-white"}`}
           >
             {title}
@@ -53,8 +53,8 @@ const TaskCard: React.FC<TaskCardProps> = ({
                 {effect.metric} {effect.value}
               </span>
             </div>
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-sm text-gray-600 dark:text-gray-400">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+              <span className="whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
                 Required team members
               </span>
               <div className="flex flex-wrap gap-2">
@@ -71,7 +71,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
             </div>
           </div>
         </div>
-        <div className="ml-4">
+        <div className="flex-shrink-0">
           {isCompleted ? (
             <CheckCircle className="h-6 w-6 text-green-500" />
           ) : (
@@ -156,15 +156,19 @@ const TaskGrid = () => {
   };
 
   return (
-    <div className="grid max-w-sm grid-cols-1 gap-4 p-4 md:mx-auto md:max-w-6xl md:grid-cols-2 md:gap-6">
-      {tasks.map((task, index) => (
-        <TaskCard
-          key={index}
-          {...task}
-          isCompleted={completedTasks.includes(index)}
-          onToggle={() => toggleTask(index)}
-        />
-      ))}
+    <div className="overflow-hidden px-4">
+      <div className="mx-auto ">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6">
+          {tasks.map((task, index) => (
+            <TaskCard
+              key={index}
+              {...task}
+              isCompleted={completedTasks.includes(index)}
+              onToggle={() => toggleTask(index)}
+            />
+          ))}
+        </div>
+      </div>
     </div>
   );
 };
