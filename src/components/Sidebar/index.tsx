@@ -21,7 +21,6 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
     legend: {
       show: true,
       position: "left",
-
     },
     plotOptions: {
       pie: {
@@ -58,7 +57,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
 
   return (
     <aside
-      className={`fixed left-0 top-0 z-50 flex h-screen w-[300px] flex-col overflow-y-hidden bg-white duration-300 ease-linear dark:bg-boxdark lg:translate-x-0 ${
+      className={`fixed left-0 top-0 z-50 flex h-screen w-[350px] flex-col overflow-y-hidden bg-white duration-300 ease-linear dark:bg-boxdark lg:translate-x-0 ${
         sidebarOpen ? "translate-x-0" : "-translate-x-full"
       }`}
     >
@@ -105,39 +104,14 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                 height={200}
               />
               {/* Static center label */}
-              {/* <div className="absolute left-2/3 top-1/2 -translate-x-1/2 -translate-y-1/2 transform text-center">
-                <div className="text-sm font-normal text-gray-600">Funds</div>
-                <div className="text-lg font-medium text-gray-900">
-                  $100 000
+              <div className="absolute ml-3 left-2/3 top-1/2 -translate-x-1/2 -translate-y-1/2 transform text-center">
+                <div className="text-xs font-normal text-gray-600">Funds</div>
+                <div className="text-sm font-medium text-gray-900">
+                  $100,000
                 </div>
-              </div> */}
+              </div>
             </div>
           </div>
-
-          {/* Legend */}
-          {/* <div className="mb-6 space-y-2">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <div className="mr-2 h-2.5 w-2.5 rounded-full bg-[#6577F3]"></div>
-                <span className="text-sm text-gray-600">Founder</span>
-              </div>
-              <span className="text-sm">90%</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <div className="mr-2 h-2.5 w-2.5 rounded-full bg-[#A5D6A7]"></div>
-                <span className="text-sm text-gray-600">Investors</span>
-              </div>
-              <span className="text-sm">10%</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <div className="mr-2 h-2.5 w-2.5 rounded-full bg-[#8FD0EF]"></div>
-                <span className="text-sm text-gray-600">Mentors</span>
-              </div>
-              <span className="text-sm">0%</span>
-            </div>
-          </div> */}
 
           {/* Financial Stats */}
           <div className="space-y-2">
