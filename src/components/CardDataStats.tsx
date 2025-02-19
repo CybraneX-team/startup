@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Users, CheckCircle } from "lucide-react";
+import { Users, CheckSquare } from "lucide-react";
 
 interface FilterButtonProps {
   label: string;
@@ -20,13 +20,20 @@ interface TaskCardProps {
   onToggle: () => void;
 }
 
-const FilterButton: React.FC<FilterButtonProps> = ({ label, count, isActive, onClick }) => (
+const FilterButton: React.FC<FilterButtonProps> = ({
+  label,
+  count,
+  isActive,
+  onClick,
+}) => (
   <button
     onClick={onClick}
     className={`flex items-center rounded-full px-4 py-1.5 text-sm transition-colors
-      ${isActive 
-        ? "bg-blue-50 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400" 
-        : "bg-white text-gray-600 hover:bg-gray-50 dark:bg-boxdark dark:text-gray-400 dark:hover:bg-gray-800"}`}
+      ${
+        isActive
+          ? "bg-blue-50 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400"
+          : "bg-white text-gray-600 hover:bg-gray-50 dark:bg-boxdark dark:text-gray-400 dark:hover:bg-gray-800"
+      }`}
   >
     <span>{label}</span>
     {count !== undefined && (
@@ -97,7 +104,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
         </div>
         <div className="flex-shrink-0">
           {isCompleted ? (
-            <CheckCircle className="h-6 w-6 text-green-500" />
+            <CheckSquare className="h-6 w-6 text-green-500" />
           ) : (
             <div className="h-6 w-6 rounded-full border-2 border-gray-300 dark:border-gray-600" />
           )}
@@ -119,7 +126,9 @@ interface Task {
 
 const TaskGrid: React.FC = () => {
   const [completedTasks, setCompletedTasks] = useState<number[]>([]);
-  const [activeFilters, setActiveFilters] = useState<Set<string>>(new Set(["all"]));
+  const [activeFilters, setActiveFilters] = useState<Set<string>>(
+    new Set(["all"]),
+  );
   const [inProgress, setInProgress] = useState<Set<number>>(new Set());
 
   const tasks: Task[] = [
@@ -187,7 +196,7 @@ const TaskGrid: React.FC = () => {
 
   const toggleTask = (index: number) => {
     setCompletedTasks((prev) =>
-      prev.includes(index) ? prev.filter((i) => i !== index) : [...prev, index]
+      prev.includes(index) ? prev.filter((i) => i !== index) : [...prev, index],
     );
     if (!completedTasks.includes(index)) {
       setInProgress((prev) => {
