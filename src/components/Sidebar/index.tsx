@@ -1,9 +1,11 @@
-import React from "react";
+"use client"
+import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Info } from "lucide-react";
 import ReactApexChart from "react-apexcharts";
 import { ApexOptions } from "apexcharts";
+import { useUser } from "@/context/UserContext";
 
 interface SidebarProps {
   sidebarOpen: boolean;
@@ -11,6 +13,9 @@ interface SidebarProps {
 }
 
 const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
+   const [makevisible, setmakevisible] = useState(false);
+  const {resetTheGame, user }  = useUser()
+  
   const options: ApexOptions = {
     chart: {
       fontFamily: "Satoshi, sans-serif",
@@ -54,7 +59,12 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
   };
 
   const series = [90, 10, 0];
-
+  const makeVisible = () => {
+    setmakevisible((prev)=> !prev)
+  }
+  
+  
+  
   return (
     <aside
       className={`fixed left-0 top-0 z-50 flex h-screen w-[300px] flex-col overflow-y-hidden bg-white duration-300 ease-linear dark:bg-boxdark lg:translate-x-0 ${
@@ -81,8 +91,17 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
       <div className="flex flex-col overflow-y-auto px-6 py-4">
         {/* Business Idea Section */}
         <div className="mb-6">
-          <h2 className="mb-3 text-sm font-semibold text-black dark:text-white">
-            Business Idea
+          <h2 className="mb-3 text-sm font-semibold text-black">
+            Business Idea  
+            <span 
+            onClick={makeVisible}
+            className="ml-20 cursor-pointer text-xl" > ... </span> 
+          </h2>
+          
+          <h2 
+            className={`text-sm font-semibold cursor-pointer text-black ${makevisible ? "block" : "hidden"}`}
+            onClick={resetTheGame}
+          > reset game 
           </h2>
           <p className="rounded-lg bg-gray-100 p-3 text-sm text-gray-600">
             Subscription service that delivers a monthly package of pet care
@@ -109,7 +128,10 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
               <div className="absolute left-2/3 top-1/2 ml-3 -translate-x-1/2 -translate-y-1/2 transform text-center">
                 <div className="text-xs font-normal text-gray-600">Funds</div>
                 <div className="text-sm font-medium text-gray-900">
-                  $100,000
+                  $ {user?.finances ?
+                    user?.finances : 
+                    "not logged in"
+                   }
                 </div>
               </div>
             </div>

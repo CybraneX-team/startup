@@ -1,5 +1,9 @@
-import React, { useState } from "react";
+"use client";
+import React, { useEffect, useState } from "react";
 import { Users, CheckSquare } from "lucide-react";
+import { useUser } from "@/context/UserContext";
+import { useRouter } from "next/navigation";
+import { Bounce, toast, ToastContainer } from "react-toastify";
 
 interface FilterButtonProps {
   label: string;
@@ -9,11 +13,24 @@ interface FilterButtonProps {
 }
 
 interface TaskCardProps {
-  title: string;
-  turns: number;
-  effect: {
-    metric: string;
-    value: string;
+  name: string;
+  turnsRequired: number;
+  metricsImpact: {
+    conversionFirstPurchase: number;
+    averageOrderValue: number;
+    userAcquisition: number;
+    buyerCount: number;
+    costOfGoodsSold: number;
+    averagePaymentCount: number;
+    customerLifetimeValue: number;
+    averageRevenuePerUser: number;
+    costPerAcquisition: number;
+    contributionMargin: number;
+  };
+  requiredTeamMembers: {
+    ceo: number;
+    developer: number;
+    sales: number;
   };
   requiredTeam: string[];
   isCompleted: boolean;
@@ -45,13 +62,31 @@ const FilterButton: React.FC<FilterButtonProps> = ({
 );
 
 const TaskCard: React.FC<TaskCardProps> = ({
-  title,
-  turns,
-  effect,
+  name,
+  turnsRequired,
+  requiredTeamMembers,
+  metricsImpact,
   requiredTeam,
-  isCompleted,
+  isCompleted = false,
   onToggle,
 }) => {
+  console.log("required team for task is: ", requiredTeam)
+  function getShortName(metricName: string): string {
+    const metricMap: Record<string, string> = {
+      userAcquisition: "UA",
+      conversionFirstPurchase: "C1",
+      averageOrderValue: "AOV",
+      costOfGoodsSold: "COGS",
+      averagePaymentCount: "APC",
+      customerLifetimeValue: "CLTV",
+      averageRevenuePerUser: "ARPU",
+      costPerAcquisition: "CPA",
+      contributionMargin: "CM",
+      buyerCount: "B",
+    };
+  
+    return metricMap[metricName] || metricName; 
+  }
   return (
     <div
       className={`w-full cursor-pointer rounded-xl border p-4 shadow-sm transition-all duration-200 hover:shadow-md
@@ -68,34 +103,40 @@ const TaskCard: React.FC<TaskCardProps> = ({
             className={`text-md mb-4 truncate font-semibold
             ${isCompleted ? "text-green-700 dark:text-green-400" : "text-black dark:text-white"}`}
           >
-            {title}
+            {name}
           </h3>
 
           <div className="space-y-3">
             <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
               <span>Turns required</span>
-              <span>{turns}</span>
+              <span>{turnsRequired}</span>
             </div>
             <div className="flex items-center justify-between text-sm">
               <span className="text-gray-600 dark:text-gray-400">
                 Effect on Metrics
               </span>
               <span className="text-emerald-600 dark:text-emerald-400">
-                {effect.metric} {effect.value}
+                {
+                  Object.entries(metricsImpact)
+                    .filter(([key, value]) => value !== undefined && value !== 0)
+                    .map(([key, value]) => `${getShortName(key)}: +${value}%`)
+                    .join(" , ")
+                }
               </span>
+
             </div>
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
               <span className="whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
                 Required team members
               </span>
               <div className="flex flex-wrap gap-2">
-                {requiredTeam.map((member, index) => (
+                {Object.keys(requiredTeamMembers).map((member, index) => (
                   <div
                     key={index}
                     className="flex items-center gap-1 rounded bg-gray-100 px-2 py-1 text-xs dark:bg-gray-700"
                   >
                     <Users className="h-3 w-3" />
-                    <span>{member}</span>
+                    <span>{member}</span> <span> {requiredTeamMembers[member]} </span>
                   </div>
                 ))}
               </div>
@@ -114,85 +155,51 @@ const TaskCard: React.FC<TaskCardProps> = ({
   );
 };
 
-interface Task {
-  title: string;
-  turns: number;
-  effect: {
-    metric: string;
-    value: string;
-  };
-  requiredTeam: string[];
-}
-
-const TaskGrid: React.FC = () => {
+const TaskGrid = () => {
   const [completedTasks, setCompletedTasks] = useState<number[]>([]);
   const [activeFilters, setActiveFilters] = useState<Set<string>>(
     new Set(["all"]),
   );
+  const {user} = useUser()
+  const [Tasks, setTasks] = useState([]);
+  // const [activeFilters, setActiveFilters] = useState<Set<string>>(new Set(["all"]));
   const [inProgress, setInProgress] = useState<Set<number>>(new Set());
-
-  const tasks: Task[] = [
-    {
-      title: "Launch an ad on TikTok",
-      turns: 1,
-      effect: { metric: "UA", value: "+109" },
-      requiredTeam: ["Sales"],
-    },
-    {
-      title: "Launch landing page for an alternate target audience",
-      turns: 2,
-      effect: { metric: "UA", value: "+102" },
-      requiredTeam: ["Sales", "Developer"],
-    },
-    {
-      title: "Promote your site on Instagram",
-      turns: 2,
-      effect: { metric: "UA", value: "+109" },
-      requiredTeam: ["Sales"],
-    },
-    {
-      title: "Set up ads in Google UAC",
-      turns: 1,
-      effect: { metric: "C1", value: "+113" },
-      requiredTeam: ["Sales"],
-    },
-    {
-      title: "Launch an ad on Twitter",
-      turns: 3,
-      effect: { metric: "AOV", value: "+106" },
-      requiredTeam: ["Sales", "CEO"],
-    },
-    {
-      title: "SEO your website",
-      turns: 3,
-      effect: { metric: "Cogs", value: "+107" },
-      requiredTeam: ["Sales", "Developer"],
-    },
-    {
-      title: "Launch a mass media ad campaign",
-      turns: 1,
-      effect: { metric: "APC", value: "+113" },
-      requiredTeam: ["Sales"],
-    },
-    {
-      title: "Implement analytics from user calls",
-      turns: 2,
-      effect: { metric: "CPA", value: "+113" },
-      requiredTeam: ["Sales"],
-    },
-    {
-      title: "Add payment method for cryptocurrency",
-      turns: 2,
-      effect: { metric: "Bugs", value: "+113" },
-      requiredTeam: ["CEO", "Developer"],
-    },
-    {
-      title: "Set up automated email platform",
-      turns: 0,
-      effect: { metric: "UA", value: "+113" },
-      requiredTeam: ["Sales", "Developer"],
-    },
-  ];
+  const {setTask} = useUser()
+  const router = useRouter(); 
+  useEffect(() => {
+  
+    if (!user?.gameId) {
+      toast.error("Please login. Game ID not available.");
+      router.push("/auth/signup");
+      return;
+    }
+  
+    async function fetchTasks() {
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/tasks`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ gameId: user?.gameId }), // Pass gameId properly
+          }
+        );
+  
+        if (!response.ok) {
+          throw new Error("Failed to fetch tasks");
+        }
+  
+        const taskJson = await response.json();
+        setTasks(taskJson.tasks);
+      } catch (error) {
+        console.log("Failed to load tasks. Please try again.", error);
+      }
+    }
+  
+    fetchTasks();
+  }, [user]);
 
   const toggleTask = (index: number) => {
     setCompletedTasks((prev) =>
@@ -230,7 +237,7 @@ const TaskGrid: React.FC = () => {
     });
   };
 
-  const filteredTasks = tasks.filter((task, index) => {
+  const filteredTasks = Tasks.filter((task: any, index: number) => {
     if (activeFilters.has("all")) return true;
     if (activeFilters.has("in_progress")) return inProgress.has(index);
     return activeFilters.has(task.effect.metric);
@@ -239,6 +246,20 @@ const TaskGrid: React.FC = () => {
   const metrics = ["UA", "C1", "AOV", "Cogs", "APC", "CPA", "Bugs"];
 
   return (
+    <>
+    {/* <ToastContainer
+    position="top-right"
+    autoClose={5000}
+    hideProgressBar={false}
+    newestOnTop={false}
+    closeOnClick={false}
+    rtl={false}
+    pauseOnFocusLoss
+    draggable
+    pauseOnHover
+    theme="light"
+    transition={Bounce}
+  /> */}
     <div className="space-y-4 px-4">
       <div className="flex flex-wrap gap-2">
         <FilterButton
@@ -270,16 +291,20 @@ const TaskGrid: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6">
-        {filteredTasks.map((task, index) => (
+        {filteredTasks.map((task: any, index: number) => (
           <TaskCard
             key={index}
             {...task}
             isCompleted={completedTasks.includes(index)}
-            onToggle={() => toggleTask(index)}
+            onToggle={() => {
+              toggleTask(index)
+              setTask(task?._id)
+            }}
           />
         ))}
       </div>
     </div>
+    </>
   );
 };
 

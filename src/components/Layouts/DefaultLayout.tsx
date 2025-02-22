@@ -3,6 +3,7 @@ import React, { useState, ReactNode } from "react";
 import Sidebar from "@/components/Sidebar";
 import Header from "@/components/Header";
 import ECommerce from "../Dashboard/E-commerce";
+import { useUser } from "@/context/UserContext";
 
 export default function DefaultLayout({
   children,
@@ -11,8 +12,15 @@ export default function DefaultLayout({
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const {loader , setloader} = useUser()
   return (
     <div className="flex h-screen overflow-hidden">
+        {
+          loader ? 
+          <div className="absolute bg-black-2 h-full w-full opacity-40 left-[0em] z-9999"> 
+        
+        </div>
+        : <div> </div>}
       {/* <!-- ===== Sidebar Start ===== --> */}
       <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
       {/* <!-- ===== Sidebar End ===== --> */}

@@ -5,6 +5,8 @@ import "@/css/satoshi.css";
 import "@/css/style.css";
 import React, { useEffect, useState } from "react";
 import Loader from "@/components/common/Loader";
+import { UserProvider } from "@/context/UserContext";
+import { Bounce, ToastContainer } from "react-toastify";
 
 export default function RootLayout({
   children,
@@ -24,7 +26,9 @@ export default function RootLayout({
     <html lang="en">
       <body suppressHydrationWarning={true}>
         <div className="dark:bg-boxdark-2 dark:text-bodydark">
+          <UserProvider>
           {loading ? <Loader /> : children}
+          </UserProvider>
         </div>
       </body>
     </html>

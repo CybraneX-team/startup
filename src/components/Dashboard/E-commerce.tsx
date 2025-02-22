@@ -1,16 +1,17 @@
 "use client";
 import dynamic from "next/dynamic";
-import React, { useState } from "react";
-import ChartOne from "../Charts/ChartOne";
-import ChartTwo from "../Charts/ChartTwo";
-import ChatCard from "../Chat/ChatCard";
-import TableOne from "../Tables/TableOne";
+import React, { useEffect, useState } from "react";
 import TaskGrid from "../CardDataStats";
 import { InfoIcon } from "lucide-react";
 import TooltipModal from "@/components/TooltipModal";
 import SpotlightModal from "@/components/SpotlightModal";
 
 
+// import { Dice1, InfoIcon } from "lucide-react";
+import { useUser } from "@/context/UserContext";
+import { useRouter } from "next/navigation";
+import { Bounce, toast, ToastContainer } from "react-toastify";
+import '@/components/Dashboard/index.css'
 const MapOne = dynamic(() => import("@/components/Maps/MapOne"), {
   ssr: false,
 });
@@ -64,7 +65,9 @@ const InfoModal: React.FC<ModalProps> = ({
     (metric) => metric.title === title,
   );
 
+  
   return (
+    <>
     <div className="fixed inset-0 z-[99999] flex items-center justify-center">
       <div
         className="absolute inset-0 bg-black bg-opacity-50"
@@ -97,6 +100,7 @@ const InfoModal: React.FC<ModalProps> = ({
         <div className="text-gray-600 dark:text-gray-300">{content}</div>
       </div>
     </div>
+    </>
   );
 };
 
@@ -313,18 +317,98 @@ interface ModalInfo {
 // };
 
 const ECommerce: React.FC = () => {
+  const { user, task, setUser, setUserState, loader, setloader } = useUser();
+  const router = useRouter();
+
+  const [, forceRender] = useState(0);
+ 
+  useEffect(() => {
+    console.log("🟢 useEffect triggered! Updated user:", user);
+    forceRender(prev => prev + 1); 
+  }, [user]);
+  
+  useEffect(() => {
+    if (typeof window !== "undefined") { // ✅ Ensure this runs only on the client
+      const token = localStorage.getItem("userToken");
+      if (!token) {
+        router.push("/auth/signup");
+      }
+    }
+  }, [router]);
+  
+
   const [modalInfo, setModalInfo] = useState<ModalInfo>({
     isOpen: false,
     title: "",
     content: "",
     anchorEl: null,
   });
+
   const [selectedMetric, setSelectedMetric] = useState<string | null>(null);
   const [selectedStage, setSelectedStage] = useState<string | null>(null);
 
-  const handleMetricClick = (
-    metricKey: string,
-    event: React.MouseEvent<HTMLDivElement>,
+
+  async function makeTurn (taskID : string, taskAmount : string){
+    setloader(true)
+    const delay = (ms:number) => new Promise((resolve) => setTimeout(resolve, ms));
+    const token = localStorage.getItem("userToken");
+    if (!token) {
+      alert("User is not authenticated. Please log in.");
+      return;
+    }
+    const makeReq = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/turn`,
+      {
+        method : "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "token": token
+        },
+        body: JSON.stringify({
+          gameId: user?.gameId,
+          turnAmount: taskAmount,
+          taskId: taskID
+        })
+      }
+    )
+    if(makeReq.ok){
+      const response = await makeReq.json()
+      setUser({...response.user, gameId: response.gameId, finances: response.finances, currentStage: response.currentStage})
+      setUserState({...response.user, gameId: response.gameId, finances: response.finances, currentStage: response.currentStage})
+      
+    }
+    delay(1000)
+    setloader(false)
+  }
+  function getShortName(metricName: string): string {
+    const metricMap: Record<string, string> = {
+      userAcquisition: "UA",
+      conversionFirstPurchase: "C1",
+      averageOrderValue: "AOV",
+      costOfGoodsSold: "COGS",
+      averagePaymentCount: "APC",
+      customerLifetimeValue: "CLTV",
+      averageRevenuePerUser: "ARPU",
+      costPerAcquisition: "CPA",
+      contributionMargin: "CM",
+      buyerCount: "B",
+    };
+  
+    return metricMap[metricName] || metricName; 
+  }
+  const stages = [
+    "FFF",
+    "Angels",
+    "PreSeeds",
+    "Seed",
+    "A",
+    "B",
+    "C",
+    "D",
+    "pre-IPO",
+    "IPO",
+  ];
+  const handleMetricClick = (metricKey: string,
+    event: React.MouseEvent<HTMLDivElement>
   ) => {
     const info = metricsInfo[metricKey];
     if (info) {
@@ -399,44 +483,51 @@ const ECommerce: React.FC = () => {
     setSelectedMetric(null);
     setSelectedStage(null);
   };
-  const metrics = [
-    { title: "UA", value: "651" },
-    { title: "C1", value: "0.6%" },
-    { title: "B", value: "3" },
-    { title: "AOV", value: "9$" },
-    { title: "Cogs", value: "45" },
-    { title: "APC", value: "1.2" },
-    { title: "CLTV", value: "65" },
-    { title: "ARPU", value: "0.03$" },
-    { title: "CPA", value: "0.4$" },
-    { title: "CM", value: "-236.96$" },
-  ];
-
-  const stages = [
-    "FFF",
-    "Angels",
-    "PreSeeds",
-    "Seed",
-    "A",
-    "B",
-    "C",
-    "D",
-    "pre-IPO",
-    "IPO",
-  ];
 
   return (
-    <div className="relative h-screen">
+    <>
+    <ToastContainer
+      position="top-right"
+      autoClose={5000}
+      hideProgressBar={false}
+      newestOnTop={false}
+      closeOnClick={false}
+      rtl={false}
+      pauseOnFocusLoss
+      draggable
+      pauseOnHover
+      theme="light"
+      transition={Bounce}
+    />
+    {
+      loader === true ?  
+    <div className="h-full w-full bg-black-2 relative z-99999 top-[14em] left-[39%]">
+      <div className="flex flex-row gap-2 absolute">
+      <div className="w-4 h-4 rounded-full bg-blue-700 animate-bounce [animation-delay:.7s]"></div>
+      <div className="w-4 h-4 rounded-full bg-blue-700 animate-bounce [animation-delay:.3s]"></div>
+      <div className="w-4 h-4 rounded-full bg-blue-700 animate-bounce [animation-delay:.7s]"></div>
+    </div>
+    </div>
+      : 
+      <div></div>
+    }
+    
       <h3 className="text-sm text-gray-500 dark:text-gray-400">
         Startup Stages
       </h3>
+      {user?.currentStage  === "FFF"?
+        <p> Your goal is to reach 10 buyers </p> 
+        : user?.currentStage === "Angels" ?
+        <p> Your goal is to reach 100 buyers </p> 
+        : <p> Your goal is to reach 500 buyers </p> 
+      }
       <div className="my-2 flex gap-3 overflow-x-scroll">
         {stages.map((stage, index) => (
           <div
             key={index}
             onClick={() => handleStageClick(stage)}
             className={` min-w-[103px] cursor-pointer  overflow-x-scroll rounded-xl border border-stroke bg-white p-2 transition-colors dark:border-strokedark dark:bg-boxdark
-              ${selectedStage === stage ? "bg-[#86b6d6] dark:bg-blue-900": ""}`}
+              ${user?.currentStage === stage ? "bg-blue-200 dark:bg-blue-900" : ""}`}
           >
             <div className="flex items-center justify-center ">
               <span className="text-sm font-medium text-black dark:text-white">
@@ -447,31 +538,27 @@ const ECommerce: React.FC = () => {
               </span>
             </div>
           </div>
+          
         ))}
       </div>
       <h3 className="text-sm text-gray-500 dark:text-gray-400">Metrics</h3>
       <div className="my-2 flex gap-3 overflow-x-scroll">
-        {metrics.map((metric, index) => (
-          <div
-            key={index}
-            onClick={(e) => handleMetricClick(metric.title, e)}
-            className={`flex min-w-[103px] cursor-pointer items-center justify-around overflow-x-scroll rounded-xl border border-stroke bg-white px-2 py-3 transition-colors dark:border-strokedark dark:bg-boxdark
-              ${selectedMetric === metric.title ? "bg-blue-50 dark:bg-blue-900" : ""}`}
-          >
-            <span
-              className={`text-xs font-medium ${
-                selectedMetric === metric.title
-                  ? "text-blue-600 dark:text-blue-400"
-                  : "text-gray-500 dark:text-gray-400"
-              }`}
-            >
-              {metric.title}
+      {user && user.metrics ? (
+        Object.keys(user.metrics).map((metric, index) => (
+          <div key={index} 
+          onClick={(e) => handleMetricClick(getShortName(metric), e)}
+          className="flex min-w-[103px] items-center justify-around rounded-xl border border-stroke bg-white px-2 py-3 dark:border-strokedark dark:bg-boxdark">
+            <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
+              {getShortName(metric)}
             </span>
             <span className="text-xs font-medium text-[#6577F3] dark:text-secondary">
-              {metric.value}
+              {user.metrics[metric].toFixed(2)}
             </span>
           </div>
-        ))}
+        ))
+      ) : (
+        <p className="text-sm text-gray-500">No metrics found. Reload?</p>
+      )}
       </div>
       <SpotlightModal
         isOpen={modalInfo.isOpen}
@@ -496,7 +583,11 @@ const ECommerce: React.FC = () => {
           </p>
         </div>
 
-        <button className="w-60 max-w-xl rounded-xl bg-[#4fc387] p-3 md:mr-80">
+        <button 
+        onClick={()=>{
+          makeTurn(task, "4326")
+        }}
+        className="w-60 max-w-xl rounded-xl bg-[#4fc387] p-3 md:mr-80">
           <span className="flex text-left font-semibold text-white">
             Make turn <br />
           </span>
@@ -506,7 +597,8 @@ const ECommerce: React.FC = () => {
           </div>
         </button>
       </div>
-    </div>
+    {/* </div> */}
+    </>
   );
 };
 
