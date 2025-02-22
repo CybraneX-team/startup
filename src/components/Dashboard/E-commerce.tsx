@@ -7,6 +7,9 @@ import ChatCard from "../Chat/ChatCard";
 import TableOne from "../Tables/TableOne";
 import TaskGrid from "../CardDataStats";
 import { InfoIcon } from "lucide-react";
+import TooltipModal from "@/components/TooltipModal";
+import SpotlightModal from "@/components/SpotlightModal";
+
 
 const MapOne = dynamic(() => import("@/components/Maps/MapOne"), {
   ssr: false,
@@ -240,23 +243,89 @@ const stagesInfo: StagesData = {
     mentors: "Yes",
   },
 };
-
 interface ModalInfo {
   isOpen: boolean;
   title: string;
   content: React.ReactNode;
+  anchorEl: HTMLElement | null;
 }
+
+// SEED: {
+//     title: "Seed",
+//     content:
+//       "Your product has shown great scalability and attracted the attention of a group of investors. That being said, for further scaling, it’s important to achieve positive unit economics. There is nothing more illusory to a startup than negative unit economics, or selling a product for less than its variable cost. After all, growth is easy and success is “achieved” if you sell a dollar for ninety cents. Get 2,500 subscribers, achieve a positive contribution margin, and economic convergence. Start attracting customers through paid channels.",
+//     roundGoal:
+//       "Increase the number of your customers to 2,500, while ensuring that your contribution margin is positive.",
+//     employees: ["CEO", "Developer", "Marketing", "Designer", "QA", "Manager"],
+//     investors: "Yes",
+//     mentors: "Yes",
+//   },
+//   A: {
+//     title: "A",
+//     content:
+//       "Your unit economics is positive. Investors believe in your product. However, for further growth, the weekly turnover should also be positive. This will prove to investors that you are capable of running the company cost-effectively and that you deserve to be the CEO",
+//     roundGoal:
+//       "Bring the number of your clients to 10,000, and the contribution margin to at least $100,000. Lastly, you must also pass the breakeven point, that is, show a weekly income.",
+//     employees: ["CEO", "Developer", "Marketing", "Designer", "QA", "Manager"],
+//     investors: "Yes",
+//     mentors: "Yes",
+//   },
+//   B: {
+//     title: "B",
+//     content:
+//       "Learning, course-correcting, growing! Your company is breaking even and has achieved positive unit economics. Still, investors want to make sure that you’re economically viable and can attract more customers and become a top seller in the local market.",
+//     roundGoal:
+//       "Your goal is 50,000 customers, a contribution margin of at least $500,000, and a weekly income of more than $100,000. Keep scaling up and earn your first $100,000!",
+//     employees: ["CEO", "Developer", "Marketing", "Designer", "QA", "Manager"],
+//     investors: "Yes",
+//     mentors: "Yes",
+//   },
+//   C: {
+//     title: "C",
+//     content:
+//       "You have achieved all your goals and hit the ceiling in your local market. It’s time to keep scaling and expanding to international markets. But be careful: new markets present new unexpected problems!",
+//     roundGoal:
+//       "Number of customers: 100,000 Contribution margin: at least $1,000,000 Weekly income: more than $500,000 Keep scaling and earn your first $500,000",
+//     employees: ["CEO", "Developer", "Marketing", "Designer", "QA", "Manager"],
+//     investors: "Yes",
+//     mentors: "Yes",
+//   },
+//   D: {
+//     title: "D",
+//     content:
+//       "You have successfully entered the international market. Your global market share, however, is not yet significant enough for your startup to be considered by strategic investors. Prove to them that your international sales are sustainable and growing, and that your product is universal — not geographically limited.",
+//     roundGoal:
+//       "Number of customers: 500,000. Contribution margin: at least $10,000,000. Weekly income: >$5,000,000. Earn your first $5,000,000",
+//     employees: ["CEO", "Developer", "Marketing", "Designer", "QA", "Manager"],
+//     investors: "Yes",
+//     mentors: "Yes",
+//   },
+//   PREIPO: {
+//     title: "pre-IPO",
+//     content:
+//       "Your company is recognized as a leader in the global market. You have offices in major cities all over the world and your finances are stellar. However, preparing for an IPO requires operational decisions from a strong CEO. Get your company ready without impeding your steady growth. Increase the number of your clients to 1,000,000, expand the contribution margin to at least $15,000,000, and earn more than $10,000,000 a week. Remember that to begin the IPO process, you first need to partner with an investment bank or a large fund.",
+//     roundGoal:
+//       "Number of customers: 1,000,000. Contribution margin: at least $15,000,000. Weekly income: >$10,000,000. Begin IPO preparations. Choose and partner with an investment bank or a large fund.",
+//     employees: ["CEO", "Developer", "Marketing", "Designer", "QA", "Manager"],
+//     investors: "Yes",
+//     mentors: "Yes",
+//   },
+// };
 
 const ECommerce: React.FC = () => {
   const [modalInfo, setModalInfo] = useState<ModalInfo>({
     isOpen: false,
     title: "",
     content: "",
+    anchorEl: null,
   });
   const [selectedMetric, setSelectedMetric] = useState<string | null>(null);
   const [selectedStage, setSelectedStage] = useState<string | null>(null);
 
-  const handleMetricClick = (metricKey: string) => {
+  const handleMetricClick = (
+    metricKey: string,
+    event: React.MouseEvent<HTMLDivElement>,
+  ) => {
     const info = metricsInfo[metricKey];
     if (info) {
       setSelectedMetric(metricKey);
@@ -264,10 +333,10 @@ const ECommerce: React.FC = () => {
         isOpen: true,
         title: info.title,
         content: info.content,
+        anchorEl: event.currentTarget,
       });
     }
   };
-
   const handleStageClick = (stage: string) => {
     const stageKey = stage.toUpperCase();
     const info = stagesInfo[stageKey];
@@ -321,11 +390,15 @@ const ECommerce: React.FC = () => {
   };
 
   const handleModalClose = () => {
-    setModalInfo({ isOpen: false, title: "", content: "" });
+    setModalInfo({
+      isOpen: false,
+      title: "",
+      content: "",
+      anchorEl: null,
+    });
     setSelectedMetric(null);
     setSelectedStage(null);
   };
-
   const metrics = [
     { title: "UA", value: "651" },
     { title: "C1", value: "0.6%" },
@@ -363,7 +436,7 @@ const ECommerce: React.FC = () => {
             key={index}
             onClick={() => handleStageClick(stage)}
             className={` min-w-[103px] cursor-pointer  overflow-x-scroll rounded-xl border border-stroke bg-white p-2 transition-colors dark:border-strokedark dark:bg-boxdark
-              ${selectedStage === stage ? "bg-blue-50 dark:bg-blue-900" : ""}`}
+              ${selectedStage === stage ? "bg-[#86b6d6] dark:bg-blue-900": ""}`}
           >
             <div className="flex items-center justify-center ">
               <span className="text-sm font-medium text-black dark:text-white">
@@ -381,9 +454,9 @@ const ECommerce: React.FC = () => {
         {metrics.map((metric, index) => (
           <div
             key={index}
-            onClick={() => handleMetricClick(metric.title)}
-            className={`flex min-w-[103px] cursor-pointer items-center justify-around overflow-x-scroll  rounded-xl border border-stroke bg-white px-2  py-3 transition-colors dark:border-strokedark dark:bg-boxdark
-              ${selectedMetric === metric.title ? "bg-[#86b6d6] dark:bg-blue-900" : ""}`}
+            onClick={(e) => handleMetricClick(metric.title, e)}
+            className={`flex min-w-[103px] cursor-pointer items-center justify-around overflow-x-scroll rounded-xl border border-stroke bg-white px-2 py-3 transition-colors dark:border-strokedark dark:bg-boxdark
+              ${selectedMetric === metric.title ? "bg-blue-50 dark:bg-blue-900" : ""}`}
           >
             <span
               className={`text-xs font-medium ${
@@ -400,11 +473,13 @@ const ECommerce: React.FC = () => {
           </div>
         ))}
       </div>
-      <InfoModal
+      <SpotlightModal
         isOpen={modalInfo.isOpen}
         onClose={handleModalClose}
         title={modalInfo.title}
         content={modalInfo.content}
+        anchorEl={modalInfo.anchorEl}
+        selectedMetric={selectedMetric}
       />
       <div className="mt-4 w-full pb-28 md:mt-4 2xl:mt-7.5">
         <TaskGrid />
