@@ -58,8 +58,16 @@ const CancelTaskModal: React.FC<CancelTaskModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="w-full max-w-md rounded-2xl bg-white p-6">
+    // The key issue is that we need to use a higher z-index than any other elements on the page
+    // and make sure the modal is properly positioned in the DOM
+    <div className="fixed inset-0 z-[99999] flex items-center justify-center">
+      {/* This overlay div should cover the entire screen */}
+      <div 
+        className="absolute inset-0 bg-black bg-opacity-50" 
+        onClick={onCancel}
+      />
+      
+      <div className="relative w-full max-w-md rounded-2xl bg-white p-6 shadow-lg">
         <h2 className="mb-4 text-xl font-semibold text-gray-900">Cancel task?</h2>
         
         <div className="mb-6 rounded-lg border border-gray-200 p-4">
@@ -106,7 +114,6 @@ const CancelTaskModal: React.FC<CancelTaskModalProps> = ({
     </div>
   );
 };
-
 const FilterButton: React.FC<FilterButtonProps> = ({
   label,
   count,
