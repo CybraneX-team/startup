@@ -6,6 +6,9 @@ import { Info, Edit } from "lucide-react";
 import ReactApexChart from "react-apexcharts";
 import { ApexOptions } from "apexcharts";
 import { useUser } from "@/context/UserContext";
+import MarketInfoModal from "./MarketInfoModal";
+import MentorsModal from "./MentorsModal";
+import TeamManagementModal from "./TeamManagementModal";
 
 interface SidebarProps {
   sidebarOpen: boolean;
@@ -14,6 +17,9 @@ interface SidebarProps {
 
 const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
   const [makevisible, setmakevisible] = useState(false);
+  const [marketModalOpen, setMarketModalOpen] = useState(false);
+  const [mentorsModalOpen, setMentorsModalOpen] = useState(false);
+  const [teamModalOpen, setTeamModalOpen] = useState(false);
   const { resetTheGame, user } = useUser();
 
   const options: ApexOptions = {
@@ -64,6 +70,30 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
     setmakevisible((prev) => !prev);
   };
 
+  const openMarketModal = () => {
+    setMarketModalOpen(true);
+  };
+
+  const closeMarketModal = () => {
+    setMarketModalOpen(false);
+  };
+
+  const openMentorsModal = () => {
+    setMentorsModalOpen(true);
+  };
+
+  const closeMentorsModal = () => {
+    setMentorsModalOpen(false);
+  };
+
+  const openTeamModal = () => {
+    setTeamModalOpen(true);
+  };
+
+  const closeTeamModal = () => {
+    setTeamModalOpen(false);
+  };
+
   return (
     <>
       <aside
@@ -103,11 +133,13 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
             </h2>
 
             <h2
-              className={`cursor-pointer text-sm font-semibold text-black ${makevisible ? "block" : "hidden"}`}
+              className={`cursor-pointer text-sm font-semibold text-black ${
+                makevisible ? "block" : "hidden"
+              }`}
               onClick={resetTheGame}
             >
               {" "}
-              reset game
+              reset game{" "}
             </h2>
             <p className="rounded-lg bg-gray-100 p-3 text-sm text-gray-600">
               Subscription service that delivers a monthly package of pet care
@@ -122,21 +154,34 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
             </h2>
 
             {/* Donut Chart with Static Center Label */}
-            <div className="relative mb-4">
-              <div id="chartThree" className="mx-auto flex justify-center">
+            <div className="flex items-center">
+              {/* Legend Column */}
+              <div className=" flex flex-col">
+                <div className="mb-2 flex items-center">
+                  <span className="inline-block h-3 w-3 rounded-full bg-[#6577F3]"></span>
+                  <span className="ml-2 text-sm text-gray-600">Founder</span>
+                </div>
+                <div className="mb-2 flex items-center">
+                  <span className="inline-block h-3 w-3 rounded-full bg-[#A5D6A7]"></span>
+                  <span className="ml-2 text-sm text-gray-600">Investors</span>
+                </div>
+                <div
+                  className="flex cursor-pointer items-center hover:text-blue-500"
+                  onClick={openMentorsModal}
+                >
+                  <span className="inline-block h-3 w-3 rounded-full bg-[#8FD0EF]"></span>
+                  <span className="ml-2 text-sm text-gray-600">Mentors</span>
+                </div>
+              </div>
+
+              {/* Donut Chart */}
+              <div className="relative -ml-10">
                 <ReactApexChart
                   options={options}
                   series={series}
                   type="donut"
-                  height={200}
+                  height={150}
                 />
-                {/* Static center label */}
-                <div className="absolute left-2/3 top-1/2 ml-3 -translate-x-1/2 -translate-y-1/2 transform text-center">
-                  <div className="text-xs font-normal text-gray-600">Funds</div>
-                  <div className="text-sm font-medium text-gray-900">
-                    $ {user?.finances ? user?.finances : "not logged in"}
-                  </div>
-                </div>
               </div>
             </div>
 
@@ -175,16 +220,26 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                 <span className="text-sm font-medium text-blue-500">
                   USD 999B
                 </span>
-                <Info className="ml-1 h-4 w-4 text-gray-400" />
+                <Info
+                  className="ml-1 h-4 w-4 cursor-pointer text-gray-400 hover:text-gray-600"
+                  onClick={openMarketModal}
+                />
               </div>
             </div>
           </div>
 
           {/* Team Section */}
           <div>
-            <h2 className="mb-4 text-sm font-semibold text-black dark:text-white">
-              Team
-            </h2>
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="text-sm font-semibold text-black dark:text-white">
+                Team
+              </h2>
+              {/* Edit button for Team */}
+              <Edit
+                className="h-4 w-4 cursor-pointer text-blue-500 hover:text-blue-700"
+                onClick={openTeamModal}
+              />
+            </div>
             <div className="grid grid-cols-3 gap-4">
               {[
                 {
@@ -221,6 +276,21 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
           </div>
         </div>
       </aside>
+
+      {/* Market Info Modal */}
+      {marketModalOpen && (
+        <MarketInfoModal isOpen={marketModalOpen} onClose={closeMarketModal} />
+      )}
+
+      {/* Mentors Modal */}
+      {mentorsModalOpen && (
+        <MentorsModal isOpen={mentorsModalOpen} onClose={closeMentorsModal} />
+      )}
+
+      {/* Team Management Modal */}
+      {teamModalOpen && (
+        <TeamManagementModal isOpen={teamModalOpen} onClose={closeTeamModal} />
+      )}
     </>
   );
 };

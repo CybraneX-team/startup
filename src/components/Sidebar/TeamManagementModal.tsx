@@ -5,7 +5,7 @@ const TeamManagementModal = ({ isOpen, onClose }) => {
   const [team, setTeam] = useState([
     { role: "CEO", count: 1, salary: "$1,000", canReplace: true },
     { role: "Developer", count: 1, salary: "$1,200", canReplace: false },
-    { role: "Sales", count: 1, salary: "$1,200", canReplace: false }
+    { role: "Sales", count: 1, salary: "$1,200", canReplace: false },
   ]);
 
   const increaseCount = (index) => {
@@ -109,15 +109,15 @@ const TeamManagementModal = ({ isOpen, onClose }) => {
                     -1
                   </span>
                 )} */}
-                <button 
-                  className={`mr-2 text-gray-500 hover:text-gray-700 ${member.count <= 1 && member.canReplace ? "opacity-50 cursor-not-allowed" : ""}`}
+                <button
+                  className={`mr-2 text-gray-500 hover:text-gray-700 ${member.count <= 1 && member.canReplace ? "cursor-not-allowed opacity-50" : ""}`}
                   onClick={() => decreaseCount(index)}
                   disabled={member.count <= 1 && member.canReplace}
                 >
                   <Minus size={16} />
                 </button>
                 <span className="text-blue-500">{member.count}</span>
-                <button 
+                <button
                   className="ml-2 text-gray-500 hover:text-gray-700"
                   onClick={() => increaseCount(index)}
                 >
@@ -128,7 +128,9 @@ const TeamManagementModal = ({ isOpen, onClose }) => {
                     +1
                   </span>
                 )} */}
-                <span className="ml-4 text-sm font-medium">{member.salary}</span>
+                <span className="ml-4 text-sm font-medium">
+                  {member.salary}
+                </span>
               </div>
             </div>
           ))}
