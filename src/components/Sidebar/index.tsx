@@ -2,11 +2,10 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Info } from "lucide-react";
+import { Info, Edit } from "lucide-react";
 import ReactApexChart from "react-apexcharts";
 import { ApexOptions } from "apexcharts";
 import { useUser } from "@/context/UserContext";
-import AvailableMarketModal from "./Marketmodal";
 
 interface SidebarProps {
   sidebarOpen: boolean;
@@ -14,9 +13,9 @@ interface SidebarProps {
 }
 
 const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
-  const [makevisible, setmakevisible] = useState(false);
-  const { resetTheGame, user } = useUser();
-
+   const [makevisible, setmakevisible] = useState(false);
+  const {resetTheGame, user }  = useUser()
+  
   const options: ApexOptions = {
     chart: {
       fontFamily: "Satoshi, sans-serif",
@@ -25,7 +24,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
     colors: ["#6577F3", "#A5D6A7", "#8FD0EF"],
     labels: ["Founder", "Investors", "Mentors"],
     legend: {
-      show: true,
+      show: false,
       position: "left",
     },
     plotOptions: {
@@ -60,55 +59,51 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
   };
 
   const series = [90, 10, 0];
+  
   const makeVisible = () => {
-    setmakevisible((prev) => !prev);
-  };
-
-  const [isMarketModalOpen, setIsMarketModalOpen] = useState(false);
-
+    setmakevisible((prev)=> !prev)
+  }
+  
+  
+  
   return (
-    <aside
-      className={`fixed left-0 top-0 z-50 flex h-screen w-[300px] flex-col overflow-y-hidden bg-white duration-300 ease-linear dark:bg-boxdark lg:translate-x-0 ${
-        sidebarOpen ? "translate-x-0" : "-translate-x-full"
-      }`}
-    >
-      {/* Header */}
-      <div className="flex items-center justify-between gap-2 px-6 py-5.5">
-        <Link href="/" className="flex items-center">
-          <Image
-            width={24}
-            height={24}
-            src={"/favicon.ico"}
-            alt="Logo"
-            priority
-          />
-          <h1 className="mx-2 text-xl font-semibold text-black dark:text-white">
-            Startup Simulator
-          </h1>
-        </Link>
-      </div>
+    <>
+      <aside
+        className={`fixed left-0 top-0 z-50 flex h-screen w-[300px] flex-col overflow-y-hidden bg-white duration-300 ease-linear dark:bg-boxdark lg:translate-x-0 ${
+          sidebarOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
+        {/* Header - With gray background to match app header */}
+        <div className="flex items-center justify-between gap-2 px-6 py-5.5 bg-gray-100 dark:bg-gray-800">
+          <Link href="/" className="flex items-center">
+            <Image
+              width={24}
+              height={24}
+              src={"/favicon.ico"}
+              alt="Logo"
+              priority
+            />
+            <h1 className="mx-2 text-xl font-semibold text-black dark:text-white">
+              Startup Simulator
+            </h1>
+          </Link>
+        </div>
 
       {/* Main Content */}
       <div className="flex flex-col overflow-y-auto px-6 py-4">
         {/* Business Idea Section */}
         <div className="mb-6">
           <h2 className="mb-3 text-sm font-semibold text-black">
-            Business Idea
-            <span
-              onClick={makeVisible}
-              className="ml-20 cursor-pointer text-xl"
-            >
-              {" "}
-              ...{" "}
-            </span>
+            Business Idea  
+            <span 
+            onClick={makeVisible}
+            className="ml-20 cursor-pointer text-xl" > ... </span> 
           </h2>
-
-          <h2
-            className={`cursor-pointer text-sm font-semibold text-black ${makevisible ? "block" : "hidden"}`}
+          
+          <h2 
+            className={`text-sm font-semibold cursor-pointer text-black ${makevisible ? "block" : "hidden"}`}
             onClick={resetTheGame}
-          >
-            {" "}
-            reset game
+          > reset game 
           </h2>
           <p className="rounded-lg bg-gray-100 p-3 text-sm text-gray-600">
             Subscription service that delivers a monthly package of pet care
@@ -116,11 +111,11 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
           </p>
         </div>
 
-        {/* Financials Section */}
-        <div className="mb-6">
-          <h2 className="mb-4 text-base font-medium text-black dark:text-white">
-            Financials
-          </h2>
+          {/* Financials Section */}
+          <div className="mb-6">
+            <h2 className="mb-4 text-base font-medium text-black dark:text-white">
+              Financials
+            </h2>
 
           {/* Donut Chart with Static Center Label */}
           <div className="relative mb-4">
@@ -135,35 +130,38 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
               <div className="absolute left-2/3 top-1/2 ml-3 -translate-x-1/2 -translate-y-1/2 transform text-center">
                 <div className="text-xs font-normal text-gray-600">Funds</div>
                 <div className="text-sm font-medium text-gray-900">
-                  $ {user?.finances ? user?.finances : "not logged in"}
+                  $ {user?.finances ?
+                    user?.finances : 
+                    "not logged in"
+                   }
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Financial Stats */}
-          <div className="space-y-2">
-            <div className="flex justify-between">
-              <span className="text-sm text-gray-600">Revenue</span>
-              <span className="text-sm font-medium text-emerald-500">$49</span>
+            {/* Financial Stats */}
+            <div className="space-y-2">
+              <div className="flex justify-between">
+                <span className="text-sm text-gray-600">Revenue</span>
+                <span className="text-sm font-medium text-emerald-500">$49</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-sm text-gray-600">Salaries</span>
+                <span className="text-sm font-medium text-red-500">-$3,400</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-sm text-gray-600">Rent</span>
+                <span className="text-sm font-medium text-red-500">-$800</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-sm text-gray-600">Marketing</span>
+                <span className="text-sm font-medium text-red-500">-$280</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-sm text-gray-600">Cost of Sales</span>
+                <span className="text-sm font-medium text-red-500">-$55</span>
+              </div>
             </div>
-            <div className="flex justify-between">
-              <span className="text-sm text-gray-600">Salaries</span>
-              <span className="text-sm font-medium text-red-500">-$3,400</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-sm text-gray-600">Rent</span>
-              <span className="text-sm font-medium text-red-500">-$800</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-sm text-gray-600">Marketing</span>
-              <span className="text-sm font-medium text-red-500">-$280</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-sm text-gray-600">Cost of Sales</span>
-              <span className="text-sm font-medium text-red-500">-$55</span>
-            </div>
-          </div>
 
           {/* Available Market */}
           <div className="mt-4 flex items-center justify-between">
@@ -172,10 +170,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
               <span className="text-sm font-medium text-blue-500">
                 USD 999B
               </span>
-              <Info
-                className="ml-1 h-4 w-4 cursor-pointer text-gray-400"
-                onClick={() => setIsMarketModalOpen(true)}
-              />
+              <Info className="ml-1 h-4 w-4 text-gray-400" />
             </div>
           </div>
         </div>
@@ -220,10 +215,6 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
           </div>
         </div>
       </div>
-      <AvailableMarketModal
-        isOpen={isMarketModalOpen}
-        onClose={() => setIsMarketModalOpen(false)}
-      />
     </aside>
   );
 };
