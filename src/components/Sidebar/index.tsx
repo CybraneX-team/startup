@@ -2,12 +2,13 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Info } from "lucide-react";
+import { Info, Edit } from "lucide-react";
 import ReactApexChart from "react-apexcharts";
 import { ApexOptions } from "apexcharts";
 import { useUser } from "@/context/UserContext";
 import MarketInfoModal from "./MarketInfoModal";
 import MentorsModal from "./MentorsModal";
+import TeamManagementModal from "./TeamManagementModal";
 
 interface SidebarProps {
   sidebarOpen: boolean;
@@ -18,6 +19,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
   const [makevisible, setmakevisible] = useState(false);
   const [marketModalOpen, setMarketModalOpen] = useState(false);
   const [mentorsModalOpen, setMentorsModalOpen] = useState(false);
+  const [teamModalOpen, setTeamModalOpen] = useState(false);
   const { resetTheGame, user } = useUser();
   
   const options: ApexOptions = {
@@ -82,6 +84,14 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
   
   const closeMentorsModal = () => {
     setMentorsModalOpen(false);
+  };
+  
+  const openTeamModal = () => {
+    setTeamModalOpen(true);
+  };
+  
+  const closeTeamModal = () => {
+    setTeamModalOpen(false);
   };
   
   return (
@@ -216,9 +226,16 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
 
           {/* Team Section */}
           <div>
-            <h2 className="mb-4 text-sm font-semibold text-black dark:text-white">
-              Team
-            </h2>
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="text-sm font-semibold text-black dark:text-white">
+                Team
+              </h2>
+              {/* Edit button for Team */}
+              <Edit 
+                className="h-4 w-4 text-blue-500 cursor-pointer hover:text-blue-700" 
+                onClick={openTeamModal}
+              />
+            </div>
             <div className="grid grid-cols-3 gap-4">
               {[
                 {
@@ -269,6 +286,14 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
         <MentorsModal
           isOpen={mentorsModalOpen}
           onClose={closeMentorsModal}
+        />
+      )}
+
+      {/* Team Management Modal */}
+      {teamModalOpen && (
+        <TeamManagementModal
+          isOpen={teamModalOpen}
+          onClose={closeTeamModal}
         />
       )}
     </>
