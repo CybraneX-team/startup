@@ -6,12 +6,11 @@ import { InfoIcon } from "lucide-react";
 import TooltipModal from "@/components/TooltipModal";
 import SpotlightModal from "@/components/SpotlightModal";
 
-
 // import { Dice1, InfoIcon } from "lucide-react";
 import { useUser } from "@/context/UserContext";
 import { useRouter } from "next/navigation";
 import { Bounce, toast, ToastContainer } from "react-toastify";
-import '@/components/Dashboard/index.css'
+import "@/components/Dashboard/index.css";
 const MapOne = dynamic(() => import("@/components/Maps/MapOne"), {
   ssr: false,
 });
@@ -65,41 +64,40 @@ const InfoModal: React.FC<ModalProps> = ({
     (metric) => metric.title === title,
   );
 
-  
   return (
     <>
-    <div className="fixed inset-0 z-[99999] flex items-center justify-center">
-      <div
-        className="absolute inset-0 bg-black bg-opacity-50"
-        onClick={onClose}
-      ></div>
-      <div
-        className={`relative w-full ${isMetricModal ? "max-w-sm" : "max-w-3xl"} rounded-2xl bg-white p-6 dark:bg-boxdark`}
-      >
-        <div className="-m-6 mb-4 flex items-center justify-between rounded-tl-2xl rounded-tr-2xl bg-[#f3f3f3] p-5 dark:bg-transparent">
-          <h2 className="text-xl font-semibold">{title}</h2>
-          <button
-            onClick={onClose}
-            className="text-gray-500 hover:text-gray-700"
-          >
-            <svg
-              className="h-6 w-6"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
+      <div className="fixed inset-0 z-[99999] flex items-center justify-center">
+        <div
+          className="absolute inset-0 bg-black bg-opacity-50"
+          onClick={onClose}
+        ></div>
+        <div
+          className={`relative w-full ${isMetricModal ? "max-w-sm" : "max-w-3xl"} rounded-2xl bg-white p-6 dark:bg-boxdark`}
+        >
+          <div className="-m-6 mb-4 flex items-center justify-between rounded-tl-2xl rounded-tr-2xl bg-[#f3f3f3] p-5 dark:bg-transparent">
+            <h2 className="text-xl font-semibold">{title}</h2>
+            <button
+              onClick={onClose}
+              className="text-gray-500 hover:text-gray-700"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </button>
+              <svg
+                className="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+          </div>
+          <div className="text-gray-600 dark:text-gray-300">{content}</div>
         </div>
-        <div className="text-gray-600 dark:text-gray-300">{content}</div>
       </div>
-    </div>
     </>
   );
 };
@@ -125,7 +123,7 @@ const metricsInfo: MetricsData = {
     content:
       "Measures the average value of each transaction made by your business. A higher AOV suggests that customers are spending more per transaction, which can indicate client loyalty or the success of upsell and cross-sell strategies.",
   },
-  Cogs: {
+  COGS: {
     title: "Cost of Good Sold (COGS)",
     content:
       "Cost incurred to produce or acquire the goods sold by a player's company. Includes: direct costs of materials, maintenance of hardware and software, etc",
@@ -321,21 +319,21 @@ const ECommerce: React.FC = () => {
   const router = useRouter();
 
   const [, forceRender] = useState(0);
- 
+
   useEffect(() => {
     console.log("🟢 useEffect triggered! Updated user:", user);
-    forceRender(prev => prev + 1); 
+    forceRender((prev) => prev + 1);
   }, [user]);
-  
+
   useEffect(() => {
-    if (typeof window !== "undefined") { // ✅ Ensure this runs only on the client
+    if (typeof window !== "undefined") {
+      // ✅ Ensure this runs only on the client
       const token = localStorage.getItem("userToken");
       if (!token) {
         router.push("/auth/signup");
       }
     }
   }, [router]);
-  
 
   const [modalInfo, setModalInfo] = useState<ModalInfo>({
     isOpen: false,
@@ -346,38 +344,45 @@ const ECommerce: React.FC = () => {
 
   const [selectedMetric, setSelectedMetric] = useState<string | null>(null);
   const [selectedStage, setSelectedStage] = useState<string | null>(null);
-
-
-  async function makeTurn (taskID : string, taskAmount : string){
-    setloader(true)
-    const delay = (ms:number) => new Promise((resolve) => setTimeout(resolve, ms));
+  console.log(user?.currentStage);
+  async function makeTurn(taskID: string, taskAmount: string) {
+    setloader(true);
+    const delay = (ms: number) =>
+      new Promise((resolve) => setTimeout(resolve, ms));
     const token = localStorage.getItem("userToken");
     if (!token) {
       alert("User is not authenticated. Please log in.");
       return;
     }
-    const makeReq = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/turn`,
-      {
-        method : "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "token": token
-        },
-        body: JSON.stringify({
-          gameId: user?.gameId,
-          turnAmount: taskAmount,
-          taskId: taskID
-        })
-      }
-    )
-    if(makeReq.ok){
-      const response = await makeReq.json()
-      setUser({...response.user, gameId: response.gameId, finances: response.finances, currentStage: response.currentStage})
-      setUserState({...response.user, gameId: response.gameId, finances: response.finances, currentStage: response.currentStage})
-      
+    const makeReq = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/turn`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        token: token,
+      },
+      body: JSON.stringify({
+        gameId: user?.gameId,
+        turnAmount: taskAmount,
+        taskId: taskID,
+      }),
+    });
+    if (makeReq.ok) {
+      const response = await makeReq.json();
+      setUser({
+        ...response.user,
+        gameId: response.gameId,
+        finances: response.finances,
+        currentStage: response.currentStage,
+      });
+      setUserState({
+        ...response.user,
+        gameId: response.gameId,
+        finances: response.finances,
+        currentStage: response.currentStage,
+      });
     }
-    delay(1000)
-    setloader(false)
+    delay(1000);
+    setloader(false);
   }
   function getShortName(metricName: string): string {
     const metricMap: Record<string, string> = {
@@ -392,8 +397,8 @@ const ECommerce: React.FC = () => {
       contributionMargin: "CM",
       buyerCount: "B",
     };
-  
-    return metricMap[metricName] || metricName; 
+
+    return metricMap[metricName] || metricName;
   }
   const stages = [
     "FFF",
@@ -407,8 +412,9 @@ const ECommerce: React.FC = () => {
     "pre-IPO",
     "IPO",
   ];
-  const handleMetricClick = (metricKey: string,
-    event: React.MouseEvent<HTMLDivElement>
+  const handleMetricClick = (
+    metricKey: string,
+    event: React.MouseEvent<HTMLDivElement>,
   ) => {
     const info = metricsInfo[metricKey];
     if (info) {
@@ -486,41 +492,41 @@ const ECommerce: React.FC = () => {
 
   return (
     <>
-    <ToastContainer
-      position="top-right"
-      autoClose={5000}
-      hideProgressBar={false}
-      newestOnTop={false}
-      closeOnClick={false}
-      rtl={false}
-      pauseOnFocusLoss
-      draggable
-      pauseOnHover
-      theme="light"
-      transition={Bounce}
-    />
-    {
-      loader === true ?  
-    <div className="h-full w-full bg-black-2 relative z-99999 top-[14em] left-[39%]">
-      <div className="flex flex-row gap-2 absolute">
-      <div className="w-4 h-4 rounded-full bg-blue-700 animate-bounce [animation-delay:.7s]"></div>
-      <div className="w-4 h-4 rounded-full bg-blue-700 animate-bounce [animation-delay:.3s]"></div>
-      <div className="w-4 h-4 rounded-full bg-blue-700 animate-bounce [animation-delay:.7s]"></div>
-    </div>
-    </div>
-      : 
-      <div></div>
-    }
-    
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick={false}
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+        transition={Bounce}
+      />
+      {loader === true ? (
+        <div className="relative left-[39%] top-[14em] z-99999 h-full w-full bg-black-2">
+          <div className="absolute flex flex-row gap-2">
+            <div className="h-4 w-4 animate-bounce rounded-full bg-blue-700 [animation-delay:.7s]"></div>
+            <div className="h-4 w-4 animate-bounce rounded-full bg-blue-700 [animation-delay:.3s]"></div>
+            <div className="h-4 w-4 animate-bounce rounded-full bg-blue-700 [animation-delay:.7s]"></div>
+          </div>
+        </div>
+      ) : (
+        <div></div>
+      )}
+
       <h3 className="text-sm text-gray-500 dark:text-gray-400">
         Startup Stages
       </h3>
-      {user?.currentStage  === "FFF"?
-        <p> Your goal is to reach 10 buyers </p> 
-        : user?.currentStage === "Angels" ?
-        <p> Your goal is to reach 100 buyers </p> 
-        : <p> Your goal is to reach 500 buyers </p> 
-      }
+      {user?.currentStage === "FFF" ? (
+        <p> Your goal is to reach 10 buyers </p>
+      ) : user?.currentStage === "Angels" ? (
+        <p> Your goal is to reach 100 buyers </p>
+      ) : (
+        <p> Your goal is to reach 500 buyers </p>
+      )}
       <div className="my-2 flex gap-3 overflow-x-scroll">
         {stages.map((stage, index) => (
           <div
@@ -538,27 +544,28 @@ const ECommerce: React.FC = () => {
               </span>
             </div>
           </div>
-          
         ))}
       </div>
       <h3 className="text-sm text-gray-500 dark:text-gray-400">Metrics</h3>
       <div className="my-2 flex gap-3 overflow-x-scroll">
-      {user && user.metrics ? (
-        Object.keys(user.metrics).map((metric, index) => (
-          <div key={index} 
-          onClick={(e) => handleMetricClick(getShortName(metric), e)}
-          className="flex min-w-[103px] items-center justify-around rounded-xl border border-stroke bg-white px-2 py-3 dark:border-strokedark dark:bg-boxdark">
-            <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
-              {getShortName(metric)}
-            </span>
-            <span className="text-xs font-medium text-[#6577F3] dark:text-secondary">
-              {user.metrics[metric].toFixed(2)}
-            </span>
-          </div>
-        ))
-      ) : (
-        <p className="text-sm text-gray-500">No metrics found. Reload?</p>
-      )}
+        {user && user.metrics ? (
+          Object.keys(user.metrics).map((metric, index) => (
+            <div
+              key={index}
+              onClick={(e) => handleMetricClick(getShortName(metric), e)}
+              className="flex min-w-[103px] items-center justify-around rounded-xl border border-stroke bg-white px-2 py-3 dark:border-strokedark dark:bg-boxdark"
+            >
+              <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                {getShortName(metric)}
+              </span>
+              <span className="text-xs font-medium text-[#6577F3] dark:text-secondary">
+                {user.metrics[metric].toFixed(2)}
+              </span>
+            </div>
+          ))
+        ) : (
+          <p className="text-sm text-gray-500">No metrics found. Reload?</p>
+        )}
       </div>
       <SpotlightModal
         isOpen={modalInfo.isOpen}
@@ -583,11 +590,12 @@ const ECommerce: React.FC = () => {
           </p>
         </div>
 
-        <button 
-        onClick={()=>{
-          makeTurn(task, "4326")
-        }}
-        className="w-60 max-w-xl rounded-xl bg-[#4fc387] p-3 md:mr-80">
+        <button
+          onClick={() => {
+            makeTurn(task, "4326");
+          }}
+          className="w-60 max-w-xl rounded-xl bg-[#4fc387] p-3 md:mr-80"
+        >
           <span className="flex text-left font-semibold text-white">
             Make turn <br />
           </span>
@@ -597,7 +605,7 @@ const ECommerce: React.FC = () => {
           </div>
         </button>
       </div>
-    {/* </div> */}
+      {/* </div> */}
     </>
   );
 };
