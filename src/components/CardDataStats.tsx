@@ -58,21 +58,17 @@ const CancelTaskModal: React.FC<CancelTaskModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    // The key issue is that we need to use a higher z-index than any other elements on the page
-    // and make sure the modal is properly positioned in the DOM
-    <div className="fixed inset-0 z-[99999] flex items-center justify-center">
-      {/* This overlay div should cover the entire screen */}
-      <div 
-        className="absolute inset-0 bg-black bg-opacity-50" 
-        onClick={onCancel}
-      />
-      
-      <div className="relative w-full max-w-md rounded-2xl bg-white p-6 shadow-lg">
-        <h2 className="mb-4 text-xl font-semibold text-gray-900">Cancel task?</h2>
-        
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+      <div className="w-full max-w-md rounded-2xl bg-white p-6">
+        <h2 className="mb-4 text-xl font-semibold text-gray-900">
+          Cancel task?
+        </h2>
+
         <div className="mb-6 rounded-lg border border-gray-200 p-4">
-          <h3 className="mb-3 text-base font-medium text-gray-900">{taskName}</h3>
-          
+          <h3 className="mb-3 text-base font-medium text-gray-900">
+            {taskName}
+          </h3>
+
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-600">Turns required</span>
@@ -81,14 +77,16 @@ const CancelTaskModal: React.FC<CancelTaskModalProps> = ({
                 <span className="text-sm text-gray-500">/{turns.total}</span>
               </div>
             </div>
-            
+
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-600">Effect on Metrics</span>
               <div className="flex items-center gap-2">
                 {metrics.map((metric, index) => (
                   <div key={index} className="flex items-center gap-1">
                     <span className="text-sm text-gray-900">{metric.name}</span>
-                    <span className="text-sm text-emerald-600">+{metric.value}</span>
+                    <span className="text-sm text-emerald-600">
+                      +{metric.value}
+                    </span>
                   </div>
                 ))}
               </div>
@@ -192,12 +190,10 @@ const TaskCard: React.FC<TaskCardProps> = ({
                 Effect on Metrics
               </span>
               <span className="text-emerald-600 dark:text-emerald-400">
-                {
-                  Object.entries(metricsImpact)
-                    .filter(([, value]) => value !== undefined && value !== 0)
-                    .map(([key, value]) => `${getShortName(key)}: +${value}%`)
-                    .join(" , ")
-                }
+                {Object.entries(metricsImpact)
+                  .filter(([, value]) => value !== undefined && value !== 0)
+                  .map(([key, value]) => `${getShortName(key)}: +${value}%`)
+                  .join(" , ")}
               </span>
             </div>
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
@@ -205,15 +201,17 @@ const TaskCard: React.FC<TaskCardProps> = ({
                 Required team members
               </span>
               <div className="flex flex-wrap gap-2">
-                {Object.entries(requiredTeamMembers).map(([member, count], index) => (
-                  <div
-                    key={index}
-                    className="flex items-center gap-1 rounded bg-gray-100 px-2 py-1 text-xs dark:bg-gray-700"
-                  >
-                    <Users className="h-3 w-3" />
-                    <span>{member}</span> <span>{count}</span>
-                  </div>
-                ))}
+                {Object.entries(requiredTeamMembers).map(
+                  ([member, count], index) => (
+                    <div
+                      key={index}
+                      className="flex items-center gap-1 rounded bg-gray-100 px-2 py-1 text-xs dark:bg-gray-700"
+                    >
+                      <Users className="h-3 w-3" />
+                      <span>{member}</span> <span>{count}</span>
+                    </div>
+                  ),
+                )}
               </div>
             </div>
           </div>
@@ -232,7 +230,9 @@ const TaskCard: React.FC<TaskCardProps> = ({
 
 const TaskGrid: React.FC = () => {
   const [selectedTasks, setSelectedTasks] = useState<Set<number>>(new Set());
-  const [activeFilters, setActiveFilters] = useState<Set<string>>(new Set(["all"]));
+  const [activeFilters, setActiveFilters] = useState<Set<string>>(
+    new Set(["all"]),
+  );
   const { user, setTask } = useUser();
   const [Tasks, setTasks] = useState([]);
   const router = useRouter();
@@ -264,7 +264,7 @@ const TaskGrid: React.FC = () => {
               "Content-Type": "application/json",
             },
             body: JSON.stringify({ gameId: user?.gameId }),
-          }
+          },
         );
 
         if (!response.ok) {
@@ -291,7 +291,7 @@ const TaskGrid: React.FC = () => {
       });
     } else {
       // Directly select the task
-      setSelectedTasks(prev => {
+      setSelectedTasks((prev) => {
         const newSelected = new Set(prev);
         newSelected.add(index);
         return newSelected;
@@ -302,9 +302,11 @@ const TaskGrid: React.FC = () => {
 
   const handleCancelConfirm = () => {
     if (cancelModal.taskIndex !== null) {
-      setSelectedTasks(prev => {
+      setSelectedTasks((prev) => {
         const newSelected = new Set(prev);
-        newSelected.delete(cancelModal.taskIndex);
+        if (cancelModal.taskIndex !== null) {
+          newSelected.delete(cancelModal.taskIndex);
+        }
         return newSelected;
       });
     }
@@ -353,7 +355,7 @@ const TaskGrid: React.FC = () => {
   const filteredTasks = Tasks.filter((task: any, index: number) => {
     if (activeFilters.has("all")) return true;
     if (activeFilters.has("in_progress")) return selectedTasks.has(index);
-    
+
     if (task.metricsImpact) {
       return Object.entries(task.metricsImpact).some(([metric, value]) => {
         const shortMetric = getShortName(metric).toUpperCase();
@@ -391,14 +393,14 @@ const TaskGrid: React.FC = () => {
                 .filter(([, value]) => value !== undefined && value !== 0)
                 .map(([key, value]) => ({
                   name: getShortName(key),
-                  value: value,
+                  value: value as number,
                 }))
             : []
         }
         onConfirm={handleCancelConfirm}
         onCancel={handleCancelDismiss}
       />
-      
+
       <div className="space-y-4 px-4">
         <div className="flex flex-wrap gap-2">
           <FilterButton
