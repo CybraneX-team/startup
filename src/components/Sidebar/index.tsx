@@ -1,4 +1,4 @@
-"use client";
+"use client"
 import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
@@ -23,7 +23,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
   const [teamModalOpen, setTeamModalOpen] = useState(false);
   const [investorsModalOpen, setInvestorsModalOpen] = useState(false);
   const { resetTheGame, user } = useUser();
-
+  
   const options: ApexOptions = {
     chart: {
       fontFamily: "Satoshi, sans-serif",
@@ -67,15 +67,15 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
   };
 
   const series = [90, 10, 0];
-
+  
   const makeVisible = () => {
     setmakevisible((prev) => !prev);
   };
-
+  
   const openMarketModal = () => {
     setMarketModalOpen(true);
   };
-
+  
   const closeMarketModal = () => {
     setMarketModalOpen(false);
   };
@@ -83,19 +83,27 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
   const openMentorsModal = () => {
     setMentorsModalOpen(true);
   };
-
+  
   const closeMentorsModal = () => {
     setMentorsModalOpen(false);
   };
-
+  
   const openTeamModal = () => {
     setTeamModalOpen(true);
   };
-
+  
   const closeTeamModal = () => {
     setTeamModalOpen(false);
   };
-
+  
+  const openInvestorsModal = () => {
+    setInvestorsModalOpen(true);
+  };
+  
+  const closeInvestorsModal = () => {
+    setInvestorsModalOpen(false);
+  };
+  
   return (
     <>
       <aside
@@ -104,7 +112,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
         }`}
       >
         {/* Header - With gray background to match app header */}
-        <div className="flex items-center justify-between gap-2 bg-gray-100 px-6 py-5.5 dark:bg-gray-800">
+        <div className="flex items-center justify-between gap-2 px-6 py-5.5 bg-gray-100 dark:bg-gray-800">
           <Link href="/" className="flex items-center">
             <Image
               width={24}
@@ -135,7 +143,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
             </h2>
 
             <h2
-              className={`cursor-pointer text-sm font-semibold text-black ${
+              className={`text-sm font-semibold cursor-pointer text-black ${
                 makevisible ? "block" : "hidden"
               }`}
               onClick={resetTheGame}
@@ -159,25 +167,28 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
             <div className="flex items-center">
               {/* Legend Column */}
               <div className=" flex flex-col">
-                <div className="mb-2 flex items-center">
+                <div className="flex items-center mb-2">
                   <span className="inline-block h-3 w-3 rounded-full bg-[#6577F3]"></span>
                   <span className="ml-2 text-sm text-gray-600">Founder</span>
                 </div>
-                <div className="mb-2 flex items-center">
+                <div 
+                  className="flex items-center cursor-pointer hover:text-blue-500"
+                  onClick={openInvestorsModal}
+                >
                   <span className="inline-block h-3 w-3 rounded-full bg-[#A5D6A7]"></span>
                   <span className="ml-2 text-sm text-gray-600">Investors</span>
                 </div>
-                <div
-                  className="flex cursor-pointer items-center hover:text-blue-500"
+                <div 
+                  className="flex items-center cursor-pointer hover:text-blue-500"
                   onClick={openMentorsModal}
                 >
                   <span className="inline-block h-3 w-3 rounded-full bg-[#8FD0EF]"></span>
                   <span className="ml-2 text-sm text-gray-600">Mentors</span>
                 </div>
               </div>
-
+              
               {/* Donut Chart */}
-              <div className="relative -ml-10">
+              <div className="-ml-10 relative">
                 <ReactApexChart
                   options={options}
                   series={series}
@@ -191,15 +202,11 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
             <div className="space-y-2">
               <div className="flex justify-between">
                 <span className="text-sm text-gray-600">Revenue</span>
-                <span className="text-sm font-medium text-emerald-500">
-                  $49
-                </span>
+                <span className="text-sm font-medium text-emerald-500">$49</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-sm text-gray-600">Salaries</span>
-                <span className="text-sm font-medium text-red-500">
-                  -$3,400
-                </span>
+                <span className="text-sm font-medium text-red-500">-$3,400</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-sm text-gray-600">Rent</span>
@@ -222,8 +229,8 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                 <span className="text-sm font-medium text-blue-500">
                   USD 999B
                 </span>
-                <Info
-                  className="ml-1 h-4 w-4 cursor-pointer text-gray-400 hover:text-gray-600"
+                <Info 
+                  className="ml-1 h-4 w-4 text-gray-400 cursor-pointer hover:text-gray-600" 
                   onClick={openMarketModal}
                 />
               </div>
@@ -237,8 +244,8 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                 Team
               </h2>
               {/* Edit button for Team */}
-              <Edit
-                className="h-4 w-4 cursor-pointer text-blue-500 hover:text-blue-700"
+              <Edit 
+                className="h-4 w-4 text-blue-500 cursor-pointer hover:text-blue-700" 
                 onClick={openTeamModal}
               />
             </div>
@@ -281,17 +288,34 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
 
       {/* Market Info Modal */}
       {marketModalOpen && (
-        <MarketInfoModal isOpen={marketModalOpen} onClose={closeMarketModal} />
+        <MarketInfoModal 
+          isOpen={marketModalOpen} 
+          onClose={closeMarketModal} 
+        />
       )}
 
       {/* Mentors Modal */}
       {mentorsModalOpen && (
-        <MentorsModal isOpen={mentorsModalOpen} onClose={closeMentorsModal} />
+        <MentorsModal
+          isOpen={mentorsModalOpen}
+          onClose={closeMentorsModal}
+        />
       )}
 
       {/* Team Management Modal */}
       {teamModalOpen && (
-        <TeamManagementModal isOpen={teamModalOpen} onClose={closeTeamModal} />
+        <TeamManagementModal
+          isOpen={teamModalOpen}
+          onClose={closeTeamModal}
+        />
+      )}
+
+      {/* Investors Modal */}
+      {investorsModalOpen && (
+        <InvestorsModal
+          isOpen={investorsModalOpen}
+          onClose={closeInvestorsModal}
+        />
       )}
     </>
   );
