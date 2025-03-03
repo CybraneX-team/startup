@@ -9,6 +9,7 @@ import { useUser } from "@/context/UserContext";
 import MarketInfoModal from "./MarketInfoModal";
 import MentorsModal from "./MentorsModal";
 import TeamManagementModal from "./TeamManagementModal";
+import InvestorsModal from "./InvestorsModal";
 
 interface SidebarProps {
   sidebarOpen: boolean;
@@ -20,6 +21,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
   const [marketModalOpen, setMarketModalOpen] = useState(false);
   const [mentorsModalOpen, setMentorsModalOpen] = useState(false);
   const [teamModalOpen, setTeamModalOpen] = useState(false);
+  const [investorsModalOpen, setInvestorsModalOpen] = useState(false);
   const { resetTheGame, user } = useUser();
 
   const options: ApexOptions = {
