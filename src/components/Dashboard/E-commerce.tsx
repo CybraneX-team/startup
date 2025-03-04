@@ -321,7 +321,7 @@ const ECommerce: React.FC = () => {
   const [, forceRender] = useState(0);
 
   useEffect(() => {
-    console.log("🟢 useEffect triggered! Updated user:", user);
+    console.log("User state changed:", user);
     forceRender((prev) => prev + 1);
   }, [user]);
 
@@ -373,12 +373,16 @@ const ECommerce: React.FC = () => {
         gameId: response.gameId,
         finances: response.finances,
         currentStage: response.currentStage,
+        investmentsMade: response.investmentMade,
+        availableInvestments: response.availableInvestments
       });
       setUserState({
         ...response.user,
         gameId: response.gameId,
         finances: response.finances,
         currentStage: response.currentStage,
+        investmentsMade: response.investmentMade,
+        availableInvestments: response.availableInvestments
       });
     }
     delay(1000);

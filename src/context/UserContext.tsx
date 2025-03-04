@@ -23,6 +23,8 @@ interface UserData {
   token: string;
   teamMembers: any[]
   gameId: string
+  availableInvestments : any[];
+  investmentsMade: any[]
 }
 
 interface UserContextType {
@@ -52,6 +54,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     }
     
   }, []);
+  
 
   // Custom setUser function to store in localStorage
   const setUser = (userData: UserData | null) => {
@@ -69,6 +72,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       }
     }
   };
+  
 
   const logout = () => {
     setUserState(null);
@@ -112,8 +116,16 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         // Add a delay before updating the state and hiding the loader
         await delay(1000); // Delay for 1 second (adjust as needed)
   
-        setUserState({ ...response.user, gameId: response?.gameId, finances: response.finances });
-        setUser({ ...response.user, gameId: response?.gameId, finances: response.finances });
+        setUserState({ ...response.user, 
+          gameId: response?.gameId, 
+          finances: response.finances, 
+          availableInvestments : response.availableInvestments 
+        });
+        setUser({ ...response.user, 
+          gameId: response?.gameId, 
+          finances: response.finances,
+          availableInvestments : response.availableInvestments
+         });
         console.log("🟢 State updated with:", response.user);
       }
     } catch (error) {

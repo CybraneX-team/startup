@@ -189,12 +189,14 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
               
               {/* Donut Chart */}
               <div className="-ml-10 relative">
+                {/* {user?.finances} */}
                 <ReactApexChart
                   options={options}
                   series={series}
                   type="donut"
                   height={150}
                 />
+                {/* <p></p>{user?.finances} */}
               </div>
             </div>
 
