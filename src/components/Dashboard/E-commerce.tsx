@@ -374,7 +374,7 @@ const ECommerce: React.FC = () => {
         finances: response.finances,
         currentStage: response.currentStage,
         investmentsMade: response.investmentMade,
-        availableInvestments: response.availableInvestments
+        availableInvestments: response.availableInvestments,
       });
       setUserState({
         ...response.user,
@@ -382,7 +382,7 @@ const ECommerce: React.FC = () => {
         finances: response.finances,
         currentStage: response.currentStage,
         investmentsMade: response.investmentMade,
-        availableInvestments: response.availableInvestments
+        availableInvestments: response.availableInvestments,
       });
     }
     delay(1000);

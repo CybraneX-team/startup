@@ -1,7 +1,7 @@
-"use client"
-import React, { useEffect, useState } from 'react';
-import { X } from 'lucide-react';
-import { useUser } from '@/context/UserContext';
+"use client";
+import React, { useEffect, useState } from "react";
+import { X } from "lucide-react";
+import { useUser } from "@/context/UserContext";
 
 interface InvestorsModalProps {
   isOpen: boolean;
@@ -10,136 +10,164 @@ interface InvestorsModalProps {
 
 const InvestorsModal: React.FC<InvestorsModalProps> = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
-  const {user, setUser, setUserState} = useUser()
-  console.log("user is :",  user)
+  const { user, setUser, setUserState } = useUser();
   const [investmentsArray, setInvestmentsArray] = useState<any[]>([]);
 
   useEffect(() => {
     if (user) {
       const investmentsMade = user.investmentsMade || [];
       const availableInvestments = user.availableInvestments || [];
-  
-      const hasMatchingNames = investmentsMade.some(investmentMade =>
-        availableInvestments.some(available => available.name === investmentMade.name)
+
+      const hasMatchingNames = investmentsMade.some((investmentMade) =>
+        availableInvestments.some(
+          (available) => available.name === investmentMade.name,
+        ),
       );
-  
+
       if (hasMatchingNames) {
         setInvestmentsArray([...availableInvestments]);
       } else {
-        setInvestmentsArray([
-          ...availableInvestments,
-          ...investmentsMade
-        ]);
+        setInvestmentsArray([...availableInvestments, ...investmentsMade]);
       }
     }
   }, [user]);
-  
 
   const signInvestmentOnClick = async (investmentSigned: any) => {
     try {
-      const makeReq = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/makeInvestment`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json", 
-          "token": `${localStorage.getItem("userToken")}` // Use a proper Authorization header
+      const makeReq = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/makeInvestment`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            token: `${localStorage.getItem("userToken")}`,
+          },
+          body: JSON.stringify({
+            investmentSigned,
+            investmentAmount: investmentSigned.money,
+            investorsShare: investmentSigned.share,
+            gameId: user?.gameId,
+          }),
         },
-        body: JSON.stringify({
-          investmentSigned,
-          investmentAmount: investmentSigned.money,
-          investorsShare: investmentSigned.share,
-          gameId: user?.gameId
-        })
-      });
-  
+      );
+
       if (makeReq.ok) {
         const response = await makeReq.json();
-        console.log("res", response); // Log the response
-        setUser(response)
-        setUserState(response)
-        
+        console.log("res", response);
+        setUser(response);
+        setUserState(response);
       } else {
-        console.error(`Request failed with status ${makeReq.status}: ${makeReq.statusText}`);
+        console.error(
+          `Request failed with status ${makeReq.status}: ${makeReq.statusText}`,
+        );
       }
     } catch (error) {
-      console.error("An error occurred:", error); 
+      console.error("An error occurred:", error);
     }
   };
-  
+
   return (
-    <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/50 backdrop-blur-sm">
-      {
-        investmentsArray.map((e)=>{
-        return   <div className="relative w-90 h-[85%] overflow-y-auto mx-5 max-w-md rounded-lg bg-white shadow-xl p-6">
-            {/* Close Button */}
-            <button 
-              onClick={onClose} 
-              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
-            >
-              <X className="h-6 w-6" />
-            </button>
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center">
+      <div className="absolute inset-0 bg-black/30" onClick={onClose}></div>
 
-            {/* Modal Header */}
-            <h2 className="text-lg font-semibold text-gray-900 mb-2">Available Investors 
-              {user?.availableInvestments.length}</h2>
-            <p className="text-sm text-gray-600 mb-6">
-              Each round new investors will be available to you. In addition to funds, they will provide invaluable knowledge, in exchange for shares in your company.
-            </p>
+      <div className="relative w-full max-w-5xl rounded-xl bg-white p-6 shadow-lg ">
+        <button
+          onClick={onClose}
+          className="absolute right-4 top-4 text-gray-400 hover:text-gray-600"
+        >
+          <X className="h-6 w-6" />
+        </button>
 
-            {/* Investor Category */}
-            <h3 className="text-base font-semibold text-gray-900 mb-2">{e.name}</h3>
-            <p className="text-sm text-blue-500 italic mb-3">
-            { e.quote}
-            </p>
-
-            {/* Investor Description */}
-            <p className="text-sm text-gray-600 mb-6">
-              {e.description}
-            </p>
-
-            {/* Investment Details */}
-            <div className="space-y-4 border-t border-gray-200 pt-4">
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600">Investment</span>
-                <span className="text-sm font-medium text-green-600">$ {e.money}</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600">Buyout price</span>
-                <span className="text-sm font-medium text-green-600">$ 200,000</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600">Investor's share</span>
-                <span className="text-sm font-medium text-blue-500">{e.share} %</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600 flex items-center">
-                  <span className="inline-block w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
-                  Advantages
-                </span>
-                <span className="text-sm text-blue-500"> {e.bug_percent_point < 0? 
-                `Decreases bugs by ${e.bug_percent_point} %` : `Increases bugs by ${e.bug_percent_point} %` } </span>
-              </div>
-            </div>
-
-            {/* Signed Tag */}
-            <div className="mt-4 text-right">
-  {user?.investmentsMade.some((element) => element.name === e.name) ? (
-    <span className="text-green-600 font-semibold border border-green-600 rounded px-2 py-1">
-      SIGNED
-    </span>
-  ) : (
-    <span
-      onClick={() => signInvestmentOnClick(e)}
-      className="text-green-600 font-semibold border cursor-pointer border-green-600 rounded px-2 py-1"
-    >
-      Sign Investment
-    </span>
-  )}
-</div>
-
+        <div className="mb-6">
+          <div className="flex items-center gap-2">
+            <h2 className="text-2xl font-medium text-gray-800">
+              Available Investors
+            </h2>
+            <span className="text-2xl font-medium text-green-500">
+              {user?.availableInvestments.length}
+            </span>
           </div>
-        })
-      
-      }
+          <p className="mt-2 text-sm text-gray-600">
+            Each round new investors will be available to you. In addition to
+            funds, they will provide invaluable knowledge, in exchange for
+            shares in your company.
+          </p>
+        </div>
+
+        {/* Scrollable cards container */}
+        <div className="max-w-5xl max-w-fit overflow-x-auto pb-4">
+          <div className="flex gap-4">
+            {investmentsArray.map((e, index) => (
+              <div
+                key={index}
+                className="min-w-[350px] flex-none rounded-xl border border-gray-200 p-5"
+              >
+                {/* Investor Name */}
+                <h3 className="mb-2 text-xl font-medium text-gray-800">
+                  {e.name}
+                </h3>
+                <p className="mb-3 text-sm italic text-blue-500">{e.quote}</p>
+
+                {/* Investor Description */}
+                <p className="mb-6 text-sm text-gray-600">{e.description}</p>
+
+                {/* Investment Details */}
+                <div className="space-y-4 border-t border-gray-200 pt-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-600">Investment</span>
+                    <span className="text-sm font-medium text-green-600">
+                      $ {e.money}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-600">Buyout price</span>
+                    <span className="text-sm font-medium text-green-600">
+                      $ 200,000
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-600">
+                      Investor's share
+                    </span>
+                    <span className="text-sm font-medium text-blue-500">
+                      {e.share} %
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="flex items-center text-sm text-gray-600">
+                      <span className="mr-2 inline-block h-2 w-2 rounded-full bg-blue-500"></span>
+                      Advantages
+                    </span>
+                    <span className="text-sm text-blue-500">
+                      {e.bug_percent_point < 0
+                        ? `Decreases bugs by ${e.bug_percent_point} %`
+                        : `Increases bugs by ${e.bug_percent_point} %`}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Signed Tag */}
+                <div className="mt-4 text-right">
+                  {user?.investmentsMade.some(
+                    (element) => element.name === e.name,
+                  ) ? (
+                    <span className="rounded border border-green-600 px-2 py-1 font-semibold text-green-600">
+                      SIGNED
+                    </span>
+                  ) : (
+                    <span
+                      onClick={() => signInvestmentOnClick(e)}
+                      className="cursor-pointer rounded border border-green-600 px-2 py-1 font-semibold text-green-600"
+                    >
+                      Sign Investment
+                    </span>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

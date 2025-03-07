@@ -401,33 +401,38 @@ const TaskGrid: React.FC = () => {
         onCancel={handleCancelDismiss}
       />
 
-      <div className="space-y-4 px-4">
-        <div className="flex flex-wrap gap-2">
-          <FilterButton
-            label="All tasks"
-            count={Tasks.length}
-            isActive={activeFilters.has("all")}
-            onClick={() => toggleFilter("all")}
-          />
-          <FilterButton
-            label="In progress"
-            count={selectedTasks.size}
-            isActive={activeFilters.has("in_progress")}
-            onClick={() => toggleFilter("in_progress")}
-          />
-          {metrics.map((metric) => (
+      <div className="flex flex-col space-y-4 px-4">
+        <div className="flex flex-wrap justify-between gap-2">
+          <div className="flex flex-wrap gap-2">
             <FilterButton
-              key={metric}
-              label={metric}
-              isActive={activeFilters.has(metric)}
-              onClick={() => toggleFilter(metric)}
+              label="All tasks"
+              count={Tasks.length}
+              isActive={activeFilters.has("all")}
+              onClick={() => toggleFilter("all")}
             />
-          ))}
-          <button
-            onClick={() => setActiveFilters(new Set(["all"]))}
-            className="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-          >
-            Reset filters
+            <FilterButton
+              label="In progress"
+              count={selectedTasks.size}
+              isActive={activeFilters.has("in_progress")}
+              onClick={() => toggleFilter("in_progress")}
+            />
+            {metrics.map((metric) => (
+              <FilterButton
+                key={metric}
+                label={metric}
+                isActive={activeFilters.has(metric)}
+                onClick={() => toggleFilter(metric)}
+              />
+            ))}
+            <button
+              onClick={() => setActiveFilters(new Set(["all"]))}
+              className="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+            >
+              Reset filters
+            </button>
+          </div>
+          <button className="flex self-end rounded-lg bg-white px-3 py-2 text-xs font-medium text-black shadow-xl dark:bg-blue-900/50 dark:text-blue-400">
+            Brainstrom
           </button>
         </div>
 
