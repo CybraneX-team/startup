@@ -1,20 +1,32 @@
 import React, { useState } from "react";
 import { Edit, Minus, Plus } from "lucide-react";
 
-const TeamManagementModal = ({ isOpen, onClose }) => {
-  const [team, setTeam] = useState([
+interface TeamManagementModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+interface TeamMember {
+  role: string;
+  count: number;
+  salary: string;
+  canReplace: boolean;
+}
+
+const TeamManagementModal: React.FC<TeamManagementModalProps> = ({ isOpen, onClose }) => {
+  const [team, setTeam] = useState<TeamMember[]>([
     { role: "CEO", count: 1, salary: "$1,000", canReplace: true },
     { role: "Developer", count: 1, salary: "$1,200", canReplace: false },
     { role: "Sales", count: 1, salary: "$1,200", canReplace: false },
   ]);
 
-  const increaseCount = (index) => {
+  const increaseCount = (index: number) => {
     const updatedTeam = [...team];
     updatedTeam[index].count += 1;
     setTeam(updatedTeam);
   };
 
-  const decreaseCount = (index) => {
+  const decreaseCount = (index: number) => {
     const updatedTeam = [...team];
     if (updatedTeam[index].count > 1 || !updatedTeam[index].canReplace) {
       updatedTeam[index].count -= 1;

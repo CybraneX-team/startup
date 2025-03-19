@@ -116,7 +116,7 @@ const metricsInfo: MetricsData = {
   B: {
     title: "Buyer (B)",
     content:
-      "The number of paying customers that the player has acquired through the user acquisition process, referred to as “buyers” or “customers” in the simulator.",
+      'The number of paying customers that the player has acquired through the user acquisition process, referred to as "buyers" or "customers" in the simulator.',
   },
   AOV: {
     title: "Average order volume",
@@ -159,9 +159,9 @@ const stagesInfo: StagesData = {
   FFF: {
     title: "FFF Stage",
     content:
-      "At this very early stage, you rely on your personal relationships to obtain funding. You have nothing with which to entice investors, so you go to your FFFs: Friends, Fools, and Family. This is one of a startup’s first rounds of funding. Your objective is to attract your first ten users and prove that your product or service solves someone’s problem",
+      "At this very early stage, you rely on your personal relationships to obtain funding. You have nothing with which to entice investors, so you go to your FFFs: Friends, Fools, and Family. This is one of a startup's first rounds of funding. Your objective is to attract your first ten users and prove that your product or service solves someone's problem",
     roundGoal:
-      "Get your first tenclients and prove that your company is solving someone’s problem.",
+      "Get your first tenclients and prove that your company is solving someone's problem.",
     employees: ["CEO", "Developer", "Marketing"],
     investors: "No",
     mentors: "Yes",
@@ -169,7 +169,7 @@ const stagesInfo: StagesData = {
   ANGELS: {
     title: "Angels",
     content:
-      "Angel investors are often the main source of funding for many startups that have created MVPs and attracted early adopters. These individuals invest their own capital during a company’s early stages. In this round your goal is to attract 100 users, confirm that your sales are not just random luck, and that you understand the challenges and problems your customers face — and solve them.",
+      "Angel investors are often the main source of funding for many startups that have created MVPs and attracted early adopters. These individuals invest their own capital during a company's early stages. In this round your goal is to attract 100 users, confirm that your sales are not just random luck, and that you understand the challenges and problems your customers face — and solve them.",
     roundGoal: "Increase the number of clients to 100",
     employees: ["CEO", "Developer", "Marketing"],
     investors: "Yes",
@@ -187,7 +187,7 @@ const stagesInfo: StagesData = {
   SEED: {
     title: "Seed",
     content:
-      "Your product has shown great scalability and attracted the attention of a group of investors. That being said, for further scaling, it’s important to achieve positive unit economics. There is nothing more illusory to a startup than negative unit economics, or selling a product for less than its variable cost. After all, growth is easy and success is “achieved” if you sell a dollar for ninety cents. Get 2,500 subscribers, achieve a positive contribution margin, and economic convergence. Start attracting customers through paid channels.",
+      'Your product has shown great scalability and attracted the attention of a group of investors. That being said, for further scaling, it\'s important to achieve positive unit economics. There is nothing more illusory to a startup than negative unit economics, or selling a product for less than its variable cost. After all, growth is easy and success is "achieved" if you sell a dollar for ninety cents. Get 2,500 subscribers, achieve a positive contribution margin, and economic convergence. Start attracting customers through paid channels.',
     roundGoal:
       "Increase the number of your customers to 2,500, while ensuring that your contribution margin is positive.",
     employees: ["CEO", "Developer", "Marketing", "Designer", "QA", "Manager"],
@@ -207,7 +207,7 @@ const stagesInfo: StagesData = {
   B: {
     title: "B",
     content:
-      "Learning, course-correcting, growing! Your company is breaking even and has achieved positive unit economics. Still, investors want to make sure that you’re economically viable and can attract more customers and become a top seller in the local market.",
+      "Learning, course-correcting, growing! Your company is breaking even and has achieved positive unit economics. Still, investors want to make sure that you're economically viable and can attract more customers and become a top seller in the local market.",
     roundGoal:
       "Your goal is 50,000 customers, a contribution margin of at least $500,000, and a weekly income of more than $100,000. Keep scaling up and earn your first $100,000!",
     employees: ["CEO", "Developer", "Marketing", "Designer", "QA", "Manager"],
@@ -217,7 +217,7 @@ const stagesInfo: StagesData = {
   C: {
     title: "C",
     content:
-      "You have achieved all your goals and hit the ceiling in your local market. It’s time to keep scaling and expanding to international markets. But be careful: new markets present new unexpected problems!",
+      "You have achieved all your goals and hit the ceiling in your local market. It's time to keep scaling and expanding to international markets. But be careful: new markets present new unexpected problems!",
     roundGoal:
       "Number of customers: 100,000 Contribution margin: at least $1,000,000 Weekly income: more than $500,000 Keep scaling and earn your first $500,000",
     employees: ["CEO", "Developer", "Marketing", "Designer", "QA", "Manager"],
@@ -255,7 +255,7 @@ interface ModalInfo {
 // SEED: {
 //     title: "Seed",
 //     content:
-//       "Your product has shown great scalability and attracted the attention of a group of investors. That being said, for further scaling, it’s important to achieve positive unit economics. There is nothing more illusory to a startup than negative unit economics, or selling a product for less than its variable cost. After all, growth is easy and success is “achieved” if you sell a dollar for ninety cents. Get 2,500 subscribers, achieve a positive contribution margin, and economic convergence. Start attracting customers through paid channels.",
+//       "Your product has shown great scalability and attracted the attention of a group of investors. That being said, for further scaling, it's important to achieve positive unit economics. There is nothing more illusory to a startup than negative unit economics, or selling a product for less than its variable cost. After all, growth is easy and success is "achieved" if you sell a dollar for ninety cents. Get 2,500 subscribers, achieve a positive contribution margin, and economic convergence. Start attracting customers through paid channels.",
 //     roundGoal:
 //       "Increase the number of your customers to 2,500, while ensuring that your contribution margin is positive.",
 //     employees: ["CEO", "Developer", "Marketing", "Designer", "QA", "Manager"],
@@ -275,7 +275,7 @@ interface ModalInfo {
 //   B: {
 //     title: "B",
 //     content:
-//       "Learning, course-correcting, growing! Your company is breaking even and has achieved positive unit economics. Still, investors want to make sure that you’re economically viable and can attract more customers and become a top seller in the local market.",
+//       "Learning, course-correcting, growing! Your company is breaking even and has achieved positive unit economics. Still, investors want to make sure that you're economically viable and can attract more customers and become a top seller in the local market.",
 //     roundGoal:
 //       "Your goal is 50,000 customers, a contribution margin of at least $500,000, and a weekly income of more than $100,000. Keep scaling up and earn your first $100,000!",
 //     employees: ["CEO", "Developer", "Marketing", "Designer", "QA", "Manager"],
@@ -285,7 +285,7 @@ interface ModalInfo {
 //   C: {
 //     title: "C",
 //     content:
-//       "You have achieved all your goals and hit the ceiling in your local market. It’s time to keep scaling and expanding to international markets. But be careful: new markets present new unexpected problems!",
+//       "You have achieved all your goals and hit the ceiling in your local market. It's time to keep scaling and expanding to international markets. But be careful: new markets present new unexpected problems!",
 //     roundGoal:
 //       "Number of customers: 100,000 Contribution margin: at least $1,000,000 Weekly income: more than $500,000 Keep scaling and earn your first $500,000",
 //     employees: ["CEO", "Developer", "Marketing", "Designer", "QA", "Manager"],
@@ -431,7 +431,7 @@ const ECommerce: React.FC = () => {
       });
     }
   };
-  const handleStageClick = (stage: string) => {
+  const handleStageClick = (stage: string, event: React.MouseEvent<HTMLDivElement>) => {
     const stageKey = stage.toUpperCase();
     const info = stagesInfo[stageKey];
     if (info) {
@@ -439,6 +439,7 @@ const ECommerce: React.FC = () => {
       setModalInfo({
         isOpen: true,
         title: info.title,
+        anchorEl: event.currentTarget,
         content: (
           <div>
             <h3 className="mb-2 font-medium">Description</h3>
@@ -535,7 +536,7 @@ const ECommerce: React.FC = () => {
         {stages.map((stage, index) => (
           <div
             key={index}
-            onClick={() => handleStageClick(stage)}
+            onClick={(e) => handleStageClick(stage, e)}
             className={` min-w-[103px] cursor-pointer  overflow-x-scroll rounded-xl border border-stroke bg-white p-2 transition-colors dark:border-strokedark dark:bg-boxdark
               ${user?.currentStage === stage ? "bg-blue-200 dark:bg-blue-900" : ""}`}
           >
@@ -563,7 +564,7 @@ const ECommerce: React.FC = () => {
                 {getShortName(metric)}
               </span>
               <span className="text-xs font-medium text-[#6577F3] dark:text-secondary">
-                {user.metrics[metric].toFixed(2)}
+                {((user.metrics as unknown) as Record<string, number>)[metric].toFixed(2)}
               </span>
             </div>
           ))
@@ -590,7 +591,7 @@ const ECommerce: React.FC = () => {
           </h3>
           <p className="text-sm">
             Get your first 10 clients and prove that your company is solving
-            someone's problem.
+            someone&apos;s problem.
           </p>
         </div>
 

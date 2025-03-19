@@ -9,10 +9,9 @@ interface InvestorsModalProps {
 }
 
 const InvestorsModal: React.FC<InvestorsModalProps> = ({ isOpen, onClose }) => {
-  if (!isOpen) return null;
   const { user, setUser, setUserState } = useUser();
   const [investmentsArray, setInvestmentsArray] = useState<any[]>([]);
-
+  
   useEffect(() => {
     if (user) {
       const investmentsMade = user.investmentsMade || [];
@@ -31,6 +30,8 @@ const InvestorsModal: React.FC<InvestorsModalProps> = ({ isOpen, onClose }) => {
       }
     }
   }, [user]);
+
+  if (!isOpen) return null;
 
   const signInvestmentOnClick = async (investmentSigned: any) => {
     try {
@@ -127,7 +128,7 @@ const InvestorsModal: React.FC<InvestorsModalProps> = ({ isOpen, onClose }) => {
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-600">
-                      Investor's share
+                      Investor&apos;s share
                     </span>
                     <span className="text-sm font-medium text-blue-500">
                       {e.share} %

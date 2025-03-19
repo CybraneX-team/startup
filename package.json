@@ -9,7 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "apexcharts": "^3.45.2",
+    "apexcharts": "^4.0.0",
     "cors": "^2.8.5",
     "docx-preview": "^0.3.4",
     "flatpickr": "^4.6.13",
@@ -24,6 +24,7 @@
     "react-toastify": "^11.0.3"
   },
   "devDependencies": {
+    "@netlify/plugin-nextjs": "^5.10.0",
     "@types/cors": "^2.8.17",
     "@types/node": "^20",
     "@types/react": "^18",

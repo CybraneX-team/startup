@@ -1,6 +1,15 @@
 import React, { useRef, useEffect, useState } from 'react';
 
-const TooltipModal = ({ 
+interface TooltipModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  title: string;
+  content: React.ReactNode;
+  anchorEl: HTMLElement | null;
+  selectedMetric: string | null;
+}
+
+const TooltipModal: React.FC<TooltipModalProps> = ({ 
   isOpen, 
   onClose, 
   title, 
@@ -9,7 +18,7 @@ const TooltipModal = ({
   selectedMetric
 }) => {
   const [position, setPosition] = useState({ top: 0, left: 0 });
-  const modalRef = useRef(null);
+  const modalRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (isOpen && anchorEl && modalRef.current) {
