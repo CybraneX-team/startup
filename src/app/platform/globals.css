@@ -1,0 +1,4 @@
+/* Platform specific global styles */
+
+/* Import the component-specific CSS file */
+@import './components/platform.css'; 

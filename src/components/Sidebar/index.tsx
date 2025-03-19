@@ -1,15 +1,18 @@
 "use client"
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Info, Edit } from "lucide-react";
-import ReactApexChart from "react-apexcharts";
+import dynamic from 'next/dynamic';
 import { ApexOptions } from "apexcharts";
 import { useUser } from "@/context/UserContext";
 import MarketInfoModal from "./MarketInfoModal";
 import MentorsModal from "./MentorsModal";
 import TeamManagementModal from "./TeamManagementModal";
 import InvestorsModal from "./InvestorsModal";
+
+// Dynamically import ReactApexChart to avoid window is not defined errors
+const ReactApexChart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
 interface SidebarProps {
   sidebarOpen: boolean;

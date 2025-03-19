@@ -1,0 +1,408 @@
+/* Platform specific styles */
+
+/* Module Card Styles */
+.module-card {
+  transition: all 0.3s ease;
+  transform: translateY(0);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.module-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.module-card .card-image {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #e91e63, #9c27b0);
+  height: 160px;
+}
+
+.module-card h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #333;
+  line-height: 1.4;
+}
+
+/* Button hover effect from Uiverse.io by nikk7007 */
+.fancy-button {
+  --color: #000000;
+  padding: 0.8em 1.7em;
+  background-color: transparent;
+  border-radius: .3em;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  transition: .5s;
+  font-weight: 400;
+  font-size: 17px;
+  border: 1px solid;
+  font-family: inherit;
+  text-transform: uppercase;
+  color: var(--color);
+  z-index: 1;
+  width: 100%;
+  text-align: center;
+}
+
+.fancy-button::before, .fancy-button::after {
+  content: '';
+  display: block;
+  width: 50px;
+  height: 50px;
+  transform: translate(-50%, -50%);
+  position: absolute;
+  border-radius: 50%;
+  z-index: -1;
+  background-color: var(--color);
+  transition: 1s ease;
+}
+
+.fancy-button::before {
+  top: -1em;
+  left: -1em;
+}
+
+.fancy-button::after {
+  left: calc(100% + 1em);
+  top: calc(100% + 1em);
+}
+
+.fancy-button:hover::before, .fancy-button:hover::after {
+  height: 500px;
+  width: 500px;
+}
+
+.fancy-button:hover {
+  color: white;
+}
+
+.fancy-button:active {
+  filter: brightness(.8);
+}
+
+/* Black button style for Open/Start buttons */
+.black-button {
+  background-color: #000;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 12px 24px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.black-button::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: all 0.5s ease;
+}
+
+.black-button:hover::after {
+  left: 100%;
+}
+
+/* Stripe button style with hover effect from Uiverse.io by mrhyddenn */
+.stripe-button {
+  background: #fff;
+  border: 1px solid #000;
+  padding: 10px 20px;
+  font-size: 15px;
+  font-weight: 600;
+  width: 100%;
+  text-transform: uppercase;
+  cursor: pointer;
+  transform: none;
+  position: relative;
+  overflow: hidden;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  z-index: 1;
+}
+
+.stripe-button span {
+  display: inline-block;
+  transform: none;
+}
+
+.stripe-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 100%;
+  left: 0;
+  background: rgb(20, 20, 20);
+  opacity: 0;
+  z-index: -1;
+  transition: all 0.5s;
+}
+
+.stripe-button:hover {
+  color: #fff;
+}
+
+.stripe-button:hover::before {
+  left: 0;
+  right: 0;
+  opacity: 1;
+}
+
+/* Sidebar styles */
+.sidebar {
+  transition: all 0.3s ease;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
+}
+
+.sidebar.expanded {
+  max-width: 380px;
+  border-right: 1px solid #e5e7eb;
+}
+
+.sidebar.collapsed {
+  width: 100px;
+  background-color: #ffffff;
+  border-right: 1px solid #f3f4f6;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Collapsed sidebar specific styles */
+.collapsed-header {
+  background-color: #f9fafb;
+  border-radius: 9999px;
+  padding: 8px 12px;
+  margin-bottom: 20px;
+  width: 80px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.collapsed-item {
+  border: 1px solid #e5e7eb;
+  border-radius: 100px;
+  padding: 10px;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 70px;
+  height: 40px;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  transition: .5s;
+}
+
+.collapsed-item::before, .collapsed-item::after {
+  content: '';
+  display: block;
+  width: 20px;
+  height: 20px;
+  transform: translate(-50%, -50%);
+  position: absolute;
+  border-radius: 50%;
+  z-index: -1;
+  background-color: #000000;
+  transition: 1s ease;
+}
+
+.collapsed-item::before {
+  top: -1em;
+  left: -1em;
+}
+
+.collapsed-item::after {
+  left: calc(100% + 1em);
+  top: calc(100% + 1em);
+}
+
+.collapsed-item:hover::before, .collapsed-item:hover::after {
+  height: 150px;
+  width: 150px;
+}
+
+.collapsed-item:hover {
+  color: white;
+  border-color: #000000;
+}
+
+.collapsed-item:hover svg {
+  fill: white;
+}
+
+/* Educational Platform Sidebar */
+.sidebar h2, .sidebar h3 {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  font-weight: 600;
+}
+
+.sidebar .progress-bar {
+  height: 4px;
+  background-color: #4F46E5;
+  border-radius: 2px;
+  transition: width 0.5s ease-in-out;
+}
+
+.sidebar .active-module {
+  border-radius: 12px;
+  border-color: #E5E7EB;
+}
+
+.sidebar .active-module h3 {
+  font-weight: 600;
+}
+
+.sidebar .course-title {
+  border-radius: 12px;
+  border-color: #E5E7EB;
+  padding: 12px 16px;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  transition: .5s;
+}
+
+.sidebar .course-title::before, .sidebar .course-title::after {
+  content: '';
+  display: block;
+  width: 50px;
+  height: 50px;
+  transform: translate(-50%, -50%);
+  position: absolute;
+  border-radius: 50%;
+  z-index: -1;
+  background-color: #000000;
+  transition: 1s ease;
+}
+
+.sidebar .course-title::before {
+  top: -1em;
+  left: -1em;
+}
+
+.sidebar .course-title::after {
+  left: calc(100% + 1em);
+  top: calc(100% + 1em);
+}
+
+.sidebar .course-title:hover::before, .sidebar .course-title:hover::after {
+  height: 410px;
+  width: 410px;
+}
+
+.sidebar .course-title:hover {
+  color: white;
+  border-color: #000000;
+}
+
+.sidebar .course-title:hover span {
+  color: white;
+}
+
+.sidebar .course-title span {
+  font-weight: 500;
+  position: relative;
+  z-index: 1;
+}
+
+/* Sidebar navigation item hover effect */
+.sidebar a {
+  position: relative;
+  transition: all 0.3s ease;
+  padding: 0.75rem 1rem;
+  border-radius: 0.375rem;
+}
+
+.sidebar a:hover {
+  background-color: rgba(79, 70, 229, 0.1);
+}
+
+.sidebar a.active {
+  background-color: rgba(79, 70, 229, 0.1);
+  color: #4F46E5;
+}
+
+/* Sidebar toggle button */
+.sidebar-toggle {
+  transition: all 0.3s ease;
+}
+
+.sidebar-toggle:hover {
+  background-color: rgba(79, 70, 229, 0.1);
+}
+
+/* Progress bar animation */
+@keyframes progress {
+  0% {
+    width: 0;
+  }
+}
+
+.progress-bar {
+  animation: progress 1.5s ease-in-out;
+}
+
+/* Button hover effect */
+.start-button {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.start-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: all 0.5s ease;
+}
+
+.start-button:hover::before {
+  left: 100%;
+}
+
+/* Main content container */
+.module-card-container {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Module card specific styles to match design */
+.module-card .card-image {
+  background: linear-gradient(135deg, #e91e63, #9c27b0);
+}
+
+/* Mobile styles */
+@media (max-width: 768px) {
+  .sidebar.expanded {
+    width: 100%;
+    max-width: 100%;
+  }
+  
+  .sidebar.collapsed {
+    width: 100px;
+  }
+} 

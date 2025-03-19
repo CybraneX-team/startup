@@ -1,0 +1,88 @@
+/* Global styles for the entire application */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* App layout specific styles */
+/* This replaces the layout.css file */
+
+/* Module page specific styles */
+.module-content {
+  width: 100%;
+  transition: width 0.3s ease, margin-left 0.3s ease;
+  background-color: white;
+}
+
+@media (min-width: 768px) {
+  .module-content {
+    width: calc(100vw - 100px);
+    margin-left: 100px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .module-content {
+    width: calc(100vw - 384px);
+    margin-left: 384px;
+  }
+}
+
+/* Quiz container styling */
+.quiz-container {
+  width: 100%;
+  font-family: var(--font-sans), system-ui, sans-serif;
+}
+
+.module-quiz-container {
+  width: 750px !important; /* Letter format width */
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+.module-quiz-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+/* Override for docx-preview styles */
+.docx-viewer,
+.docx-viewer-page,
+.docx-viewer-inner,
+.docx-wrapper,
+.page-container,
+.document-container,
+.docx-container {
+  background-color: white !important;
+  box-shadow: none !important;
+  border: none !important;
+  font-family: var(--font-sans), system-ui, sans-serif !important;
+}
+
+/* Letter format document styling */
+.docx-viewer .document-container,
+.docx-viewer-page,
+.page-container {
+  width: 750px !important; /* Standard US Letter width */
+  max-width: 100% !important;
+  margin: 0 auto !important;
+}
+
+/* Target the gray background container specifically */
+.docx-viewer > div {
+  background-color: white !important;
+}
+
+/* Shared document and quiz layout */
+.document-scroll-container,
+.module-quiz-wrapper {
+  margin-bottom: 0;
+  width: 100%;
+}
+
+.quiz-container .option-selected {
+  border-color: rgba(59, 130, 246, 0.5);
+}
+
+.quiz-container .option-correct {
+  border-color: rgba(16, 185, 129, 0.5);
+} 

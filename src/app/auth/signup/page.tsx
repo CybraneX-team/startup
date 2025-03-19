@@ -3,12 +3,18 @@ import React, { ChangeEvent, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
-
-// import { Metadata } from "next";
-import DefaultLayout from "@/components/Layouts/DefaultLayout";
 import { useUser } from "@/context/UserContext";
 import { useRouter } from "next/navigation";
 import { Bounce, ToastContainer } from "react-toastify";
+import dynamic from 'next/dynamic';
+
+// Dynamically import DefaultLayout with no SSR to prevent window is not defined errors
+const DefaultLayout = dynamic(
+  () => import("@/components/Layouts/DefaultLayout"),
+  { ssr: false }
+);
+
+// import { Metadata } from "next";
 // export const metadata: Metadata = {
 //   title: "Next.js SignUp Page | TailAdmin - Next.js Dashboard Template",
 //   description: "This is Next.js SignUp Page TailAdmin Dashboard Template",
