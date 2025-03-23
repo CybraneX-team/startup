@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import TaskGrid from "../CardDataStats";
 import { InfoIcon } from "lucide-react";
 import TooltipModal from "@/components/TooltipModal";
+import { Bell } from "lucide-react";
 import SpotlightModal from "@/components/SpotlightModal";
 
 // import { Dice1, InfoIcon } from "lucide-react";
@@ -175,7 +176,7 @@ const stagesInfo: StagesData = {
     investors: "Yes",
     mentors: "Yes",
   },
-  PRESEEDS: {
+  PRE_SEED: {
     title: "PreSeed",
     content:
       "You proved to early investors that your product has potential. Now you are ready for a public beta release — a massive launch of your product. You collected feedback from the first 100 users, tested hypotheses, built a development cycle, redesigned and performed testing. However, serial investors are still not sure if your product is scaleable. Your goal is to attract 500 users.",
@@ -251,6 +252,33 @@ interface ModalInfo {
   content: React.ReactNode;
   anchorEl: HTMLElement | null;
 }
+type MetricKey =
+  | 'userAcquisition'
+  | 'conversionFirstPurchase'
+  | 'averageOrderValue'
+  | 'costOfGoodsSold'
+  | 'averagePaymentCount'
+  | 'costPerAcquisition'
+  | 'buyerCount'
+  | 'customerLifetimeValue'
+  | 'averageRevenuePerUser'
+  | 'contributionMargin';
+
+type Metrics = {
+  [key in MetricKey]: number;
+}
+const orderedMetrics: MetricKey[] = [
+  'userAcquisition',        // UA
+  'conversionFirstPurchase',// C1
+  'buyerCount',             // B
+  'averageOrderValue',      // AOV
+  'costOfGoodsSold',        // Cogs
+  'averagePaymentCount',    // APC
+  'customerLifetimeValue',  // CLTV
+  'averageRevenuePerUser',  // ARPU
+  'costPerAcquisition',     // CPA
+  'contributionMargin',     // CM
+];
 
 // SEED: {
 //     title: "Seed",
@@ -315,11 +343,21 @@ interface ModalInfo {
 // };
 
 const ECommerce: React.FC = () => {
-  const { user, task, setUser, setUserState, loader, setloader } = useUser();
+  const { 
+    user, 
+    task, 
+    setUser, 
+    setUserState, 
+    loader, 
+    setloader, 
+    notificationMessages, 
+    setnotificationMessages 
+  } = useUser();
+  
   const router = useRouter();
 
   const [, forceRender] = useState(0);
-
+  
   useEffect(() => {
     console.log("User state changed:", user);
     forceRender((prev) => prev + 1);
@@ -344,8 +382,13 @@ const ECommerce: React.FC = () => {
 
   const [selectedMetric, setSelectedMetric] = useState<string | null>(null);
   const [selectedStage, setSelectedStage] = useState<string | null>(null);
-  console.log(user?.currentStage);
-  async function makeTurn(taskID: string, taskAmount: string) {
+  const [showNotifications, setShowNotifications] = useState(false);
+  const dollarMetrics = ['AOV', 'Cogs', 'CLTV', 'ARPU', 'CPA', 'CM'];
+   async function makeTurn(
+    task: any, 
+    turnAmount: string
+  ) {
+    console.log("tasktasktask", task)
     setloader(true);
     const delay = (ms: number) =>
       new Promise((resolve) => setTimeout(resolve, ms));
@@ -354,36 +397,35 @@ const ECommerce: React.FC = () => {
       alert("User is not authenticated. Please log in.");
       return;
     }
+    let requestBody 
+    if(task.isBug){
+      requestBody = {
+        bugId : task._id,
+        gameId : user?.gameId,
+        employees : user?.teamMembers,
+        turnAmount : turnAmount
+      }
+    }else{
+      requestBody = {
+        taskId : task.taskId ? task.taskId : task._id   ,
+        gameId : user?.gameId,
+        employees : user?.teamMembers,
+        turnAmount : turnAmount
+      }
+    }
     const makeReq = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/turn`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         token: token,
       },
-      body: JSON.stringify({
-        gameId: user?.gameId,
-        turnAmount: taskAmount,
-        taskId: taskID,
-      }),
+      body: JSON.stringify(requestBody),
     });
     if (makeReq.ok) {
       const response = await makeReq.json();
-      setUser({
-        ...response.user,
-        gameId: response.gameId,
-        finances: response.finances,
-        currentStage: response.currentStage,
-        investmentsMade: response.investmentMade,
-        availableInvestments: response.availableInvestments,
-      });
-      setUserState({
-        ...response.user,
-        gameId: response.gameId,
-        finances: response.finances,
-        currentStage: response.currentStage,
-        investmentsMade: response.investmentMade,
-        availableInvestments: response.availableInvestments,
-      });
+      setUser(response);
+      setUserState(response);
+      setnotificationMessages([...notificationMessages, response.message])
     }
     delay(1000);
     setloader(false);
@@ -400,6 +442,7 @@ const ECommerce: React.FC = () => {
       costPerAcquisition: "CPA",
       contributionMargin: "CM",
       buyerCount: "B",
+      bugPercentage : "Bugs"
     };
 
     return metricMap[metricName] || metricName;
@@ -407,7 +450,7 @@ const ECommerce: React.FC = () => {
   const stages = [
     "FFF",
     "Angels",
-    "PreSeeds",
+    "pre_seed",
     "Seed",
     "A",
     "B",
@@ -494,7 +537,11 @@ const ECommerce: React.FC = () => {
     setSelectedMetric(null);
     setSelectedStage(null);
   };
-
+  function countDecimalPlaces(value: number): number {
+    if (Math.floor(value) === value) return 0; // integer
+    return value.toString().split(".")[1]?.length || 0;
+  }
+  
   return (
     <>
       <ToastContainer
@@ -525,53 +572,67 @@ const ECommerce: React.FC = () => {
       <h3 className="text-sm text-gray-500 dark:text-gray-400">
         Startup Stages
       </h3>
-      {user?.currentStage === "FFF" ? (
+      {user?.startupStage === "FFF" ? (
         <p> Your goal is to reach 10 buyers </p>
-      ) : user?.currentStage === "Angels" ? (
+      ) : user?.startupStage === "Angels" ? (
         <p> Your goal is to reach 100 buyers </p>
       ) : (
         <p> Your goal is to reach 500 buyers </p>
       )}
-      <div className="my-2 flex gap-3 overflow-x-scroll">
-        {stages.map((stage, index) => (
-          <div
-            key={index}
-            onClick={(e) => handleStageClick(stage, e)}
-            className={` min-w-[103px] cursor-pointer  overflow-x-scroll rounded-xl border border-stroke bg-white p-2 transition-colors dark:border-strokedark dark:bg-boxdark
-              ${user?.currentStage === stage ? "bg-blue-200 dark:bg-blue-900" : ""}`}
-          >
-            <div className="flex items-center justify-center ">
-              <span className="text-sm font-medium text-black dark:text-white">
-                {stage}
-              </span>
-              <span className="opacity-0 duration-200 hover:opacity-100">
-                <InfoIcon size={12} className="ml-4" />
-              </span>
-            </div>
-          </div>
-        ))}
+    <div className="my-2 flex gap-3 overflow-x-auto lg:overflow-hidden">
+  {stages.map((stage, index) => (
+    <div
+      key={index}
+      onClick={(e) => handleStageClick(stage,e)}
+      className={`min-w-[90px] cursor-pointer 
+        px-5 py-2 text-center rounded-lg border transition-all
+        ${user?.startupStage === stage 
+          ? "bg-white dark:bg-gray-700  border-gray-300 dark:border-gray-600" 
+          : "bg-gray-200 dark:bg-gray-200 border-transparent hover:bg-gray-200 dark:hover:bg-gray-700"}`
+      }
+    >
+      <div className="flex items-center justify-center">
+        <span
+          className={`text-sm font-medium 
+            ${user?.startupStage === stage 
+              ? "text-black dark:text-white font-semibold" 
+              : "text-gray-500 dark:text-gray-400"}`}
+        >
+          {stage}
+        </span>
+        <span className="opacity-0 duration-200 hover:opacity-100">
+          <InfoIcon size={12} className="ml-2 text-gray-500 dark:text-gray-400" />
+        </span>
       </div>
+    </div>
+  ))}
+</div>
+
+
+
       <h3 className="text-sm text-gray-500 dark:text-gray-400">Metrics</h3>
-      <div className="my-2 flex gap-3 overflow-x-scroll">
-        {user && user.metrics ? (
-          Object.keys(user.metrics).map((metric, index) => (
-            <div
-              key={index}
-              onClick={(e) => handleMetricClick(getShortName(metric), e)}
-              className="flex min-w-[103px] items-center justify-around rounded-xl border border-stroke bg-white px-2 py-3 dark:border-strokedark dark:bg-boxdark"
-            >
-              <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
-                {getShortName(metric)}
-              </span>
-              <span className="text-xs font-medium text-[#6577F3] dark:text-secondary">
-                {((user.metrics as unknown) as Record<string, number>)[metric].toFixed(2)}
-              </span>
-            </div>
-          ))
-        ) : (
-          <p className="text-sm text-gray-500">No metrics found. Reload?</p>
-        )}
-      </div>
+      <div className="my-2 flex gap-3 overflow-x-scroll lg:overflow-x-hidden">
+  {user && user.metrics && orderedMetrics.map((metric, index) => (
+    <div
+      key={index}
+      onClick={(e) => handleMetricClick(getShortName(metric), e)}
+      className="flex min-w-[103px] items-center justify-around rounded-xl border border-stroke bg-white px-2 py-3 dark:border-strokedark dark:bg-boxdark"
+    >
+      <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
+        {getShortName(metric)}
+      </span>
+      <span className="text-xs font-medium text-[#6577F3] dark:text-secondary">
+        {dollarMetrics.includes(getShortName(metric)) ? '' : ''}
+        {Number.isInteger(user.metrics[metric]) || countDecimalPlaces(user.metrics[metric]) <= 2
+          ? user.metrics[metric]
+          : user.metrics[metric].toFixed(2)}
+        {dollarMetrics.includes(getShortName(metric)) ? '$' : ''}
+      </span>
+    </div>
+  ))}
+</div>
+
+
       <SpotlightModal
         isOpen={modalInfo.isOpen}
         onClose={handleModalClose}
@@ -584,32 +645,89 @@ const ECommerce: React.FC = () => {
         <TaskGrid />
       </div>
 
-      <div className="fixed bottom-0 -mx-4 flex w-full items-center justify-between bg-white p-5 dark:bg-boxdark">
-        <div className="rounded-xl bg-[#eff4fb9a] p-3 dark:bg-[#1A222C]">
-          <h3 className="text-sm text-emerald-600 dark:text-emerald-400">
-            Welcome back to the game
-          </h3>
-          <p className="text-sm">
-            Get your first 10 clients and prove that your company is solving
-            someone&apos;s problem.
-          </p>
-        </div>
+      <div className="fixed bottom-0 -mx-8 flex w-full items-center justify-between bg-white p-5 dark:bg-boxdark">
+      {/* Notification Box with Fixed Width */}
+      <div className="w-[35em] transition-all duration-300 ">
+        <div className="rounded-xl bg-[#eff4fb9a] p-3 dark:bg-[#1A222C] ">
+          <div className="flex justify-between items-center ">
+            <h3 className={` 
+              text-sm 
+              ${ notificationMessages[notificationMessages.length - 1].isPositive?
+                `text-emerald-600 
+                dark:text-emerald-400 ` :
+                `text-red-600 
+                dark:text-red-400 ` 
+              }
+             
+              `}>
+              {
+              notificationMessages[notificationMessages.length - 1].message
+              }
+            </h3>
+            <button
+              onClick={() => setShowNotifications(!showNotifications)}
+              className="text-gray-600 dark:text-gray-400"
+            >
+              {showNotifications ? (
+                <span className="flex items-center">
+                  Hide notifications <Bell className="ml-1" size={16} />
+                </span>
+              ) : (
+                <span className="flex items-center">
+                  Show notifications <Bell className="ml-1 text-red-500" size={16} />
+                </span>
+              )}
+            </button>
+          </div>
 
+          <div
+            className={`overflow-hidden transition-all duration-300 overflow-y-scroll ${
+              showNotifications ? "max-h-40" : "max-h-0"
+            }`}
+          >
+            <div className="mt-2 text-sm">
+            {
+              notificationMessages
+                .map((e, i, arr) => {
+                  if (i !== arr.length - 1) {
+                    return (
+                      <p key={i} className={e.isPositive ? "text-green-600" : "text-red-500"}>
+                        {e.message}
+                      </p>
+                    );
+                  }
+                  return null;
+                })
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Funds & Turn Section */}
+      <div className="flex items-center space-x-10 absolute left-[50em]">
+        <div className="text-sm">
+          <p>Bugs</p>
+          <p className="font-semibold"> {user?.bugPercentage}% </p>
+        </div>
+        <div className="text-sm">
+          <p>Current funds</p>
+          <p className="font-semibold"> ${user?.finances}</p>
+        </div>
         <button
-          onClick={() => {
-            makeTurn(task, "4326");
-          }}
-          className="w-60 max-w-xl rounded-xl bg-[#4fc387] p-3 md:mr-80"
+          onClick={()=>{makeTurn(task, "4836")}}
+          className="w-60 max-w-xl rounded-xl bg-[#4fc387] p-3"
         >
-          <span className="flex text-left font-semibold text-white">
-            Make turn <br />
+          <span className="flex text-end font-semibold text-white">
+            Make turn 
           </span>
           <div className="flex items-center justify-between">
-            <span className="ifont-semibold text-white">income</span>
-            <h3 className="font-bold text-white">-$4 326</h3>
+            <span className="font-semibold text-white">Income</span>
+            <h3 className="font-bold text-white">- $4486</h3>
           </div>
         </button>
       </div>
+    </div>
       {/* </div> */}
     </>
   );

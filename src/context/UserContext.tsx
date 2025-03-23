@@ -14,19 +14,48 @@ interface Metrics {
   contributionMargin: number;
   buyerCount: number;
 }
-
-interface UserData {
+interface availableemployees{
+  _id : string ;
+  roleName : string;
+  salary : number
+}
+interface employeesAvailable{
+  _id: string;
+  stage :string;
+  maximum_allowed_employess: number;
+  availableEmployes : availableemployees[]
+}
+interface financesBreakdown {
+  Founder: number;  // Uppercase matches API response
+  Investors: number;
+  Mentor: number;
+}
+export interface UserData {
   finances: number;
   metrics: Metrics;
-  currentStage: string;
+  startupStage: string;
   completedTasks: any[];
   token: string;
+  username: string;
+  revenue : number;
+  marketing : number;
+  salaries : number;
+  costOfSales  : number;
+  rent  : number;
   teamMembers: any[]
   gameId: string
   availableInvestments : any[];
   investmentsMade: any[]
+  employeesAvailable: employeesAvailable[]; 
+  financesBreakdown : financesBreakdown;
+  mentorsAvailable: any[];
+  tasks : any[];
+  bugPercentage : number;
 }
-
+interface notificationMessagesType{
+  message: string;
+  isPositive: boolean;
+}
 interface UserContextType {
   user: UserData | null;
   setUser: (userData: UserData | null) => void;
@@ -36,6 +65,8 @@ interface UserContextType {
   task : string
   setTask  : (taskID : string) => void 
   loader : boolean
+  notificationMessages : notificationMessagesType[] ;
+  setnotificationMessages  : (newNotficationArray : notificationMessagesType[])=> void   ; 
   setloader : (loaderShow : boolean) => void
 }
 
@@ -44,15 +75,20 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUserState] = useState<UserData | null>(null);
   const [task, setTask] = useState("");
+  const [tasks, setTasks] = useState([]);
   const [loader, setloader] = useState(false);
-  const [tasklist, settasklist] = useState([]);
-
+  const [notificationMessages, setnotificationMessages] = useState<notificationMessagesType[]>([
+      {
+        message: "Welcome to the game",
+        isPositive: true
+      }
+    ])
+  
   useEffect(() => {
     const storedUser = localStorage.getItem("userData");
     if (storedUser) {
       setUserState(JSON.parse(storedUser));
     }
-    
   }, []);
   
 
@@ -113,8 +149,8 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       if (response.user) {
         console.log("✅ Updating user state with:", response.user);
   
-        // Add a delay before updating the state and hiding the loader
-        await delay(1000); // Delay for 1 second (adjust as needed)
+     
+        await delay(1000); 
   
         setUserState({ ...response.user, 
           gameId: response?.gameId, 
@@ -132,12 +168,13 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       console.error("Error resetting game:", error);
       alert("Failed to reset the game. Please try again.");
     } finally {
-      setloader(false); // Ensure loader is turned off in all cases
+      setloader(false);
     }
   };
   
   return (
-    <UserContext.Provider value={{ 
+    <UserContext.Provider 
+    value={{ 
       user, 
       setUser, 
       logout, 
@@ -146,7 +183,9 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       task,
       setTask,
       loader,
-      setloader
+      setloader,
+      notificationMessages,
+      setnotificationMessages
       }}>
       {children}
     </UserContext.Provider>

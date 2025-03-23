@@ -13,6 +13,7 @@ const InvestorsModal: React.FC<InvestorsModalProps> = ({ isOpen, onClose }) => {
   const [investmentsArray, setInvestmentsArray] = useState<any[]>([]);
   
   useEffect(() => {
+    
     if (user) {
       const investmentsMade = user.investmentsMade || [];
       const availableInvestments = user.availableInvestments || [];
@@ -66,12 +67,13 @@ const InvestorsModal: React.FC<InvestorsModalProps> = ({ isOpen, onClose }) => {
       console.error("An error occurred:", error);
     }
   };
-
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center">
-      <div className="absolute inset-0 bg-black/30" onClick={onClose}></div>
 
-      <div className="relative w-full max-w-5xl rounded-xl bg-white p-6 shadow-lg ">
+    <>
+          <div className="fixed inset-0 z-[9999] flex items-center justify-center">
+      <div className="absolute inset-0 bg-black/30 "  onClick={onClose}></div>
+
+      <div className="relative w-full  max-w-5xl my-6 rounded-xl bg-white p-6 shadow-lg ">
         <button
           onClick={onClose}
           className="absolute right-4 top-4 text-gray-400 hover:text-gray-600"
@@ -96,12 +98,12 @@ const InvestorsModal: React.FC<InvestorsModalProps> = ({ isOpen, onClose }) => {
         </div>
 
         {/* Scrollable cards container */}
-        <div className="max-w-5xl max-w-fit overflow-x-auto pb-4">
+        <div className="max-w-5xl  overflow-x-auto pb-4">
           <div className="flex gap-4">
             {investmentsArray.map((e, index) => (
               <div
                 key={index}
-                className="min-w-[350px] flex-none rounded-xl border border-gray-200 p-5"
+                className="min-w-[250px] flex-none rounded-xl border border-gray-200 p-5"
               >
                 {/* Investor Name */}
                 <h3 className="mb-2 text-xl font-medium text-gray-800">
@@ -110,7 +112,9 @@ const InvestorsModal: React.FC<InvestorsModalProps> = ({ isOpen, onClose }) => {
                 <p className="mb-3 text-sm italic text-blue-500">{e.quote}</p>
 
                 {/* Investor Description */}
-                <p className="mb-6 text-sm text-gray-600">{e.description}</p>
+                <div className="mb-6 text-sm w-100 h-auto text-gray-600">
+                  {e.description}
+                </div>
 
                 {/* Investment Details */}
                 <div className="space-y-4 border-t border-gray-200 pt-4">
@@ -170,6 +174,7 @@ const InvestorsModal: React.FC<InvestorsModalProps> = ({ isOpen, onClose }) => {
         </div>
       </div>
     </div>
+        </>
   );
 };
 

@@ -1,5 +1,5 @@
 "use client"
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Info, Edit } from "lucide-react";
@@ -10,6 +10,7 @@ import MarketInfoModal from "./MarketInfoModal";
 import MentorsModal from "./MentorsModal";
 import TeamManagementModal from "./TeamManagementModal";
 import InvestorsModal from "./InvestorsModal";
+import { roleIcons } from "../roleIcons";
 
 // Dynamically import ReactApexChart to avoid window is not defined errors
 const ReactApexChart = dynamic(() => import('react-apexcharts'), { ssr: false });
@@ -18,7 +19,11 @@ interface SidebarProps {
   sidebarOpen: boolean;
   setSidebarOpen: (arg: boolean) => void;
 }
-
+interface financesBreakdown {
+  Founder: number;  // Uppercase matches API response
+  Investors: number;
+  Mentor: number;
+}
 const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
   const [makevisible, setmakevisible] = useState(false);
   const [marketModalOpen, setMarketModalOpen] = useState(false);
@@ -26,7 +31,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
   const [teamModalOpen, setTeamModalOpen] = useState(false);
   const [investorsModalOpen, setInvestorsModalOpen] = useState(false);
   const { resetTheGame, user } = useUser();
-  
+  const finances = user?.finances || 0;
   const options: ApexOptions = {
     chart: {
       fontFamily: "Satoshi, sans-serif",
@@ -68,8 +73,34 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
       },
     ],
   };
+  const [chartData, setChartData] = useState<{ series: number[]; options: ApexOptions } | null>(null);
 
-  const series = [90, 10, 0];
+  
+  useEffect(() => {
+    if (user?.financesBreakdown) {
+      const breakdown = user.financesBreakdown as financesBreakdown;
+  
+      console.log("breakdown is ", breakdown); // Debugging: Ensure correct structure
+  
+      setChartData({
+        series: [breakdown.Founder, breakdown.Investors, breakdown.Mentor],
+        options: {
+          chart: { type: "donut" },
+          labels: ["Founder", "Investors", "Mentors"],
+        },
+      });
+    }
+  }, [user]);
+  
+
+  // Ensure no undefined values before rendering
+  if (!user || !chartData) {
+    return <div className="p-6">Loading...</div>;
+  }
+  
+  const breakdown: financesBreakdown = user?.financesBreakdown ?? { Founder: 0, Investors: 0, Mentor: 0 };
+  const series = [breakdown.Founder, breakdown.Investors, breakdown.Mentor];
+
   
   const makeVisible = () => {
     setmakevisible((prev) => !prev);
@@ -110,12 +141,12 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
   return (
     <>
       <aside
-        className={`fixed left-0 top-0 z-50 flex h-screen w-[300px] flex-col overflow-y-hidden bg-white duration-300 ease-linear dark:bg-boxdark lg:translate-x-0 ${
+        className={`fixed left-0  top-0 z-50 flex h-screen w-[300px]  flex-col overflow-y-hidden bg-white duration-300 ease-linear dark:bg-boxdark lg:translate-x-0 ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
         {/* Header - With gray background to match app header */}
-        <div className="flex items-center justify-between gap-2 px-6 py-5.5 bg-gray-100 dark:bg-gray-800">
+        <div className="flex items-center  justify-between gap-2 px-6 py-5.5 bg-gray-100 dark:bg-gray-800">
           <Link href="/" className="flex items-center">
             <Image
               width={24}
@@ -170,28 +201,28 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
             <div className="flex items-center">
               {/* Legend Column */}
               <div className=" flex flex-col">
-                <div className="flex items-center mb-2">
-                  <span className="inline-block h-3 w-3 rounded-full bg-[#6577F3]"></span>
-                  <span className="ml-2 text-sm text-gray-600">Founder</span>
-                </div>
-                <div 
-                  className="flex items-center cursor-pointer hover:text-blue-500"
-                  onClick={openInvestorsModal}
-                >
-                  <span className="inline-block h-3 w-3 rounded-full bg-[#A5D6A7]"></span>
-                  <span className="ml-2 text-sm text-gray-600">Investors</span>
-                </div>
-                <div 
-                  className="flex items-center cursor-pointer hover:text-blue-500"
-                  onClick={openMentorsModal}
-                >
-                  <span className="inline-block h-3 w-3 rounded-full bg-[#8FD0EF]"></span>
-                  <span className="ml-2 text-sm text-gray-600">Mentors</span>
-                </div>
+             <div className="flex  text-sm">
+              <span className="inline-block h-3 w-3 rounded-full cursor-pointer
+               my-2 mx-1 bg-[#6577F3]"></span>
+              <span className="text-gray-600 mt-1">Founder</span>
+              <span className="font-medium mx-1 my-1 text-[#6577F3]">{breakdown["Founder"]}%</span>
+          </div>
+          <div className="flex text-sm" onClick={openInvestorsModal} >
+          <span className="inline-block h-3 w-3 mx-1 my-2 rounded-full cursor-pointer
+           bg-[#A5D6A7]"></span>
+            <span className="text-gray-600 mt-1">Investors</span>
+            <span className="font-medium mx-1 my-1 text-[#A5D6A7]">{breakdown.Investors}%</span>
+          </div>
+          <div className="flex  text-sm"  onClick={openMentorsModal}>
+            <span className="inline-block h-3 w-3 mx-1  my-2 rounded-full cursor-pointer
+             bg-[#8FD0EF]"></span>
+            <span className="text-gray-600 mt-1">Mentors</span>
+            <span className="font-medium my-1 text-[#8FD0EF]">{breakdown.Mentor}%</span>
+          </div>
               </div>
               
               {/* Donut Chart */}
-              <div className="-ml-10 relative">
+              <div className="-ml-17 relative">
                 {/* {user?.finances} */}
                 <ReactApexChart
                   options={options}
@@ -199,6 +230,10 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                   type="donut"
                   height={150}
                 />
+             <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
+              <span className="text-gray-500 text-sm font-medium">Funds</span>
+              <span className="text-sm font-bold text-gray-700">${user.finances.toLocaleString()}</span>
+            </div>
                 {/* <p></p>{user?.finances} */}
               </div>
             </div>
@@ -207,23 +242,28 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
             <div className="space-y-2">
               <div className="flex justify-between">
                 <span className="text-sm text-gray-600">Revenue</span>
-                <span className="text-sm font-medium text-emerald-500">$49</span>
+                <span className="text-sm font-medium  tabular-nums text-emerald-500">$ {user.revenue ?
+                user.revenue : "$40" }</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-sm text-gray-600">Salaries</span>
-                <span className="text-sm font-medium text-red-500">-$3,400</span>
+                <span className="text-sm font-medium  tabular-nums text-red-500">-${user.salaries ?
+                user.salaries : "3400" }</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-sm text-gray-600">Rent</span>
-                <span className="text-sm font-medium text-red-500">-$800</span>
+                <span className="text-sm font-medium  tabular-nums text-red-500">-${user.rent
+                  ? user.rent  : "600"}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-sm text-gray-600">Marketing</span>
-                <span className="text-sm font-medium text-red-500">-$280</span>
+                <span className="text-sm font-medium  tabular-nums text-red-500">-${user.marketing
+                  ? user.marketing : "3600"}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-sm text-gray-600">Cost of Sales</span>
-                <span className="text-sm font-medium text-red-500">-$55</span>
+                <span className="text-sm font-medium  tabular-nums text-red-500">-${user.costOfSales
+                  ? user.costOfSales : "44"}</span>
               </div>
             </div>
 
@@ -250,40 +290,18 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
               </h2>
               {/* Edit button for Team */}
               <Edit 
-                className="h-4 w-4 text-blue-500 cursor-pointer hover:text-blue-700" 
+                className="h-4 w-4 cursor-pointer text-blue-500  hover:text-blue-700" 
                 onClick={openTeamModal}
               />
             </div>
             <div className="grid grid-cols-3 gap-4">
-              {[
-                {
-                  role: "CEO",
-                  icon: "M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z",
-                },
-                { role: "Dev", icon: "M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" },
-                {
-                  role: "Sales",
-                  icon: "M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z",
-                },
-              ].map((item) => (
+              {user.teamMembers?.map((item) => (
                 <div key={item.role} className="flex flex-col items-center">
                   <div className="mb-2 rounded-full bg-gray-100 p-3">
-                    <svg
-                      className="h-6 w-6"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d={item.icon}
-                      />
-                    </svg>
+                    {roleIcons[item.roleName] || <span>No Icon</span>}
                   </div>
-                  <span className="text-sm text-gray-600">{item.role}</span>
-                  <span className="text-sm font-medium">1</span>
+                  <span className="text-sm text-gray-600">{item.roleName}</span>
+                  <span className="text-sm font-medium">{item.quantity}</span>
                 </div>
               ))}
             </div>

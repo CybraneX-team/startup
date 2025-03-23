@@ -35,6 +35,7 @@ interface TaskCardProps {
   };
   requiredTeam: string[];
   isSelected: boolean;
+  isBug?: boolean;
   onToggle: () => void;
 }
 
@@ -51,6 +52,7 @@ const CancelTaskModal: React.FC<CancelTaskModalProps> = ({
   isOpen,
   taskName,
   turns,
+  // isBug,
   metrics,
   onConfirm,
   onCancel,
@@ -85,7 +87,7 @@ const CancelTaskModal: React.FC<CancelTaskModalProps> = ({
                   <div key={index} className="flex items-center gap-1">
                     <span className="text-sm text-gray-900">{metric.name}</span>
                     <span className="text-sm text-emerald-600">
-                      +{metric.value}
+                      {metric.value}
                     </span>
                   </div>
                 ))}
@@ -142,6 +144,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
   requiredTeamMembers,
   metricsImpact,
   requiredTeam,
+  isBug,
   isSelected,
   onToggle,
 }) => {
@@ -177,7 +180,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
             className={`text-md mb-4 truncate font-semibold
             ${isSelected ? "text-green-700 dark:text-green-400" : "text-black dark:text-white"}`}
           >
-            {name}
+            {isBug? `🐛 ${name}` : name}
           </h3>
 
           <div className="space-y-3">
@@ -190,28 +193,31 @@ const TaskCard: React.FC<TaskCardProps> = ({
                 Effect on Metrics
               </span>
               <span className="text-emerald-600 dark:text-emerald-400">
-                {Object.entries(metricsImpact)
+              {metricsImpact &&
+                Object.entries(metricsImpact)
                   .filter(([, value]) => value !== undefined && value !== 0)
                   .map(([key, value]) => `${getShortName(key)}: +${value}%`)
                   .join(" , ")}
-              </span>
+            </span>
+
             </div>
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
               <span className="whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
                 Required team members
               </span>
               <div className="flex flex-wrap gap-2">
-                {Object.entries(requiredTeamMembers).map(
-                  ([member, count], index) => (
-                    <div
-                      key={index}
-                      className="flex items-center gap-1 rounded bg-gray-100 px-2 py-1 text-xs dark:bg-gray-700"
-                    >
-                      <Users className="h-3 w-3" />
-                      <span>{member}</span> <span>{count}</span>
-                    </div>
-                  ),
-                )}
+              {requiredTeamMembers &&
+              Object.entries(requiredTeamMembers).map(([member, count], index) =>
+                count > 0 ? (
+                  <div
+                    key={index}
+                    className="flex items-center gap-1 rounded bg-gray-100 px-2 py-1 text-xs dark:bg-gray-700"
+                  >
+                    <Users className="h-3 w-3" />
+                    <span>{member}</span> <span>{count}</span>
+                  </div>
+                ) : null
+              )}
               </div>
             </div>
           </div>
@@ -233,8 +239,8 @@ const TaskGrid: React.FC = () => {
   const [activeFilters, setActiveFilters] = useState<Set<string>>(
     new Set(["all"]),
   );
-  const { user, setTask } = useUser();
-  const [Tasks, setTasks] = useState([]);
+  const { user, setTask, setUser, notificationMessages, setnotificationMessages } = useUser();
+  // const [Tasks, setTasks] = useState([]);
   const router = useRouter();
 
   const [cancelModal, setCancelModal] = useState<{
@@ -253,32 +259,6 @@ const TaskGrid: React.FC = () => {
       router.push("/auth/signup");
       return;
     }
-
-    async function fetchTasks() {
-      try {
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/tasks`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ gameId: user?.gameId }),
-          },
-        );
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch tasks");
-        }
-
-        const taskJson = await response.json();
-        setTasks(taskJson.tasks);
-      } catch (error) {
-        console.error("Failed to load tasks. Please try again.", error);
-      }
-    }
-
-    fetchTasks();
   }, [user, router]);
 
   const handleTaskToggle = (index: number, task: any) => {
@@ -296,7 +276,7 @@ const TaskGrid: React.FC = () => {
         newSelected.add(index);
         return newSelected;
       });
-      setTask(task._id);
+      setTask(task);
     }
   };
 
@@ -348,11 +328,12 @@ const TaskGrid: React.FC = () => {
       costPerAcquisition: "CPA",
       contributionMargin: "CM",
       buyerCount: "B",
+      bugPercentage : "bugPercentage"
     };
     return metricMap[metricName] || metricName;
   }
 
-  const filteredTasks = Tasks.filter((task: any, index: number) => {
+  const filteredTasks = user?.tasks.filter((task: any, index: number) => {
     if (activeFilters.has("all")) return true;
     if (activeFilters.has("in_progress")) return selectedTasks.has(index);
 
@@ -365,8 +346,30 @@ const TaskGrid: React.FC = () => {
     return false;
   });
 
-  const metrics = ["UA", "C1", "AOV", "COGS", "APC", "CPA"];
-
+  const metrics = ["UA", "C1", "AOV", "COGS", "APC", "CPA", "Bugs"];
+  const makeBrainstrom = async (turnAmount: string)=>{
+    const token = localStorage.getItem("userToken");
+    if (!token) {
+      alert("User is not authenticated. Please log in.");
+      return;
+    }
+    const makeReq = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/brainstrom`,{
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        token: token,
+      },
+      body : JSON.stringify({
+        turnAmount,
+        gameId : user?.gameId
+      })
+    })
+    if(makeReq.ok){
+      const response = await makeReq.json();
+      setUser(response);
+      setnotificationMessages([...notificationMessages, response.message])
+    }
+  }
   return (
     <>
       <ToastContainer
@@ -406,7 +409,7 @@ const TaskGrid: React.FC = () => {
           <div className="flex flex-wrap gap-2">
             <FilterButton
               label="All tasks"
-              count={Tasks.length}
+              count={user?.tasks.length}
               isActive={activeFilters.has("all")}
               onClick={() => toggleFilter("all")}
             />
@@ -431,13 +434,16 @@ const TaskGrid: React.FC = () => {
               Reset filters
             </button>
           </div>
-          <button className="flex self-end rounded-lg bg-white px-3 py-2 text-xs font-medium text-black shadow-xl dark:bg-blue-900/50 dark:text-blue-400">
+          <button className="flex self-end rounded-lg 
+          bg-white px-3 py-2 text-xs font-medium text-black shadow-xl dark:bg-blue-900/50 dark:text-blue-400"
+          onClick={()=>{makeBrainstrom("4836")}}
+          >
             Brainstrom
           </button>
         </div>
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6">
-          {filteredTasks.map((task: any, index: number) => (
+          {filteredTasks?.map((task: any, index: number) => (
             <TaskCard
               key={index}
               {...task}
