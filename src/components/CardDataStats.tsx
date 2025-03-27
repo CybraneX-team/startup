@@ -163,7 +163,34 @@ const TaskCard: React.FC<TaskCardProps> = ({
     };
     return metricMap[metricName] || metricName;
   }
-
+  function signTeller (metricName: string) : string {
+    const nameOfMetric = getShortName(metricName)
+    if(
+      nameOfMetric === "UA" || 
+      nameOfMetric ==="C1"  || 
+      nameOfMetric ==="AOV" || 
+      nameOfMetric ==="APC"
+    ){
+      return "+"
+    }else{
+      return ""
+    }
+  }
+  function symbolToShow (metricName: string): boolean {
+    const nameOfMetric = getShortName(metricName)
+    if (nameOfMetric === "C1") {
+      return true
+    }
+    return false
+  }
+  function showDollarSign(metricName: string) : string {
+    const nameOfMetric = getShortName(metricName)
+    if (nameOfMetric === "AOV" || nameOfMetric === "COGS" || nameOfMetric === "CPA"){
+      return "$"
+    }else{
+      return ""
+    }
+  }
   return (
     <div
       className={`w-full cursor-pointer rounded-xl border p-4 shadow-sm transition-all duration-200 hover:shadow-md
@@ -180,7 +207,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
             className={`text-md mb-4 truncate font-semibold
             ${isSelected ? "text-green-700 dark:text-green-400" : "text-black dark:text-white"}`}
           >
-            {isBug? `🐛 ${name}` : name}
+            {isBug? `🐛 Bug: ${name}` : name}
           </h3>
 
           <div className="space-y-3">
@@ -196,7 +223,8 @@ const TaskCard: React.FC<TaskCardProps> = ({
               {metricsImpact &&
                 Object.entries(metricsImpact)
                   .filter(([, value]) => value !== undefined && value !== 0)
-                  .map(([key, value]) => `${getShortName(key)}: +${value}%`)
+                  .map(([key, value]) => `${getShortName(key)}: ${signTeller(key)} ${showDollarSign(key)} ${value}
+                  ${symbolToShow(key) ? "%" : "" }`)
                   .join(" , ")}
             </span>
 
@@ -298,23 +326,31 @@ const TaskGrid: React.FC = () => {
   };
 
   const toggleFilter = (filter: string) => {
+    const mappedFilter = filter === "Bugs" ? "bugPercentage" : filter;
+  
     setActiveFilters((prev) => {
       const newFilters = new Set(prev);
-      if (filter === "all") {
+  
+      if (mappedFilter === "all") {
         return new Set(["all"]);
       }
+  
       newFilters.delete("all");
-      if (newFilters.has(filter)) {
-        newFilters.delete(filter);
+  
+      if (newFilters.has(mappedFilter)) {
+        newFilters.delete(mappedFilter);
+  
         if (newFilters.size === 0) {
           return new Set(["all"]);
         }
       } else {
-        newFilters.add(filter);
+        newFilters.add(mappedFilter);
       }
+  
       return newFilters;
     });
   };
+  
 
   function getShortName(metricName: string): string {
     const metricMap: Record<string, string> = {
@@ -339,7 +375,12 @@ const TaskGrid: React.FC = () => {
 
     if (task.metricsImpact) {
       return Object.entries(task.metricsImpact).some(([metric, value]) => {
-        const shortMetric = getShortName(metric).toUpperCase();
+        let shortMetric
+        if(metric === "bugPercentage"){
+          shortMetric =getShortName(metric);
+        }else{
+          shortMetric =getShortName(metric).toUpperCase()
+        }
         return activeFilters.has(shortMetric) && value !== 0;
       });
     }

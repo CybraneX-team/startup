@@ -137,7 +137,9 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
   const closeInvestorsModal = () => {
     setInvestorsModalOpen(false);
   };
-  
+  const renderValue = (value : any) => {
+    return Number.isInteger(value) ? value : value.toFixed(1);
+  };
   return (
     <>
       <aside
@@ -205,20 +207,18 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
               <span className="inline-block h-3 w-3 rounded-full cursor-pointer
                my-2 mx-1 bg-[#6577F3]"></span>
               <span className="text-gray-600 mt-1">Founder</span>
-              <span className="font-medium mx-1 my-1 text-[#6577F3]">{breakdown["Founder"]}%</span>
+              <span className="font-medium mx-1 my-1 text-[#6577F3]">{renderValue(breakdown["Founder"])}%</span>
           </div>
           <div className="flex text-sm" onClick={openInvestorsModal} >
           <span className="inline-block h-3 w-3 mx-1 my-2 rounded-full cursor-pointer
            bg-[#A5D6A7]"></span>
             <span className="text-gray-600 mt-1">Investors</span>
-            <span className="font-medium mx-1 my-1 text-[#A5D6A7]">{breakdown.Investors}%</span>
-          </div>
+            <span className="font-medium mx-1 my-1 text-[#A5D6A7]">{renderValue(breakdown.Investors)}%</span> </div>
           <div className="flex  text-sm"  onClick={openMentorsModal}>
             <span className="inline-block h-3 w-3 mx-1  my-2 rounded-full cursor-pointer
              bg-[#8FD0EF]"></span>
             <span className="text-gray-600 mt-1">Mentors</span>
-            <span className="font-medium my-1 text-[#8FD0EF]">{breakdown.Mentor}%</span>
-          </div>
+            <span className="font-medium my-1 text-[#8FD0EF]">{renderValue(breakdown.Mentor)}%</span> </div>
               </div>
               
               {/* Donut Chart */}
@@ -296,7 +296,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
             </div>
             <div className="grid grid-cols-3 gap-4">
               {user.teamMembers?.map((item) => (
-                <div key={item.role} className="flex flex-col items-center">
+                <div key={item._id} className="flex flex-col items-center">
                   <div className="mb-2 rounded-full bg-gray-100 p-3">
                     {roleIcons[item.roleName] || <span>No Icon</span>}
                   </div>

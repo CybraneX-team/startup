@@ -1,8 +1,9 @@
 "use client"
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { useUser } from "@/context/UserContext";
 import { mentorsIcon } from "../roleIcons";
+import DealModal from "./dealModel";
 
 interface MentorCardProps {
   title: string;
@@ -13,58 +14,109 @@ interface MentorCardProps {
   isSelected?: boolean;
 }
 
-const MentorCard: React.FC<MentorCardProps> = ({ 
-  title, 
-  description, 
-  conditions, 
-  benefits, 
+const MentorCard: React.FC<MentorCardProps> = ({
+  title,
+  description,
+  conditions,
+  benefits,
   limitations,
-  isSelected = false
 }) => {
+  const [showDealModal, setShowDealModal] = useState(false);
+  const {user, setUser, setUserState, setnotificationMessages, notificationMessages } = useUser()
+  async function signMentor(mentorName : string) {
+    const request = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/hireMentor`,{
+      method : "POST", 
+      body: JSON.stringify({
+        mentorName : mentorName,
+        gameId : user?.gameId
+      }),
+      headers: {
+        "Content-Type": "application/json",
+        token: `${localStorage.getItem("userToken")}`,
+      }
+    })
+
+    if(request.ok){
+      const response = await request.json()
+      setUser(response) 
+      setUserState(response)
+      setnotificationMessages([...notificationMessages, response.message])
+      setShowDealModal(false);
+    }else {
+      console.error(
+        `Request failed with status ${request.status}: ${request.statusText}`,
+      );
+    }
+  } 
   return (
-    <div className={`min-w-[350px] flex-none rounded-xl border p-5 ${isSelected ? 'border-blue-500 bg-blue-50' : 'border-gray-200'}`}>
-      <div className="mb-4 flex items-center gap-3">
-      <div className="h-full  rounded-full overflow-hidden">
-  <div className="w-full h-full">
-    {mentorsIcon[title] || <span>No Icon</span>}
-  </div>
-</div>
+    <>
+      <div
+        onClick={() => setShowDealModal(true)}
+        className="min-w-[350px] cursor-pointer flex-none rounded-xl border border-gray-200 bg-white p-5 hover:shadow-lg transition"
+      >
+        <div className="mb-4 flex items-center gap-3">
+          <div className="h-full rounded-full overflow-hidden">
+            <div className="w-full h-full">
+              {mentorsIcon[title] || <span>No Icon</span>}
+            </div>
+          </div>
+          <h3 className="text-xl font-medium text-gray-800">{title}</h3>
+        </div>
 
+        <p className="mb-6 text-sm w-90 text-gray-600">{description}</p>
 
-        <h3 className="text-xl font-medium text-gray-800">{title}</h3>
-      </div>
-      
-      <p className="mb-6 text-sm text-gray-600">{description}</p>
-      
-      <div className="mb-3 flex items-center justify-between border-b border-gray-200 pb-3">
-        <span className="text-sm font-medium text-gray-700">Conditions (required stake)</span>
-        <span className="text-sm font-medium text-blue-500">{conditions}</span>
-      </div>
-      
-      <div className="mb-3">
-        <h4 className="mb-2 text-sm font-medium text-gray-700">Benefits</h4>
-        <ul>
-          {/* {benefits.map((benefit, index) => ( */}
-            <li  className="flex items-start gap-2 text-sm text-blue-500">
+        <div className="mb-3 flex items-center justify-between border-b border-gray-200 pb-3">
+          <span className="text-sm font-medium text-gray-700">Conditions (required stake)</span>
+          <span className="text-sm font-medium text-blue-500">{conditions}%</span>
+        </div>
+
+        <div className="mb-3">
+          <h4 className="mb-2 text-sm font-medium text-gray-700">Benefits</h4>
+          <ul>
+            <li className="flex items-start gap-2 text-sm text-blue-500">
               <span className="mt-1 h-2 w-2 flex-none rounded-full bg-blue-500"></span>
               {benefits}
             </li>
-          
-        </ul>
-      </div>
-      
-      <div>
-        <h4 className="mb-2 text-sm font-medium text-gray-700">Limitations</h4>
-        <ul>
-            <li  className="flex items-start gap-2 text-sm text-blue-500">
+          </ul>
+        </div>
+
+        <div>
+          <h4 className="mb-2 text-sm font-medium text-gray-700">Limitations</h4>
+          <ul>
+            <li className="flex items-start gap-2 text-sm text-blue-500">
               <span className="mt-1 h-2 w-2 flex-none rounded-full bg-blue-500"></span>
               {limitations}
             </li>
-        </ul>
+          </ul>
+        </div>
+        <div className="mt-4 text-right">
+                  {user?.myMentors.some(
+                    (element) => element.mentorName === title,
+                  ) ? (
+                    <span className="rounded border border-green-600 px-2 py-1 font-semibold text-green-600">
+                      SIGNED
+                    </span> 
+                  ): null
+                }
+          </div>
       </div>
-    </div>
+
+      <DealModal
+        isOpen={showDealModal}
+        onClose={() => setShowDealModal(false)}
+        mentorName={title}
+        conditions={conditions.toString()}
+        benefits={[benefits]}        // 👈 string → string[]
+        limitations={[limitations]}  
+        onSign={() => {
+          signMentor(title)
+        }}
+      />
+    </>
   );
 };
+
+// export default MentorCard;
 
 interface MentorsModalProps {
   isOpen: boolean;
@@ -74,8 +126,27 @@ interface MentorsModalProps {
 const MentorsModal: React.FC<MentorsModalProps> = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
   const {user} = useUser()
-
-
+  const [mentorsArray, setmentorsArray] = useState<any[]>([]);
+  
+    useEffect(() => {
+      
+      if (user) {
+        const mentorsAvailable = user.mentorsAvailable || [];
+        const myMentors = user.myMentors || [];
+  
+        const hasMatchingNames = myMentors.some((investmentMade) =>
+          mentorsAvailable.some(
+            (available) => available.name === investmentMade.name,
+          ),
+        );
+  
+        if (hasMatchingNames) {
+          setmentorsArray([...mentorsAvailable]);
+        } else {
+          setmentorsArray([...mentorsAvailable, ...myMentors]);
+        }
+      }
+    }, [user]);
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center">
       {/* Full-screen overlay to dim entire application */}
@@ -98,15 +169,16 @@ const MentorsModal: React.FC<MentorsModalProps> = ({ isOpen, onClose }) => {
             <h2 className="text-2xl font-medium text-gray-800">Available Mentors</h2>
             <span className="text-2xl font-medium text-green-500">4</span>
           </div>
-          <p className="mt-2 text-sm text-gray-600">
+          <p className="mt-2 text-sm  text-gray-600">
             A startup mentor is someone who offers guidance and support, helping startup workers to develop their skills, grow their networks, and achieve their professional goals.
           </p>
+         
         </div>
         
         {/* Scrollable cards container */}
         <div className="overflow-x-auto pb-4">
           <div className="flex gap-4">
-            {user?.mentorsAvailable.map((mentor, index) => (
+            {mentorsArray.map((mentor, index) => (
               <MentorCard
                 key={index}
                 title={mentor.mentorName}

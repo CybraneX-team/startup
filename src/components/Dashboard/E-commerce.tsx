@@ -252,6 +252,9 @@ interface ModalInfo {
   content: React.ReactNode;
   anchorEl: HTMLElement | null;
 }
+function formatAsPercentage(num: number): number {
+  return parseFloat((num * 100).toFixed(1));
+}
 type MetricKey =
   | 'userAcquisition'
   | 'conversionFirstPurchase'
@@ -351,7 +354,9 @@ const ECommerce: React.FC = () => {
     loader, 
     setloader, 
     notificationMessages, 
-    setnotificationMessages 
+    setnotificationMessages ,
+    turnAmount,
+    setTurnAmount
   } = useUser();
   
   const router = useRouter();
@@ -442,7 +447,7 @@ const ECommerce: React.FC = () => {
       costPerAcquisition: "CPA",
       contributionMargin: "CM",
       buyerCount: "B",
-      bugPercentage : "Bugs"
+      bugPercentage : "bugPercentage"
     };
 
     return metricMap[metricName] || metricName;
@@ -612,7 +617,7 @@ const ECommerce: React.FC = () => {
 
       <h3 className="text-sm text-gray-500 dark:text-gray-400">Metrics</h3>
       <div className="my-2 flex gap-3 overflow-x-scroll lg:overflow-x-hidden">
-  {user && user.metrics && orderedMetrics.map((metric, index) => (
+      {user && user.metrics && orderedMetrics.map((metric, index) => (
     <div
       key={index}
       onClick={(e) => handleMetricClick(getShortName(metric), e)}
@@ -622,14 +627,32 @@ const ECommerce: React.FC = () => {
         {getShortName(metric)}
       </span>
       <span className="text-xs font-medium text-[#6577F3] dark:text-secondary">
-        {dollarMetrics.includes(getShortName(metric)) ? '' : ''}
-        {Number.isInteger(user.metrics[metric]) || countDecimalPlaces(user.metrics[metric]) <= 2
-          ? user.metrics[metric]
-          : user.metrics[metric].toFixed(2)}
-        {dollarMetrics.includes(getShortName(metric)) ? '$' : ''}
+  {(() => {
+    const shortName = getShortName(metric);
+    const value = user.metrics[metric];
+
+    let displayValue;
+    if (shortName === 'UA' || shortName === 'B') {
+      displayValue = Math.floor(value);
+    } else if (Number.isInteger(value) || countDecimalPlaces(value) <= 2) {
+      displayValue = value;
+    } else {
+      displayValue = value.toFixed(2);
+    }
+
+    return (
+      <>
+        {displayValue}
+        {shortName === 'C1' ? '%' : ''}
+        {dollarMetrics.includes(shortName) ? '$' : ''}
+      </>
+    );
+  })()}
       </span>
     </div>
   ))}
+
+
 </div>
 
 
@@ -644,90 +667,77 @@ const ECommerce: React.FC = () => {
       <div className="mt-4 w-full pb-28 md:mt-4 2xl:mt-7.5">
         <TaskGrid />
       </div>
-
-      <div className="fixed bottom-0 -mx-8 flex w-full items-center justify-between bg-white p-5 dark:bg-boxdark">
-      {/* Notification Box with Fixed Width */}
-      <div className="w-[35em] transition-all duration-300 ">
-        <div className="rounded-xl bg-[#eff4fb9a] p-3 dark:bg-[#1A222C] ">
-          <div className="flex justify-between items-center ">
-            <h3 className={` 
-              text-sm 
-              ${ notificationMessages[notificationMessages.length - 1].isPositive?
-                `text-emerald-600 
-                dark:text-emerald-400 ` :
-                `text-red-600 
-                dark:text-red-400 ` 
-              }
-             
-              `}>
-              {
-              notificationMessages[notificationMessages.length - 1].message
-              }
-            </h3>
-            <button
-              onClick={() => setShowNotifications(!showNotifications)}
-              className="text-gray-600 dark:text-gray-400"
-            >
-              {showNotifications ? (
-                <span className="flex items-center">
-                  Hide notifications <Bell className="ml-1" size={16} />
-                </span>
-              ) : (
-                <span className="flex items-center">
-                  Show notifications <Bell className="ml-1 text-red-500" size={16} />
-                </span>
-              )}
-            </button>
-          </div>
-
-          <div
-            className={`overflow-hidden transition-all duration-300 overflow-y-scroll ${
-              showNotifications ? "max-h-40" : "max-h-0"
-            }`}
-          >
-            <div className="mt-2 text-sm">
-            {
-              notificationMessages
-                .map((e, i, arr) => {
-                  if (i !== arr.length - 1) {
-                    return (
-                      <p key={i} className={e.isPositive ? "text-green-600" : "text-red-500"}>
-                        {e.message}
-                      </p>
-                    );
-                  }
-                  return null;
-                })
-              }
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Funds & Turn Section */}
-      <div className="flex items-center space-x-10 absolute left-[50em]">
-        <div className="text-sm">
-          <p>Bugs</p>
-          <p className="font-semibold"> {user?.bugPercentage}% </p>
-        </div>
-        <div className="text-sm">
-          <p>Current funds</p>
-          <p className="font-semibold"> ${user?.finances}</p>
-        </div>
-        <button
-          onClick={()=>{makeTurn(task, "4836")}}
-          className="w-60 max-w-xl rounded-xl bg-[#4fc387] p-3"
+      <div className="fixed bottom-0 left-[18.77em] right-0 flex w-[77em] items-end justify-between bg-white p-5 dark:bg-boxdark z-50">
+  {/* Notification Box */}
+  <div className="w-[35em] max-w-[35%] ">
+    <div className="rounded-xl bg-[#eff4fb9a] p-3 dark:bg-[#1A222C]">
+      <div className="flex justify-between items-center">
+        <h3
+          className={`text-sm ${
+            notificationMessages[notificationMessages.length - 1].isPositive
+              ? "text-emerald-600 dark:text-emerald-400"
+              : "text-red-600 dark:text-red-400"
+          }`}
         >
-          <span className="flex text-end font-semibold text-white">
-            Make turn 
-          </span>
-          <div className="flex items-center justify-between">
-            <span className="font-semibold text-white">Income</span>
-            <h3 className="font-bold text-white">- $4486</h3>
-          </div>
+          {notificationMessages[notificationMessages.length - 1].message}
+        </h3>
+        <button
+          onClick={() => setShowNotifications(!showNotifications)}
+          className="text-gray-600 dark:text-gray-400"
+        >
+          {showNotifications ? (
+            <span className="flex items-center">
+              Hide notifications <Bell className="ml-1" size={16} />
+            </span>
+          ) : (
+            <span className="flex items-center">
+              Show notifications <Bell className="ml-1 text-red-500" size={16} />
+            </span>
+          )}
         </button>
       </div>
+
+      <div
+        className={`transition-all duration-300 overflow-y-scroll ${
+          showNotifications ? "max-h-40 mt-2" : "max-h-0"
+        }`}
+      >
+        <div className="text-sm">
+          {notificationMessages
+            .slice(0, notificationMessages.length - 1)
+            .map((e, i) => (
+              <p key={i} className={e.isPositive ? "text-green-600" : "text-red-500"}>
+                {e.message}
+              </p>
+            ))}
+        </div>
+      </div>
     </div>
+  </div>
+
+  {/* Make Turn & Stats */}
+  <div className="flex items-end space-x-10">
+    <div className="text-sm">
+      <p>Bugs</p>
+      <p className="font-semibold">{user?.bugPercentage}%</p>
+    </div>
+    <div className="text-sm">
+      <p>Current funds</p>
+      <p className="font-semibold">${user?.finances}</p>
+    </div>
+    <button
+      onClick={() => makeTurn(task, turnAmount)}
+      className="w-60 rounded-xl bg-[#4fc387] p-2"
+    >
+      <span className="text-center font-semibold text-white">Make turn</span>
+      <div className="flex justify-between">
+        <span className="font-semibold text-white">Income</span>
+        <h3 className="font-bold text-white">{user ? turnAmount : ""}</h3>
+      </div>
+    </button>
+  </div>
+</div>
+
       {/* </div> */}
     </>
   );

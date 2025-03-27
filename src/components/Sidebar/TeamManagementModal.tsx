@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Minus, Plus } from "lucide-react";
 import { useUser } from "@/context/UserContext";
 import {  roleIcons } from "../roleIcons";
-
+import {UserData} from "../../context/UserContext"
 interface TeamManagementModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -16,7 +16,7 @@ interface Employee {
 }
 
 const TeamManagementModal = ({ isOpen, onClose }: TeamManagementModalProps) => {
-  const { user, setUser } = useUser();
+  const { user, setUser, setUserState } = useUser();
   const [team, setTeam] = useState<Employee[]>([]);
   const [maxEmployees, setMaxEmployees] = useState<number>(0);
   const [totalCount, setTotalCount] = useState<number>(0);
@@ -60,40 +60,25 @@ const TeamManagementModal = ({ isOpen, onClose }: TeamManagementModalProps) => {
     setTotalCount((prev) => Math.max(prev - 1, 0));
   };
 
-  const handleConfirm = async () => {
-    try {
-      const token = localStorage.getItem("userToken");
-      if (!token) {
-        alert("User is not authenticated. Please log in.");
-        return;
-      }
-
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/editTeam`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          token: token,
-        },
-        body: JSON.stringify({
-          teamData: team.reduce((acc, emp) => {
-            acc[emp.roleName] = emp.quantity;
-            return acc;
-          }, {} as Record<string, number>),
-          gameId: user?.gameId,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`Error: ${response.status} - ${response.statusText}`);
-      }
-
-      const updatedUserData = await response.json();
-      setUser(updatedUserData); 
-      onClose();
-    } catch (error) {
-      console.error("❌ Error updating team:", error);
-      alert("Failed to update team. Please try again.");
-    }
+  const handleConfirm = () => {
+    const newTeamMembers = team.map((emp) => ({
+      _id: emp._id,
+      roleName: emp.roleName,
+      quantity: emp.quantity,
+      salary: emp.salary,
+    }));
+  
+    if (!user) return;
+  
+    const updatedUser: UserData = {
+      ...user,
+      teamMembers: newTeamMembers,
+    };
+  
+    localStorage.setItem("userData", JSON.stringify(updatedUser));
+    setUserState(updatedUser);
+  
+    onClose();
   };
 
   if (!isOpen) return null;

@@ -30,6 +30,12 @@ interface financesBreakdown {
   Investors: number;
   Mentor: number;
 }
+interface Employee {
+  _id: string;
+  roleName: string;
+  salary: number;
+  quantity: number;
+}
 export interface UserData {
   finances: number;
   metrics: Metrics;
@@ -42,15 +48,16 @@ export interface UserData {
   salaries : number;
   costOfSales  : number;
   rent  : number;
-  teamMembers: any[]
-  gameId: string
+  teamMembers: Employee[];
+  gameId: string;
   availableInvestments : any[];
-  investmentsMade: any[]
+  investmentsMade: any[];
   employeesAvailable: employeesAvailable[]; 
   financesBreakdown : financesBreakdown;
   mentorsAvailable: any[];
   tasks : any[];
   bugPercentage : number;
+  myMentors : any[]
 }
 interface notificationMessagesType{
   message: string;
@@ -68,6 +75,8 @@ interface UserContextType {
   notificationMessages : notificationMessagesType[] ;
   setnotificationMessages  : (newNotficationArray : notificationMessagesType[])=> void   ; 
   setloader : (loaderShow : boolean) => void
+  turnAmount  : string, 
+  setTurnAmount : (trunAmount : string) => void
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -83,6 +92,24 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         isPositive: true
       }
     ])
+    const [turnAmount, setTurnAmount] = useState<string>("");
+
+    useEffect(() => {
+      if (
+        !user ||
+        user.salaries === undefined ||
+        user.rent === undefined ||
+        !user.metrics?.contributionMargin
+      ) {
+        setTurnAmount("");
+        return;
+      }
+    
+      const value = Math.floor(user.salaries + user.rent - user.metrics.contributionMargin);
+      const sign = value < 0 ? '-' : '-';
+      setTurnAmount(`${sign}${Math.abs(value)}`);
+    }, [user]);
+    
   
   useEffect(() => {
     const storedUser = localStorage.getItem("userData");
@@ -185,7 +212,9 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       loader,
       setloader,
       notificationMessages,
-      setnotificationMessages
+      setnotificationMessages,
+      turnAmount, 
+      setTurnAmount
       }}>
       {children}
     </UserContext.Provider>
