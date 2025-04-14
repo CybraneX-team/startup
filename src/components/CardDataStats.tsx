@@ -280,10 +280,7 @@ const TaskGrid: React.FC = () => {
   const [activeFilters, setActiveFilters] = useState<Set<string>>(
     new Set(["all"]),
   );
-  useEffect(() => {
-    console.log(selectedTasks)
-    console.log(selectedTaskIds)
-  }, [selectedTasks])
+
   
   const { user, setTask, setUser,notificationMessages ,setnotificationMessages, selectedTaskIds, setSelectedTaskIds } = useUser();
 

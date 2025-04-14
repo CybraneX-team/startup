@@ -14,9 +14,7 @@ const InvestorsModal: React.FC<InvestorsModalProps> = ({ isOpen, onClose }) => {
   const [selectedInvestor, setSelectedInvestor] = useState<any | null>(null);
   const [showSignConfirm, setShowSignConfirm] = useState(false);
   const [showBuyoutConfirm, setShowBuyoutConfirm] = useState(false);
-  useEffect(() => {
-    console.log("selectedInvestor-selectedInvestor", selectedInvestor) 
-  }, [selectedInvestor])
+
   
   useEffect(() => {
     
