@@ -1,10 +1,10 @@
 "use client";
-
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Users, CheckSquare } from "lucide-react";
 import { useUser } from "@/context/UserContext";
 import { useRouter } from "next/navigation";
 import { toast, ToastContainer, Bounce } from "react-toastify";
+// import { FixedSizeList as List } from 'react-window';
 
 interface FilterButtonProps {
   label: string;
@@ -52,41 +52,51 @@ const CancelTaskModal: React.FC<CancelTaskModalProps> = ({
   isOpen,
   taskName,
   turns,
-  // isBug,
   metrics,
   onConfirm,
   onCancel,
 }) => {
+  const {HeaderDark, setHeaderDark} = useUser()
+  useEffect(() => {
+    setHeaderDark(isOpen);
+    return () => setHeaderDark(false); // reset on unmount
+  }, [isOpen]);
   if (!isOpen) return null;
-
+  
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="w-full max-w-md rounded-2xl bg-white p-6">
-        <h2 className="mb-4 text-xl font-semibold text-gray-900">
+    <div className={`fixed inset-0 z-50  flex items-center justify-center bg-black bg-opacity-50`}>
+      <div className="w-full max-w-md rounded-2xl bg-white p-6 dark:bg-[#1A232F] dark:text-white">
+        <h2 className="mb-4 text-xl font-semibold text-gray-900 dark:text-white">
           Cancel task?
         </h2>
 
-        <div className="mb-6 rounded-lg border border-gray-200 p-4">
-          <h3 className="mb-3 text-base font-medium text-gray-900">
+        <div className="mb-6 rounded-lg border border-gray-200 p-4 dark:border-gray-700">
+          <h3 className="mb-3 text-base font-medium text-gray-900 dark:text-white">
             {taskName}
           </h3>
 
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Turns required</span>
+              <span className="text-sm text-gray-600 dark:text-gray-400">
+                Turns required
+              </span>
               <div className="flex items-center gap-1">
-                <span className="text-sm text-gray-900">{turns.current}</span>
-                <span className="text-sm text-gray-500">/{turns.total}</span>
+                <span className="text-sm text-gray-900 dark:text-white">{turns.current}</span>
+                <span className="text-sm text-gray-500 dark:text-gray-400">/{turns.total}</span>
               </div>
             </div>
 
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Effect on Metrics</span>
+              <span className="text-sm text-gray-600 dark:text-gray-400">
+                Effect on Metrics
+              </span>
               <div className="flex items-center gap-2">
                 {metrics.map((metric, index) => (
                   <div key={index} className="flex items-center gap-1">
-                    <span className="text-sm text-gray-900">{metric.name}</span>
-                    <span className="text-sm text-emerald-600">
+                    <span className="text-sm text-gray-900 dark:text-white">
+                      {metric.name}
+                    </span>
+                    <span className="text-sm text-emerald-600 dark:text-emerald-400">
                       {metric.value}
                     </span>
                   </div>
@@ -105,7 +115,7 @@ const CancelTaskModal: React.FC<CancelTaskModalProps> = ({
           </button>
           <button
             onClick={onCancel}
-            className="w-full rounded-lg border border-gray-200 bg-white py-2.5 text-gray-900 transition-colors hover:bg-gray-50"
+            className="w-full rounded-lg border border-gray-200 bg-white py-2.5 text-gray-900 transition-colors hover:bg-gray-50 dark:border-gray-700 dark:bg-[#1A232F] dark:text-white dark:hover:bg-gray-800"
           >
             No
           </button>
@@ -114,6 +124,7 @@ const CancelTaskModal: React.FC<CancelTaskModalProps> = ({
     </div>
   );
 };
+
 const FilterButton: React.FC<FilterButtonProps> = ({
   label,
   count,
@@ -263,70 +274,104 @@ const TaskCard: React.FC<TaskCardProps> = ({
 };
 
 const TaskGrid: React.FC = () => {
-  const [selectedTasks, setSelectedTasks] = useState<Set<number>>(new Set());
+  // const [selectedTasks, setSelectedTasks] = useState<Set<number>>(new Set());
+  const [selectedTasks, setSelectedTasks] = useState<Set<string>>(new Set());
+
   const [activeFilters, setActiveFilters] = useState<Set<string>>(
     new Set(["all"]),
   );
-  const { user, setTask, setUser, notificationMessages, setnotificationMessages } = useUser();
+  useEffect(() => {
+    console.log(selectedTasks)
+    console.log(selectedTaskIds)
+  }, [selectedTasks])
+  
+  const { user, setTask, setUser,notificationMessages ,setnotificationMessages, selectedTaskIds, setSelectedTaskIds } = useUser();
+
   // const [Tasks, setTasks] = useState([]);
   const router = useRouter();
 
   const [cancelModal, setCancelModal] = useState<{
     isOpen: boolean;
-    taskIndex: number | null;
+    taskId: string | null;
     task: any | null;
   }>({
     isOpen: false,
-    taskIndex: null,
+    taskId: null,
     task: null,
   });
+  
 
   useEffect(() => {
     if (!user?.gameId) {
-      toast.error("Please login. Game ID not available.");
+      toast.info("You have been logged out");
       router.push("/auth/signup");
       return;
     }
   }, [user, router]);
 
-  const handleTaskToggle = (index: number, task: any) => {
-    if (selectedTasks.has(index)) {
-      // Show cancel modal when deselecting
-      setCancelModal({
-        isOpen: true,
-        taskIndex: index,
-        task: task,
-      });
+  const handleTaskToggle = useCallback((task: any) => {
+    const newSelected = new Set(selectedTasks);
+    const taskId = task._id;
+  
+    if (newSelected.has(taskId)) {
+      setCancelModal({ isOpen: true, taskId, task });
     } else {
-      // Directly select the task
-      setSelectedTasks((prev) => {
-        const newSelected = new Set(prev);
-        newSelected.add(index);
-        return newSelected;
+      newSelected.add(taskId);
+      setSelectedTasks(newSelected);
+      setTask(taskId);
+      setSelectedTaskIds((prev) => {
+        const alreadyExists = prev.some((idObj) =>
+          task.isBug ? idObj.bugId === task._id : idObj.taskId === task.taskId
+        );
+        if (alreadyExists) return prev;
+      
+        return task.isBug
+          ? [...prev, { bugId: task._id }]
+          : [...prev, { taskId: task.taskId }];
       });
-      setTask(task);
+      
     }
-  };
-
+  }, [selectedTasks, setTask, setSelectedTaskIds]);
+  
+  
   const handleCancelConfirm = () => {
-    if (cancelModal.taskIndex !== null) {
+    console.log(cancelModal)
+    if (cancelModal.taskId) {
+      // Remove from selectedTasks set
       setSelectedTasks((prev) => {
         const newSelected = new Set(prev);
-        if (cancelModal.taskIndex !== null) {
-          newSelected.delete(cancelModal.taskIndex);
-        }
+        newSelected.delete(cancelModal.taskId? cancelModal.taskId : "" );
         return newSelected;
       });
+  
+      // Remove from selectedTaskIds array
+      setSelectedTaskIds((prev) => {
+        if (!cancelModal.task) return prev;
+  
+        return prev.filter((idObj) => {
+          if (cancelModal.task.isBug) {
+            return idObj.bugId !== cancelModal.task._id;
+          } else {
+            return idObj.taskId !== cancelModal.task.taskId;
+          }
+        });
+      });
     }
-    setCancelModal({ isOpen: false, taskIndex: null, task: null });
+  
+    // Close modal
+    setCancelModal({ isOpen: false, taskId: null, task: null });
   };
+  
+  
+  
 
   const handleCancelDismiss = () => {
-    setCancelModal({ isOpen: false, taskIndex: null, task: null });
+    setCancelModal({ isOpen: false, taskId: null, task: null });
   };
+  
 
   const toggleFilter = (filter: string) => {
-    const mappedFilter = filter === "Bugs" ? "bugPercentage" : filter;
+    const mappedFilter = filter === "Bugs" ? "bugs" : filter;
   
     setActiveFilters((prev) => {
       const newFilters = new Set(prev);
@@ -369,23 +414,24 @@ const TaskGrid: React.FC = () => {
     return metricMap[metricName] || metricName;
   }
 
-  const filteredTasks = user?.tasks.filter((task: any, index: number) => {
-    if (activeFilters.has("all")) return true;
-    if (activeFilters.has("in_progress")) return selectedTasks.has(index);
-
-    if (task.metricsImpact) {
-      return Object.entries(task.metricsImpact).some(([metric, value]) => {
-        let shortMetric
-        if(metric === "bugPercentage"){
-          shortMetric =getShortName(metric);
-        }else{
-          shortMetric =getShortName(metric).toUpperCase()
-        }
-        return activeFilters.has(shortMetric) && value !== 0;
-      });
-    }
-    return false;
-  });
+  const filteredTasks = useMemo(() => {
+    if (!user?.tasks) return [];
+  
+    return user.tasks.filter((task: any, index: number) => {
+      if (activeFilters.has("all")) return true;
+      if (activeFilters.has("in_progress")) return selectedTasks.has(task._id);
+      ;
+  
+      if (task.metricsImpact) {
+        return Object.entries(task.metricsImpact).some(([metric, value]) => {
+          const shortMetric = getShortName(metric);
+          return activeFilters.has(shortMetric) && value !== 0;
+        });
+      }
+      return false;
+    });
+  }, [user?.tasks, activeFilters, selectedTasks]);
+  
 
   const metrics = ["UA", "C1", "AOV", "COGS", "APC", "CPA", "Bugs"];
   const makeBrainstrom = async (turnAmount: string)=>{
@@ -484,14 +530,16 @@ const TaskGrid: React.FC = () => {
         </div>
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6">
-          {filteredTasks?.map((task: any, index: number) => (
+        {filteredTasks?.map((task: any, index) => (
             <TaskCard
               key={index}
               {...task}
-              isSelected={selectedTasks.has(index)}
-              onToggle={() => handleTaskToggle(index, task)}
+              isSelected={selectedTasks.has(task._id)}
+              onToggle={() => handleTaskToggle(task)}
             />
           ))}
+
+          
         </div>
       </div>
     </>

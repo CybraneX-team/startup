@@ -4,13 +4,17 @@ import DropdownMessage from "./DropdownMessage";
 import DropdownNotification from "./DropdownNotification";
 import DropdownUser from "./DropdownUser";
 import Image from "next/image";
+import { useUser } from "@/context/UserContext";
 
 const Header = (props: {
   sidebarOpen: string | boolean | undefined;
   setSidebarOpen: (arg0: boolean) => void;
 }) => {
+    const {HeaderDark} = useUser()
+  
   return (
-<header className="sticky top-0 z-[900] flex w-full bg-white dark:bg-boxdark dark:drop-shadow-none">      <div className="flex flex-grow items-center justify-end px-4 py-4 md:px-6 2xl:px-11">
+<header className={ ` sticky top-0 z-[900] flex w-full  ${HeaderDark ? 'bg-[#878C94]': "bg-white"}  dark:bg-boxdark dark:drop-shadow-none `}>      
+  <div className="flex flex-grow items-center justify-end px-4 py-4 md:px-6 2xl:px-11">
         <div className="flex items-center gap-2 sm:gap-4 lg:hidden">
           {/* <!-- Hamburger Toggle BTN --> */}
           <button
@@ -65,7 +69,7 @@ const Header = (props: {
           </Link>
         </div>
 
-        <div className="flex items-center gap-3 2xsm:gap-7">
+        <div className="flex items-center gap-3 2xsm:gap-7 ">
           <ul className="flex items-center justify-end gap-2 2xsm:gap-4">
             {/* <!-- Dark Mode Toggler --> */}
             <DarkModeSwitcher />
@@ -76,7 +80,7 @@ const Header = (props: {
             {/* <!-- Notification Menu Area --> */}
 
             {/* <!-- Chat Notification Area --> */}
-            <DropdownMessage />
+            {/* <DropdownMessage /> */}
             {/* <!-- Chat Notification Area --> */}
           </ul>
 

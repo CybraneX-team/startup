@@ -17,16 +17,19 @@
     "lucide-react": "^0.469.0",
     "mammoth": "^1.9.0",
     "next": "^15.2.3",
+    "randomcolor": "^0.6.2",
     "react": "^18",
     "react-apexcharts": "^1.4.1",
     "react-dom": "^18",
     "react-pdf": "^7.7.3",
-    "react-toastify": "^11.0.3"
+    "react-toastify": "^11.0.3",
+    "react-window": "^1.8.11"
   },
   "devDependencies": {
     "@netlify/plugin-nextjs": "^5.10.0",
     "@types/cors": "^2.8.17",
     "@types/node": "^20",
+    "@types/randomcolor": "^0.5.9",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "autoprefixer": "^10.0.1",

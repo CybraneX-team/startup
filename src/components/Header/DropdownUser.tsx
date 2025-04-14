@@ -1,12 +1,29 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import ClickOutside from "@/components/ClickOutside";
 import { useUser } from "@/context/UserContext";
-
+import { useRouter, usePathname  } from "next/navigation";
+import randomColor  from 'randomcolor';
 const DropdownUser = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const {user}  = useUser()
+  const [bgColorDot, setbgColorDot] = useState(randomColor())
+  const { user, userLoaded, setUserState } = useUser();
+  const colorClass = `${bgColorDot}`
+  const router = useRouter()
+  const pathname = usePathname();
+  useEffect(() => {
+    const isAuthPage = pathname?.startsWith("/auth");
+    if (userLoaded && user === null && !isAuthPage) {
+      router.push("/auth/signup");
+    }
+  }, [user, userLoaded, pathname]);
+
+  function logOut () {
+    localStorage.removeItem("userToken")
+    localStorage.removeItem("userData")
+    setUserState(null);
+  }
   return (
     <ClickOutside onClick={() => setDropdownOpen(false)} className="relative">
       <Link
@@ -14,13 +31,17 @@ const DropdownUser = () => {
         className="flex items-center gap-4"
         href="#"
       >
-        <span className="hidden text-right lg:block">
-          <span className="block text-sm font-medium text-black dark:text-white">
-            {user?.username ? user?.username : "Thomas" }
-          </span>
-          {/* <span className="block text-xs">UX Designer</span> */}
+        <span className="flex text-right lg:block ">
+          <div className="flex w-10 h-auto">          
+          <span
+          style={{ backgroundColor: colorClass }}
+          className="px-3 py-2 h-auto rounded-full text-white dark:text-black font-bold text-sm text-center"
+        >
+          {user?.username ? user.username.charAt(0).toUpperCase() : "No User"}
         </span>
 
+        </div>
+        </span>
         {/* <span className="h-12 w-12 rounded-full">
           <Image
             width={112}
@@ -34,7 +55,7 @@ const DropdownUser = () => {
           />
         </span> */}
 
-        <svg
+        {/* <svg
           className="hidden fill-current sm:block"
           width="12"
           height="8"
@@ -48,7 +69,7 @@ const DropdownUser = () => {
             d="M0.410765 0.910734C0.736202 0.585297 1.26384 0.585297 1.58928 0.910734L6.00002 5.32148L10.4108 0.910734C10.7362 0.585297 11.2638 0.585297 11.5893 0.910734C11.9147 1.23617 11.9147 1.76381 11.5893 2.08924L6.58928 7.08924C6.26384 7.41468 5.7362 7.41468 5.41077 7.08924L0.410765 2.08924C0.0853277 1.76381 0.0853277 1.23617 0.410765 0.910734Z"
             fill=""
           />
-        </svg>
+        </svg> */}
       </Link>
 
       {/* <!-- Dropdown Start --> */}
@@ -56,7 +77,7 @@ const DropdownUser = () => {
         <div
           className={`absolute right-0 mt-4 flex w-62.5 flex-col rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark`}
         >
-          <ul className="flex flex-col gap-5 border-b border-stroke px-6 py-7.5 dark:border-strokedark">
+          {/* <ul className="flex flex-col gap-5 border-b border-stroke px-6 py-7.5 dark:border-strokedark">
             <li>
               <Link
                 href="/profile"
@@ -128,8 +149,10 @@ const DropdownUser = () => {
                 Account Settings
               </Link>
             </li>
-          </ul>
-          <button className="flex items-center gap-3.5 px-6 py-4 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base">
+          </ul> */}
+          <button 
+          onClick={logOut}
+          className="flex items-center gap-3.5 px-6 py-4 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base">
             <svg
               className="fill-current"
               width="22"

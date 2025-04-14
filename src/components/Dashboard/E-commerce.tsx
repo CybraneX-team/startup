@@ -12,6 +12,7 @@ import { useUser } from "@/context/UserContext";
 import { useRouter } from "next/navigation";
 import { Bounce, toast, ToastContainer } from "react-toastify";
 import "@/components/Dashboard/index.css";
+import GameOverModal from "../Sidebar/gameOverModal";
 const MapOne = dynamic(() => import("@/components/Maps/MapOne"), {
   ssr: false,
 });
@@ -356,15 +357,17 @@ const ECommerce: React.FC = () => {
     notificationMessages, 
     setnotificationMessages ,
     turnAmount,
-    setTurnAmount
+    setTurnAmount,
+    selectedTaskIds,
+    setSelectedTaskIds,
+    HeaderDark
   } = useUser();
   
   const router = useRouter();
 
   const [, forceRender] = useState(0);
-  
   useEffect(() => {
-    console.log("User state changed:", user);
+    // console.log("User state changed:", user);
     forceRender((prev) => prev + 1);
   }, [user]);
 
@@ -377,7 +380,9 @@ const ECommerce: React.FC = () => {
       }
     }
   }, [router]);
-
+  useEffect(() => {
+    setGameOverModal( user && user?.finances < 0  ? true : false )
+  }, [user]);
   const [modalInfo, setModalInfo] = useState<ModalInfo>({
     isOpen: false,
     title: "",
@@ -388,36 +393,41 @@ const ECommerce: React.FC = () => {
   const [selectedMetric, setSelectedMetric] = useState<string | null>(null);
   const [selectedStage, setSelectedStage] = useState<string | null>(null);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [gameOverModal, setGameOverModal] = useState(() => {
+    return user?.finances !== undefined && user.finances < 0;
+  });
+  const [hoveredStage, setHoveredStage] = useState<string | null>(null);
   const dollarMetrics = ['AOV', 'Cogs', 'CLTV', 'ARPU', 'CPA', 'CM'];
-   async function makeTurn(
-    task: any, 
-    turnAmount: string
-  ) {
-    console.log("tasktasktask", task)
+  async function makeTurn(turnAmount: string) {
     setloader(true);
-    const delay = (ms: number) =>
-      new Promise((resolve) => setTimeout(resolve, ms));
+    const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
     const token = localStorage.getItem("userToken");
+  
     if (!token) {
       alert("User is not authenticated. Please log in.");
+      setloader(false);
       return;
     }
-    let requestBody 
-    if(task.isBug){
-      requestBody = {
-        bugId : task._id,
-        gameId : user?.gameId,
-        employees : user?.teamMembers,
-        turnAmount : turnAmount
+  
+    let bugId  : string[] = []
+    let taskId : string[] = []
+    
+    selectedTaskIds.forEach(element => {
+      if (element.bugId) {
+        bugId.push(element.bugId)
+      }else if(element.taskId) { 
+        taskId.push(element.taskId)
       }
-    }else{
-      requestBody = {
-        taskId : task.taskId ? task.taskId : task._id   ,
-        gameId : user?.gameId,
-        employees : user?.teamMembers,
-        turnAmount : turnAmount
-      }
+    });
+
+    let requestBody = {
+      gameId : user?.gameId,
+      employees: user?.teamMembers,
+      turnAmount,
+      bugIds : bugId,
+      taskIds : taskId
     }
+
     const makeReq = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/turn`, {
       method: "POST",
       headers: {
@@ -426,15 +436,31 @@ const ECommerce: React.FC = () => {
       },
       body: JSON.stringify(requestBody),
     });
+  
     if (makeReq.ok) {
       const response = await makeReq.json();
       setUser(response);
       setUserState(response);
-      setnotificationMessages([...notificationMessages, response.message])
+      setnotificationMessages([...notificationMessages, response.message]);
+      setSelectedTaskIds((prev) => {
+        
+        // Filter the previous selected tasks based on user.tasks
+        const updated = prev.filter(p =>
+          user?.tasks.some(t => t.taskId === p.taskId)
+        );
+      
+        return updated;
+      });
+      
     }
-    delay(1000);
+    
+    // await delay(1000);
     setloader(false);
   }
+  
+  
+  
+  
   function getShortName(metricName: string): string {
     const metricMap: Record<string, string> = {
       userAcquisition: "UA",
@@ -563,7 +589,7 @@ const ECommerce: React.FC = () => {
         transition={Bounce}
       />
       {loader === true ? (
-        <div className="relative left-[39%] top-[14em] z-99999 h-full w-full bg-black-2">
+        <div className="relative left-[39%] top-[14em] z-99999 h-full w-full bg-black-2 ">
           <div className="absolute flex flex-row gap-2">
             <div className="h-4 w-4 animate-bounce rounded-full bg-blue-700 [animation-delay:.7s]"></div>
             <div className="h-4 w-4 animate-bounce rounded-full bg-blue-700 [animation-delay:.3s]"></div>
@@ -573,45 +599,65 @@ const ECommerce: React.FC = () => {
       ) : (
         <div></div>
       )}
-
+      {
+        gameOverModal ? <GameOverModal  /> : null
+      }
+      
       <h3 className="text-sm text-gray-500 dark:text-gray-400">
         Startup Stages
       </h3>
       {user?.startupStage === "FFF" ? (
-        <p> Your goal is to reach 10 buyers </p>
+        <p>Your goal is to reach 10 buyers</p>
       ) : user?.startupStage === "Angels" ? (
-        <p> Your goal is to reach 100 buyers </p>
+        <p>Your goal is to reach 100 buyers</p>
+      ) : user?.startupStage === "pre_seed" ? (
+        <p>Your goal is to reach 500 buyers</p>
+      ) : user?.startupStage === "Seed" ? (
+        <p>Your goal is to reach 2500 buyers and a positive contribution margin</p>
+      ) : user?.startupStage === "a" ? (
+        <p>Your goal is to reach 10,000 buyers and a contribution margin of $100,000</p>
+      ) : user?.startupStage === "b" ? (
+        <p>Your goal is to reach 50,000 buyers, a contribution margin of $500,000, and $100,000 in revenue</p>
+      ) : user?.startupStage === "c" ? (
+        <p>Your goal is to reach 100,000 buyers, a contribution margin of $1,000,000, and $500,000 in revenue</p>
       ) : (
-        <p> Your goal is to reach 500 buyers </p>
+        <p>Congratulations! You've reached the highest stage 🚀</p>
       )}
+
     <div className="my-2 flex gap-3 overflow-x-auto lg:overflow-hidden">
-  {stages.map((stage, index) => (
-    <div
-      key={index}
-      onClick={(e) => handleStageClick(stage,e)}
-      className={`min-w-[90px] cursor-pointer 
-        px-5 py-2 text-center rounded-lg border transition-all
-        ${user?.startupStage === stage 
-          ? "bg-white dark:bg-gray-700  border-gray-300 dark:border-gray-600" 
-          : "bg-gray-200 dark:bg-gray-200 border-transparent hover:bg-gray-200 dark:hover:bg-gray-700"}`
-      }
-    >
-      <div className="flex items-center justify-center">
-        <span
-          className={`text-sm font-medium 
+      {stages.map((stage, index) => (
+        <div
+          key={index}
+          onClick={(e) => handleStageClick(stage,e)}
+          onMouseEnter={() => setHoveredStage(stage)}
+          onMouseLeave={() => setHoveredStage(null)}     
+          className={`min-w-[9%] cursor-pointer 
+            px-5 py-2 text-center rounded-lg border transition-all
             ${user?.startupStage === stage 
-              ? "text-black dark:text-white font-semibold" 
-              : "text-gray-500 dark:text-gray-400"}`}
+              ? "bg-white dark:bg-gray-700  border-gray-300 dark:border-gray-600" 
+              : "bg-gray-200 dark:bg-[#1C2E5B] border-transparent hover:bg-gray-300 dark:hover:bg-[#1C2E5B]"}`
+          }
         >
-          {stage}
-        </span>
-        <span className="opacity-0 duration-200 hover:opacity-100">
-          <InfoIcon size={12} className="ml-2 text-gray-500 dark:text-gray-400" />
-        </span>
-      </div>
+          <div className="flex items-center justify-center" 
+                 >
+            <span
+              className={`text-sm font-medium w-auto
+                ${user?.startupStage === stage 
+                  ? "text-black dark:text-white font-semibold" 
+                  : "text-gray-500 dark:text-gray-400 dark:bg-[#1C2E5B]"}`}
+            >
+              {stage}
+            </span>
+
+            {hoveredStage === stage && (
+          <span className="opacity-100 duration-200">
+            <InfoIcon size={12} className="ml-2 text-gray-500 dark:text-gray-400" />
+          </span>
+        )}
+          </div>
+        </div>
+      ))}
     </div>
-  ))}
-</div>
 
 
 
@@ -654,8 +700,6 @@ const ECommerce: React.FC = () => {
 
 
 </div>
-
-
       <SpotlightModal
         isOpen={modalInfo.isOpen}
         onClose={handleModalClose}
@@ -667,9 +711,14 @@ const ECommerce: React.FC = () => {
       <div className="mt-4 w-full pb-28 md:mt-4 2xl:mt-7.5">
         <TaskGrid />
       </div>
-      <div className="fixed bottom-0 left-[18.77em] right-0 flex w-[77em] items-end justify-between bg-white p-5 dark:bg-boxdark z-50">
+      <div className={`fixed bottom-0 left-[18.77em] right-0 
+       ${HeaderDark ? 'bg-[#878C94]': "bg-white"}
+      flex w-[77em] items-end 
+      justify-between 
+      bg-white p-5
+       dark:bg-boxdark z-50`}>
   {/* Notification Box */}
-  <div className="w-[35em] max-w-[35%] ">
+  <div className={`w-[35em] max-w-[35%]`}>
     <div className="rounded-xl bg-[#eff4fb9a] p-3 dark:bg-[#1A222C]">
       <div className="flex justify-between items-center">
         <h3
@@ -726,7 +775,7 @@ const ECommerce: React.FC = () => {
       <p className="font-semibold">${user?.finances}</p>
     </div>
     <button
-      onClick={() => makeTurn(task, turnAmount)}
+      onClick={() => makeTurn(turnAmount)}
       className="w-60 rounded-xl bg-[#4fc387] p-2"
     >
       <span className="text-center font-semibold text-white">Make turn</span>

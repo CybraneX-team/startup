@@ -52,7 +52,8 @@ const MentorCard: React.FC<MentorCardProps> = ({
     <>
       <div
         onClick={() => setShowDealModal(true)}
-        className="min-w-[350px] cursor-pointer flex-none rounded-xl border border-gray-200 bg-white p-5 hover:shadow-lg transition"
+        className="min-w-[350px] cursor-pointer 
+        flex-none rounded-xl border border-gray-200 bg-white p-5 hover:shadow-lg transition dark:bg-[#24303F]"
       >
         <div className="mb-4 flex items-center gap-3">
           <div className="h-full rounded-full overflow-hidden">
@@ -60,18 +61,18 @@ const MentorCard: React.FC<MentorCardProps> = ({
               {mentorsIcon[title] || <span>No Icon</span>}
             </div>
           </div>
-          <h3 className="text-xl font-medium text-gray-800">{title}</h3>
+          <h3 className="text-xl font-medium text-gray-800 dark:text-white">{title}</h3>
         </div>
 
-        <p className="mb-6 text-sm w-90 text-gray-600">{description}</p>
+        <p className="mb-6 text-sm w-90 text-gray-600 dark:text-white">{description}</p>
 
         <div className="mb-3 flex items-center justify-between border-b border-gray-200 pb-3">
-          <span className="text-sm font-medium text-gray-700">Conditions (required stake)</span>
+          <span className="text-sm font-medium text-gray-700 dark:text-white">Conditions (required stake)</span>
           <span className="text-sm font-medium text-blue-500">{conditions}%</span>
         </div>
 
         <div className="mb-3">
-          <h4 className="mb-2 text-sm font-medium text-gray-700">Benefits</h4>
+          <h4 className="mb-2 text-sm font-medium text-gray-700 dark:text-white">Benefits</h4>
           <ul>
             <li className="flex items-start gap-2 text-sm text-blue-500">
               <span className="mt-1 h-2 w-2 flex-none rounded-full bg-blue-500"></span>
@@ -81,7 +82,7 @@ const MentorCard: React.FC<MentorCardProps> = ({
         </div>
 
         <div>
-          <h4 className="mb-2 text-sm font-medium text-gray-700">Limitations</h4>
+          <h4 className="mb-2 text-sm font-medium text-gray-700 dark:text-white">Limitations</h4>
           <ul>
             <li className="flex items-start gap-2 text-sm text-blue-500">
               <span className="mt-1 h-2 w-2 flex-none rounded-full bg-blue-500"></span>
@@ -148,11 +149,11 @@ const MentorsModal: React.FC<MentorsModalProps> = ({ isOpen, onClose }) => {
       }
     }, [user]);
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center ">
       {/* Full-screen overlay to dim entire application */}
-      <div className="absolute inset-0 bg-black/30" onClick={onClose}></div>
+      <div className="absolute inset-0 bg-black/30 " onClick={onClose}></div>
       
-      <div className="relative w-full max-w-5xl rounded-xl bg-white p-6 shadow-lg">
+      <div className="relative w-full max-w-5xl rounded-xl bg-white p-6 shadow-lg dark:bg-[#1A222C]">
         {/* Close button */}
         <button 
           onClick={onClose}
@@ -166,18 +167,18 @@ const MentorsModal: React.FC<MentorsModalProps> = ({ isOpen, onClose }) => {
         {/* Modal header */}
         <div className="mb-6">
           <div className="flex items-center gap-2">
-            <h2 className="text-2xl font-medium text-gray-800">Available Mentors</h2>
+            <h2 className="text-2xl font-medium text-gray-800 dark:text-white">Available Mentors</h2>
             <span className="text-2xl font-medium text-green-500">4</span>
           </div>
-          <p className="mt-2 text-sm  text-gray-600">
+          <p className="mt-2 text-sm  text-gray-600 dark:text-white">
             A startup mentor is someone who offers guidance and support, helping startup workers to develop their skills, grow their networks, and achieve their professional goals.
           </p>
          
         </div>
         
         {/* Scrollable cards container */}
-        <div className="overflow-x-auto pb-4">
-          <div className="flex gap-4">
+        <div className="overflow-x-auto pb-4 custom-scrollbar">
+          <div className="flex gap-4 ">
             {mentorsArray.map((mentor, index) => (
               <MentorCard
                 key={index}

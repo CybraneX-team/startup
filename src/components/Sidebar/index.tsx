@@ -30,7 +30,8 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
   const [mentorsModalOpen, setMentorsModalOpen] = useState(false);
   const [teamModalOpen, setTeamModalOpen] = useState(false);
   const [investorsModalOpen, setInvestorsModalOpen] = useState(false);
-  const { resetTheGame, user } = useUser();
+  const { user, setUser, setUserState, setnotificationMessages, notificationMessages, setloader } = useUser();
+
   const finances = user?.finances || 0;
   const options: ApexOptions = {
     chart: {
@@ -80,7 +81,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
     if (user?.financesBreakdown) {
       const breakdown = user.financesBreakdown as financesBreakdown;
   
-      console.log("breakdown is ", breakdown); // Debugging: Ensure correct structure
+      // console.log("breakdown is ", breakdown); // Debugging: Ensure correct structure
   
       setChartData({
         series: [breakdown.Founder, breakdown.Investors, breakdown.Mentor],
@@ -95,8 +96,11 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
 
   // Ensure no undefined values before rendering
   if (!user || !chartData) {
-    return <div className="p-6">Loading...</div>;
+    return (
+     null
+    );
   }
+  
   
   const breakdown: financesBreakdown = user?.financesBreakdown ?? { Founder: 0, Investors: 0, Mentor: 0 };
   const series = [breakdown.Founder, breakdown.Investors, breakdown.Mentor];
@@ -140,6 +144,30 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
   const renderValue = (value : any) => {
     return Number.isInteger(value) ? value : value.toFixed(1);
   };
+
+  async function resetTheGame(){
+    setloader(true)
+    const makeReq = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/resetGame`,
+      {
+        method : "POST",
+        body: JSON.stringify({
+          gameId : user?.gameId
+        }),
+        headers: {
+          "Content-Type": "application/json",
+          token: `${localStorage.getItem("userToken")}` // or however you're passing the token
+        }
+      }
+    )
+    if (makeReq.ok) {
+      const response = await makeReq.json()
+      setUser(response)
+      setUserState(response)
+      setnotificationMessages([...notificationMessages, response.message])
+      setloader(false)
+    }
+  }
   return (
     <>
       <aside
@@ -164,10 +192,11 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
         </div>
 
         {/* Main Content */}
-        <div className="flex flex-col overflow-y-auto px-6 py-4">
+        <div className="flex flex-col overflow-y-auto overflow-x-hidden px-6 py-4 custom-scrollbar">
+
           {/* Business Idea Section */}
           <div className="mb-6">
-            <h2 className="mb-3 text-sm font-semibold text-black">
+            <h2 className="mb-3 text-sm font-semibold text-black dark:text-white">
               Business Idea
               <span
                 onClick={makeVisible}
@@ -179,7 +208,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
             </h2>
 
             <h2
-              className={`text-sm font-semibold cursor-pointer text-black ${
+              className={`text-sm font-semibold my-2 cursor-pointer text-black dark:text-white ${
                 makevisible ? "block" : "hidden"
               }`}
               onClick={resetTheGame}
@@ -187,7 +216,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
               {" "}
               reset game{" "}
             </h2>
-            <p className="rounded-lg bg-gray-100 p-3 text-sm text-gray-600">
+            <p className="rounded-lg bg-gray-100 p-3 text-sm text-gray-600 dark:text-white dark:bg-[#1C2E5B]">
               Subscription service that delivers a monthly package of pet care
               items
             </p>
@@ -206,24 +235,23 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
              <div className="flex  text-sm">
               <span className="inline-block h-3 w-3 rounded-full cursor-pointer
                my-2 mx-1 bg-[#6577F3]"></span>
-              <span className="text-gray-600 mt-1">Founder</span>
+              <span className="text-gray-600 mt-1  dark:text-white">Founder</span>
               <span className="font-medium mx-1 my-1 text-[#6577F3]">{renderValue(breakdown["Founder"])}%</span>
           </div>
           <div className="flex text-sm" onClick={openInvestorsModal} >
           <span className="inline-block h-3 w-3 mx-1 my-2 rounded-full cursor-pointer
            bg-[#A5D6A7]"></span>
-            <span className="text-gray-600 mt-1">Investors</span>
+            <span className="text-gray-600 mt-1 dark:text-white">Investors</span>
             <span className="font-medium mx-1 my-1 text-[#A5D6A7]">{renderValue(breakdown.Investors)}%</span> </div>
           <div className="flex  text-sm"  onClick={openMentorsModal}>
             <span className="inline-block h-3 w-3 mx-1  my-2 rounded-full cursor-pointer
              bg-[#8FD0EF]"></span>
-            <span className="text-gray-600 mt-1">Mentors</span>
+            <span className="text-gray-600 mt-1 dark:text-white">Mentors</span>
             <span className="font-medium my-1 text-[#8FD0EF]">{renderValue(breakdown.Mentor)}%</span> </div>
               </div>
               
               {/* Donut Chart */}
               <div className="-ml-17 relative">
-                {/* {user?.finances} */}
                 <ReactApexChart
                   options={options}
                   series={series}
@@ -231,37 +259,35 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                   height={150}
                 />
              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
-              <span className="text-gray-500 text-sm font-medium">Funds</span>
-              <span className="text-sm font-bold text-gray-700">${user.finances.toLocaleString()}</span>
+              <span className="text-gray-500 text-sm font-medium dark:text-white">Funds</span>
+              <span className="text-sm font-bold text-gray-700 dark:text-white">${user.finances.toLocaleString() || "Not Logged in"}</span>
             </div>
-                {/* <p></p>{user?.finances} */}
               </div>
             </div>
 
-            {/* Financial Stats */}
             <div className="space-y-2">
               <div className="flex justify-between">
-                <span className="text-sm text-gray-600">Revenue</span>
+                <span className="text-sm text-gray-600 dark:text-white">Revenue</span>
                 <span className="text-sm font-medium  tabular-nums text-emerald-500">$ {user.revenue ?
                 user.revenue : "$40" }</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-sm text-gray-600">Salaries</span>
+                <span className="text-sm text-gray-600 dark:text-white">Salaries</span>
                 <span className="text-sm font-medium  tabular-nums text-red-500">-${user.salaries ?
                 user.salaries : "3400" }</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-sm text-gray-600">Rent</span>
+                <span className="text-sm text-gray-600 dark:text-white">Rent</span>
                 <span className="text-sm font-medium  tabular-nums text-red-500">-${user.rent
                   ? user.rent  : "600"}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-sm text-gray-600">Marketing</span>
+                <span className="text-sm text-gray-600 dark:text-white">Marketing</span>
                 <span className="text-sm font-medium  tabular-nums text-red-500">-${user.marketing
                   ? user.marketing : "3600"}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-sm text-gray-600">Cost of Sales</span>
+                <span className="text-sm text-gray-600 dark:text-white">Cost of Sales</span>
                 <span className="text-sm font-medium  tabular-nums text-red-500">-${user.costOfSales
                   ? user.costOfSales : "44"}</span>
               </div>
@@ -269,7 +295,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
 
             {/* Available Market */}
             <div className="mt-4 flex items-center justify-between">
-              <span className="text-sm text-gray-600">Available Market</span>
+              <span className="text-sm text-gray-600 dark:text-white">Available Market</span>
               <div className="flex items-center">
                 <span className="text-sm font-medium text-blue-500">
                   USD 999B
@@ -297,10 +323,10 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
             <div className="grid grid-cols-3 gap-4">
               {user.teamMembers?.map((item) => (
                 <div key={item._id} className="flex flex-col items-center">
-                  <div className="mb-2 rounded-full bg-gray-100 p-3">
-                    {roleIcons[item.roleName] || <span>No Icon</span>}
+                  <div className="mb-2 rounded-full bg-gray-100 dark:bg-[#1C2E5B] p-3">
+                    {roleIcons[item.roleName.toLowerCase()] || <span>No Icon</span>}
                   </div>
-                  <span className="text-sm text-gray-600">{item.roleName}</span>
+                  <span className="text-sm text-gray-600 dark:text-white">{item.roleName}</span>
                   <span className="text-sm font-medium">{item.quantity}</span>
                 </div>
               ))}

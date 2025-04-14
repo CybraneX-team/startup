@@ -30,7 +30,7 @@ export default function RootLayout({
         {/* Suppress 404 errors for non-existent CSS files */}
         <meta name="next-head-count" content="0" />
       </head>
-      <body suppressHydrationWarning={true}>
+      <body suppressHydrationWarning={true} className="custom-scrollbar">
         <div className="dark:bg-boxdark-2 dark:text-bodydark">
           <UserProvider>
           {loading ? <Loader /> : children}

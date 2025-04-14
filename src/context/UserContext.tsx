@@ -58,17 +58,22 @@ export interface UserData {
   tasks : any[];
   bugPercentage : number;
   myMentors : any[]
+  turnNumber: number; 
 }
 interface notificationMessagesType{
   message: string;
   isPositive: boolean;
 }
+interface selectedTasksType {
+  taskId ? : string;
+  bugId ? : string;
+}
+
 interface UserContextType {
   user: UserData | null;
   setUser: (userData: UserData | null) => void;
   logout: () => void;
   setUserState : (userData: UserData | null) => void;
-  resetTheGame : () => void
   task : string
   setTask  : (taskID : string) => void 
   loader : boolean
@@ -77,7 +82,15 @@ interface UserContextType {
   setloader : (loaderShow : boolean) => void
   turnAmount  : string, 
   setTurnAmount : (trunAmount : string) => void
+  selectedTaskIds: selectedTasksType[];
+  setSelectedTaskIds: React.Dispatch<React.SetStateAction<selectedTasksType[]>>;
+  modalOpen : boolean;
+  setModalOpen: (arg: boolean) => void;
+  userLoaded: boolean; 
+  HeaderDark : boolean;
+  setHeaderDark : (arg: boolean) => void;
 }
+
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
@@ -86,6 +99,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [task, setTask] = useState("");
   const [tasks, setTasks] = useState([]);
   const [loader, setloader] = useState(false);
+  const [selectedTaskIds, setSelectedTaskIds] = useState<selectedTasksType[]>([]);
   const [notificationMessages, setnotificationMessages] = useState<notificationMessagesType[]>([
       {
         message: "Welcome to the game",
@@ -93,7 +107,20 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       }
     ])
     const [turnAmount, setTurnAmount] = useState<string>("");
+    const [modalOpen, setModalOpen] = useState<boolean>(false)
+    const [userLoaded, setUserLoaded] = useState(false);
+    const [HeaderDark, setHeaderDark] = useState(false);
 
+    useEffect(() => {
+      const storedUser = localStorage.getItem("userData");
+      if (storedUser) {
+        setUserState(JSON.parse(storedUser));
+      }
+      setUserLoaded(true); // ✅
+    }, []);
+
+    // const [selectedTasks, setSelectedTasks] = useState<Set<number>>(new Set());
+    
     useEffect(() => {
       if (
         !user ||
@@ -105,8 +132,8 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         return;
       }
     
-      const value = Math.floor(user.salaries + user.rent - user.metrics.contributionMargin);
-      const sign = value < 0 ? '-' : '-';
+      const value = Math.floor(((-user.salaries) + (-user.rent)) - user.metrics.contributionMargin);
+      const sign = value < 0 ? '-' : '+';
       setTurnAmount(`${sign}${Math.abs(value)}`);
     }, [user]);
     
@@ -119,6 +146,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   }, []);
   
 
+  
   // Custom setUser function to store in localStorage
   const setUser = (userData: UserData | null) => {
     if (userData) {
@@ -142,62 +170,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     localStorage.removeItem("userData");
   };
   
-  const resetTheGame = async () => {
-    try {
-      setloader(true);
-  
-      // Minimum delay to ensure loader visibility
-      const delay = (ms:number) => new Promise((resolve) => setTimeout(resolve, ms));
-  
-      const token = localStorage.getItem("userToken");
-      if (!token) {
-        alert("User is not authenticated. Please log in.");
-        setloader(false); // Reset loader state
-        return;
-      }
-  
-      const makeReq = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/resetGame`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          token: token,
-        },
-        body: JSON.stringify({
-          gameId: user?.gameId,
-        }),
-      });
-  
-      if (!makeReq.ok) {
-        throw new Error(`Error: ${makeReq.status} - ${makeReq.statusText}`);
-      }
-  
-      const response = await makeReq.json();
-  
-      if (response.user) {
-        console.log("✅ Updating user state with:", response.user);
-  
-     
-        await delay(1000); 
-  
-        setUserState({ ...response.user, 
-          gameId: response?.gameId, 
-          finances: response.finances, 
-          availableInvestments : response.availableInvestments 
-        });
-        setUser({ ...response.user, 
-          gameId: response?.gameId, 
-          finances: response.finances,
-          availableInvestments : response.availableInvestments
-         });
-        console.log("🟢 State updated with:", response.user);
-      }
-    } catch (error) {
-      console.error("Error resetting game:", error);
-      alert("Failed to reset the game. Please try again.");
-    } finally {
-      setloader(false);
-    }
-  };
+
   
   return (
     <UserContext.Provider 
@@ -206,7 +179,6 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       setUser, 
       logout, 
       setUserState, 
-      resetTheGame,
       task,
       setTask,
       loader,
@@ -214,7 +186,14 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       notificationMessages,
       setnotificationMessages,
       turnAmount, 
-      setTurnAmount
+      setTurnAmount,
+      selectedTaskIds,
+      setSelectedTaskIds,
+      modalOpen, 
+      setModalOpen,
+      userLoaded,
+      HeaderDark, 
+      setHeaderDark
       }}>
       {children}
     </UserContext.Provider>

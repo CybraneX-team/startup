@@ -95,7 +95,7 @@ export default function ModulePage() {
   }, []);
 
   const handleQuizSubmit = (selectedOptions: number[]) => {
-    console.log('Selected options:', selectedOptions);
+    // console.log('Selected options:', selectedOptions);
     // Here you could track progress, save to database, etc.
   };
 
