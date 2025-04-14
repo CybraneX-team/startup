@@ -155,7 +155,6 @@ const InvestorsModal: React.FC<InvestorsModalProps> = ({ isOpen, onClose }) => {
               >
                 {/* Investor Name */}
                 <h3 className="mb-2 text-xl font-medium text-gray-800 dark:text-white">
-                {console.log(e)}
                   {e.name}
                 </h3>
                 <p className="mb-3 text-sm italic text-blue-500  dark:text-blue-500">{e.quote}</p>

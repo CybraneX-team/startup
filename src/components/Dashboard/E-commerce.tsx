@@ -27,6 +27,36 @@ interface ModalProps {
   title: string;
   content: React.ReactNode;
 }
+interface Task {
+  _id: string;
+  taskId: string;
+  name: string;
+  turnsRequired: number;
+  turnsMade: number;
+  isBug?: boolean; // optional, based on where it's used
+
+  metricsImpact: {
+    userAcquisition: number;
+    conversionFirstPurchase: number;
+    buyerCount: number;
+    averageOrderValue: number;
+    costOfGoodsSold: number;
+    averagePaymentCount: number;
+    customerLifetimeValue: number;
+    averageRevenuePerUser: number;
+    costPerAcquisition: number;
+    contributionMargin: number;
+  };
+
+  requiredTeamMembers: {
+    ceo: number;
+    developer: number;
+    sales: number;
+    manager: number;
+    qa: number;
+    designer: number;
+  };
+}
 
 interface MetricInfo {
   title: string;
@@ -439,20 +469,29 @@ const ECommerce: React.FC = () => {
   
     if (makeReq.ok) {
       const response = await makeReq.json();
+    
       setUser(response);
       setUserState(response);
       setnotificationMessages([...notificationMessages, response.message]);
+    
+      // ✅ Use the fresh task list from server response
       setSelectedTaskIds((prev) => {
-        
-        // Filter the previous selected tasks based on user.tasks
-        const updated = prev.filter(p =>
-          user?.tasks.some(t => t.taskId === p.taskId)
+        const updated = prev.filter((p) =>
+          (response.tasks as Task[])?.some((t) => t.taskId === p.taskId)
         );
-      
+        
+    
+        if (
+          updated.length === prev.length &&
+          updated.every((u, i) => u.taskId === prev[i].taskId)
+        ) {
+          return prev;
+        }
+    
         return updated;
       });
-      
     }
+    
     
     // await delay(1000);
     setloader(false);
