@@ -659,7 +659,7 @@ const ECommerce: React.FC = () => {
       ) : user?.startupStage === "c" ? (
         <p>Your goal is to reach 100,000 buyers, a contribution margin of $1,000,000, and $500,000 in revenue</p>
       ) : (
-        <p>Congratulations! You've reached the highest stage 🚀</p>
+        <p>Congratulations! You &apos; ve reached the highest stage 🚀</p>
       )}
 
     <div className="my-2 flex gap-3 overflow-x-auto lg:overflow-hidden">

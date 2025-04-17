@@ -56,11 +56,12 @@ const CancelTaskModal: React.FC<CancelTaskModalProps> = ({
   onConfirm,
   onCancel,
 }) => {
-  const {HeaderDark, setHeaderDark} = useUser()
+  const {setHeaderDark} = useUser()
   useEffect(() => {
     setHeaderDark(isOpen);
-    return () => setHeaderDark(false); // reset on unmount
-  }, [isOpen]);
+    return () => setHeaderDark(false);
+  }, [isOpen, setHeaderDark]); // ✅ Include setHeaderDark in deps
+  
   if (!isOpen) return null;
   
   return (
@@ -292,7 +293,7 @@ const BrainstormModal: React.FC<BrainstormModalProps> = ({
   useEffect(() => {
     setHeaderDark(isOpen);
     return () => setHeaderDark(false);
-  }, [isOpen]);
+  }, [isOpen, setHeaderDark]);
 
   if (!isOpen) return null;
 

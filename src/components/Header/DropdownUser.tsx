@@ -17,7 +17,7 @@ const DropdownUser = () => {
     if (userLoaded && user === null && !isAuthPage) {
       router.push("/auth/signup");
     }
-  }, [user, userLoaded, pathname]);
+  }, [user, userLoaded, pathname, router]);
 
   function logOut () {
     localStorage.removeItem("userToken")
