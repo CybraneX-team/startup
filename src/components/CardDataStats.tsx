@@ -365,7 +365,6 @@ const TaskGrid: React.FC = () => {
 
   useEffect(() => {
     if (!user?.gameId) {
-      toast.info("You have been logged out");
       router.push("/auth/signup");
       return;
     }
