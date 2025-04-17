@@ -474,7 +474,6 @@ const ECommerce: React.FC = () => {
       setUserState(response);
       setnotificationMessages([...notificationMessages, response.message]);
     
-      // ✅ Use the fresh task list from server response
       setSelectedTaskIds((prev) => {
         const updated = prev.filter((p) =>
           (response.tasks as Task[])?.some((t) => t.taskId === p.taskId)
@@ -706,7 +705,7 @@ const ECommerce: React.FC = () => {
     <div
       key={index}
       onClick={(e) => handleMetricClick(getShortName(metric), e)}
-      className="flex min-w-[103px] items-center justify-around rounded-xl border border-stroke bg-white px-2 py-3 dark:border-strokedark dark:bg-boxdark"
+      className="flex min-w-[9%] items-center justify-around rounded-xl border border-stroke bg-white px-2 py-3 dark:border-strokedark dark:bg-boxdark"
     >
       <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
         {getShortName(metric)}

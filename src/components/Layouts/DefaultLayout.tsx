@@ -1,9 +1,9 @@
 "use client";
-import React, { useState, ReactNode } from "react";
+import React, { useState } from "react";
 import Sidebar from "@/components/Sidebar";
 import Header from "@/components/Header";
-import ECommerce from "../Dashboard/E-commerce";
 import { useUser } from "@/context/UserContext";
+import { usePathname } from "next/navigation";
 
 export default function DefaultLayout({
   children,
@@ -11,35 +11,32 @@ export default function DefaultLayout({
   children: React.ReactNode;
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const {loader , setloader} = useUser()
+  const { loader } = useUser();
+  const pathname = usePathname();
+  const isAuthPage = pathname?.startsWith("/auth");
+
   return (
-    <div className="flex h-screen overflow-hidden">
-        {
-          loader ? 
-          <div className="absolute bg-black-2 h-full w-full opacity-40 left-[0em] z-9999"> 
-        
-        </div>
-        : <div> </div>}
-      {/* <!-- ===== Sidebar Start ===== --> */}
-      <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
-      {/* <!-- ===== Sidebar End ===== --> */}
+    <div className="flex min-h-screen w-full flex-col">
+      {loader && (
+        <div className="absolute left-0 top-0 z-9999 h-full w-full bg-black-2 opacity-40"></div>
+      )}
 
-      {/* <!-- ===== Content Area Start ===== --> */}
-      <div className="relative flex flex-1 flex-col overflow-x-hidden lg:ml-72.5">
-        {/* <!-- ===== Header Start ===== --> */}
-        <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
-        {/* <!-- ===== Header End ===== --> */}
+      {!isAuthPage && (
+        <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+      )}
 
-        {/* <!-- ===== Main Content Start ===== --> */}
-        <main className="flex-1">
-          <div className="mx-auto max-w-screen-2xl p-4 md:p-6 2xl:p-10">
+      <div className={`relative flex flex-1 flex-col ${!isAuthPage ? 'lg:ml-72.5' : ''}`}>
+        <Header
+          sidebarOpen={sidebarOpen}
+          setSidebarOpen={setSidebarOpen}
+        />
+
+        <main className={`w-full px-4 ${isAuthPage ? 'flex justify-center' : ''}`}>
+          <div className={`mx-auto ${isAuthPage ? 'w-full max-w-lg pt-10' : 'max-w-screen-2xl p-4 md:p-6 2xl:p-10'}`}>
             {children}
           </div>
         </main>
-        {/* <!-- ===== Main Content End ===== --> */}
       </div>
-      {/* <!-- ===== Content Area End ===== --> */}
     </div>
   );
 }

@@ -272,10 +272,74 @@ const TaskCard: React.FC<TaskCardProps> = ({
     </div>
   );
 };
+interface BrainstormModalProps {
+  isOpen: boolean;
+  turnsRequired: number;
+  tasksGenerated: number;
+  onConfirm: () => void;
+  onCancel: () => void;
+}
+
+const BrainstormModal: React.FC<BrainstormModalProps> = ({
+  isOpen,
+  turnsRequired,
+  tasksGenerated,
+  onConfirm,
+  onCancel,
+}) => {
+  const { setHeaderDark } = useUser();
+
+  useEffect(() => {
+    setHeaderDark(isOpen);
+    return () => setHeaderDark(false);
+  }, [isOpen]);
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+      <div className="w-full max-w-md rounded-2xl bg-white p-6 dark:bg-[#1A232F] dark:text-white">
+        <h2 className="mb-4 text-xl font-semibold text-gray-900 dark:text-white">
+          Would you like to start a brainstorm session?
+        </h2>
+        <p className="mb-6 text-sm text-gray-600 dark:text-gray-400">
+          You can brainstorm with your team and generate more tasks. All employees are involved in brainstorming and will not continue to work on active ones.
+        </p>
+
+        <div className="mb-6 space-y-3 text-sm">
+          <div className="flex justify-between">
+            <span className="text-gray-600 dark:text-gray-400">Turns required</span>
+            <span className="text-gray-900 dark:text-white">{turnsRequired}</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-gray-600 dark:text-gray-400">Amount of generated tasks</span>
+            <span className="text-gray-900 dark:text-white">{tasksGenerated}</span>
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <button
+            onClick={onConfirm}
+            className="w-full rounded-lg bg-emerald-500 py-2.5 text-white hover:bg-emerald-600"
+          >
+            Yes, start brainstorming
+          </button>
+          <button
+            onClick={onCancel}
+            className="w-full rounded-lg border border-gray-200 bg-white py-2.5 text-gray-900 hover:bg-gray-50 dark:border-gray-700 dark:bg-[#1A232F] dark:text-white dark:hover:bg-gray-800"
+          >
+            No, cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const TaskGrid: React.FC = () => {
   // const [selectedTasks, setSelectedTasks] = useState<Set<number>>(new Set());
   const [selectedTasks, setSelectedTasks] = useState<Set<string>>(new Set());
+  const [brainstormModalOpen, setBrainstormModalOpen] = useState(false);
 
   const [activeFilters, setActiveFilters] = useState<Set<string>>(
     new Set(["all"]),
@@ -332,7 +396,6 @@ const TaskGrid: React.FC = () => {
   
   
   const handleCancelConfirm = () => {
-    console.log(cancelModal)
     if (cancelModal.taskId) {
       // Remove from selectedTasks set
       setSelectedTasks((prev) => {
@@ -487,6 +550,16 @@ const TaskGrid: React.FC = () => {
         onConfirm={handleCancelConfirm}
         onCancel={handleCancelDismiss}
       />
+      <BrainstormModal
+        isOpen={brainstormModalOpen}
+        turnsRequired={1}
+        tasksGenerated={15}
+        onConfirm={async () => {
+          await makeBrainstrom("4836");
+          setBrainstormModalOpen(false);
+        }}
+        onCancel={() => setBrainstormModalOpen(false)}
+      />
 
       <div className="flex flex-col space-y-4 px-4">
         <div className="flex flex-wrap justify-between gap-2">
@@ -518,12 +591,13 @@ const TaskGrid: React.FC = () => {
               Reset filters
             </button>
           </div>
-          <button className="flex self-end rounded-lg 
-          bg-white px-3 py-2 text-xs font-medium text-black shadow-xl dark:bg-blue-900/50 dark:text-blue-400"
-          onClick={()=>{makeBrainstrom("4836")}}
-          >
-            Brainstrom
-          </button>
+          <button
+          className="flex self-end rounded-lg bg-white px-3 py-2 text-xs font-medium text-black shadow-xl dark:bg-blue-900/50 dark:text-blue-400"
+          onClick={() => setBrainstormModalOpen(true)}
+        >
+          Brainstorm
+        </button>
+
         </div>
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6">

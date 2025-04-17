@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { X } from "lucide-react";
 import { useUser } from "@/context/UserContext";
+import { getInvestorImage } from "../investorImages";
 
 interface InvestorsModalProps {
   isOpen: boolean;
@@ -60,7 +61,6 @@ const InvestorsModal: React.FC<InvestorsModalProps> = ({ isOpen, onClose }) => {
 
       if (makeReq.ok) {
         const response = await makeReq.json();
-        // console.log("res", response);
         setUser(response);
         setUserState(response);
       } else {
@@ -89,7 +89,6 @@ const InvestorsModal: React.FC<InvestorsModalProps> = ({ isOpen, onClose }) => {
       })
       if (makeReq.ok) {
         const response = await makeReq.json();
-        // console.log("res", response);
         setUser(response);
         setUserState(response);
       } else {
@@ -102,6 +101,7 @@ const InvestorsModal: React.FC<InvestorsModalProps> = ({ isOpen, onClose }) => {
       
     }
   }
+
   return (
 
     <>
@@ -141,94 +141,103 @@ const InvestorsModal: React.FC<InvestorsModalProps> = ({ isOpen, onClose }) => {
             {investmentsArray.map((e, index) => {
               
               const isSigned = user?.investmentsMade.some((inv) => inv.name === e.name)
-              return <div
-                key={index}
-                className={`min-w-[250px] flex-none rounded-xl border border-gray-200 p-5 ${
-                  !isSigned ? 'hover:cursor-pointer' : ''
-                }`
-                }
-                onClick={() => {
-                  const isSigned = user?.investmentsMade.some((inv) => inv.name === e.name);
-                  setSelectedInvestor(e)
-                  isSigned ? setShowBuyoutConfirm(true) : setShowSignConfirm(true);
-                }}
-              >
-                {/* Investor Name */}
-                <h3 className="mb-2 text-xl font-medium text-gray-800 dark:text-white">
-                  {e.name}
-                </h3>
-                <p className="mb-3 text-sm italic text-blue-500  dark:text-blue-500">{e.quote}</p>
-
-                {/* Investor Description */}
-                <div className="mb-6 text-sm w-100 h-auto text-gray-600 dark:text-gray-50 dark:font-light">
-                  {e.description}
+              return  (
+                <div
+                  key={index}
+                  className={`min-w-[250px] flex-none rounded-xl border border-gray-200 p-5 ${
+                    !isSigned ? 'hover:cursor-pointer' : ''
+                  }`}
+                  onClick={() => {
+                    const isSigned = user?.investmentsMade.some((inv) => inv.name === e.name);
+                    setSelectedInvestor(e);
+                    isSigned ? setShowBuyoutConfirm(true) : setShowSignConfirm(true);
+                  }}
+                >
+                  {/* Image + Name + Quote Header */}
+                  <div className="flex items-center gap-4 mb-4">
+                    {getInvestorImage(e.name) && (
+                      <img
+                        src={getInvestorImage(e.name).src}
+                        alt={e.name}
+                        className="h-24 w-24 object-contain"
+                      />
+                    )}
+                    <div>
+                      <h3 className="text-xl font-semibold text-gray-800 dark:text-white">{e.name}</h3>
+                      <p className="text-sm italic text-blue-500 dark:text-blue-500">{e.quote}</p>
+                    </div>
+                  </div>
+              
+                  {/* Investor Description */}
+                  <div className="mb-6 text-sm w-100 h-auto text-gray-600 dark:text-gray-50 dark:font-light">
+                    {e.description}
+                  </div>
+              
+                  {/* Investment Details */}
+                  <div className="space-y-4 border-t border-gray-200 pt-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-600 dark:text-white">Investment</span>
+                      <span className="text-sm font-medium text-green-600">$ {e.money}</span>
+                    </div>
+              
+                    {user?.investmentsMade.some((element) => element.name === e.name) && (
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-gray-600 dark:text-white">Buyout price</span>
+                        <span className="text-sm font-medium text-green-600">
+                          $ {e.buyout?.toLocaleString()}
+                        </span>
+                      </div>
+                    )}
+              
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-600 dark:text-white">
+                        Investor&apos;s share
+                      </span>
+                      <span className="text-sm font-medium text-blue-500">{e.share} %</span>
+                    </div>
+              
+                    <div className="flex items-center justify-between">
+                      <span className="flex items-center text-sm text-gray-600 dark:text-white">
+                        <span className="mr-2 inline-block h-2 w-2 rounded-full bg-blue-500" />
+                        Advantages
+                      </span>
+                      <span className="text-sm text-blue-500">
+                        {e.bug_percent_point < 0
+                          ? `Decreases bugs by ${Math.abs(e.bug_percent_point)} %`
+                          : `Increases bugs by ${e.bug_percent_point} %`}
+                      </span>
+                    </div>
+                  </div>
+              
+                  {/* Signed or CTA */}
+                  <div className="mt-4 text-right">
+                    {user?.investmentsMade.some((element) => element.name === e.name) ? (
+                      <span className="rounded border border-green-600 px-2 py-1 font-semibold text-green-600">
+                        SIGNED
+                      </span>
+                    ) : (
+                      <span
+                        onClick={() => {
+                          const isSigned = user?.investmentsMade.some((inv) => inv.name === e.name);
+                          setSelectedInvestor(e);
+                          isSigned ? setShowBuyoutConfirm(true) : setShowSignConfirm(true);
+                        }}
+                        className={`
+                          min-w-[150px] flex-none rounded-xl border p-3 transition-all mt-2 duration-200
+                          ${
+                            user?.investmentsMade.some((element) => element.name === e.name)
+                              ? 'border-gray-300 hover:border-blue-400 cursor-pointer'
+                              : 'border-gray-300 hover:border-green-400 cursor-pointer'
+                          }
+                        `}
+                      >
+                        Sign Investment
+                      </span>
+                    )}
+                  </div>
                 </div>
-
-                {/* Investment Details */}
-                <div className="space-y-4 border-t border-gray-200 pt-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600 dark:text-white">Investment</span>
-                    <span className="text-sm font-medium text-green-600">
-                      $ {e.money}
-                    </span>
-                  </div>
-                  {user?.investmentsMade.some((element) => element.name === e.name) && (
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600 dark:text-white">Buyout price</span>
-                    <span className="text-sm font-medium text-green-600">
-                      $ {e.buyout?.toLocaleString()}
-                    </span>
-                  </div>
-              )}
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600 dark:text-white">
-                      Investor&apos;s share
-                    </span>
-                    <span className="text-sm font-medium text-blue-500">
-                      {e.share} %
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="flex items-center text-sm text-gray-600 dark:text-white">
-                      <span className="mr-2 inline-block h-2 w-2 rounded-full bg-blue-500 "></span>
-                      Advantages
-                    </span>
-                    <span className="text-sm text-blue-500">
-                      {e.bug_percent_point < 0
-                        ? `Decreases bugs by ${e.bug_percent_point} %`
-                        : `Increases bugs by ${e.bug_percent_point} %`}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Signed Tag */}
-                <div className="mt-4 text-right" >
-                  {user?.investmentsMade.some(
-                    (element) => element.name === e.name,
-                  ) ? (
-                    <span className="rounded border border-green-600 px-2 py-1 font-semibold text-green-600">
-                      SIGNED
-                    </span>
-                  ) : (
-                    <span
-                    onClick={() => {
-                      const isSigned = user?.investmentsMade.some((inv) => inv.name === e.name);
-                      setSelectedInvestor(e);
-                      isSigned ? setShowBuyoutConfirm(true) : setShowSignConfirm(true);
-                    }}
-                    className={`
-                      min-w-[150px] flex-none rounded-xl border p-3 transition-all mt-2 duration-200
-                      ${user?.investmentsMade.some((element) => element.name === e.name) 
-                        ? 'border-gray-300 hover:border-blue-400 cursor-pointer' 
-                        : 'border-gray-300 hover:border-green-400 cursor-pointer'
-                      }
-                    `}
-                    >
-                      Sign Investment
-                    </span>
-                  )}
-                </div>
-              </div>
+              );
+              
             })}
           </div>
         </div>
