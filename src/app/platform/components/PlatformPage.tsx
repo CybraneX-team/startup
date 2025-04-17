@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { ModuleCard } from "./";
 import "./platform.css";
+import Image from "next/image";
 
 const PlatformPage = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -165,7 +166,7 @@ const PlatformPage = () => {
                   </svg>
                 </button>
                 <button onClick={toggleSidebar} className="text-gray-500">
-                  <img
+                  <Image
                     src="https://platform.teachmegrow.com/static/media/closeMenu.2188aba65727607a5657a5d58977f657.svg"
                     alt="menu"
                   />
@@ -235,7 +236,7 @@ const PlatformPage = () => {
             <div className="collapsed-header mb-8 flex w-[80px] items-center justify-between rounded-full bg-gray-100 px-4 py-2">
               <h2 className="mr-2 text-xl">🎓</h2>
               <button onClick={toggleSidebar} className="text-gray-700">
-                <img
+                <Image
                   style={{ transform: 'rotate(180deg)' }}
                   src="https://platform.teachmegrow.com/static/media/closeMenu.2188aba65727607a5657a5d58977f657.svg"
                   alt="menu"

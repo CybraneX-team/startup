@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { X } from "lucide-react";
 import { useUser } from "@/context/UserContext";
 import { getInvestorImage } from "../investorImages";
+import Image from "next/image";
 
 interface InvestorsModalProps {
   isOpen: boolean;
@@ -156,7 +157,7 @@ const InvestorsModal: React.FC<InvestorsModalProps> = ({ isOpen, onClose }) => {
                   {/* Image + Name + Quote Header */}
                   <div className="flex items-center gap-4 mb-4">
                     {getInvestorImage(e.name) && (
-                      <img
+                      <Image
                         src={getInvestorImage(e.name).src}
                         alt={e.name}
                         className="h-24 w-24 object-contain"

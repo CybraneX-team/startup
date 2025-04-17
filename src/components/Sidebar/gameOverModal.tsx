@@ -1,6 +1,7 @@
 import React from 'react';
 import rocketImage from '../../rocket.png';
 import { useUser } from '@/context/UserContext';
+import Image from 'next/image';
 
 const GameOverModal = () => {
   const {
@@ -39,7 +40,7 @@ const GameOverModal = () => {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
       <div className="bg-white dark:bg-[#1A232F] rounded-3xl p-8 text-center max-w-sm w-full shadow-xl space-y-6">
-        <img
+        <Image
           src={`${rocketImage.src}`}
           alt="Rocket crash"
           className="w-24 h-24 mx-auto"

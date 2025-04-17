@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import React from 'react';
 
 const PlatformContent = () => {
@@ -25,7 +26,7 @@ const PlatformContent = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="h-10 w-10 rounded-full">
-                <img src="/images/user/user-01.png" alt="User" />
+                <Image src="/images/user/user-01.png" alt="User" />
               </div>
               <div>
                 <h5 className="font-medium text-black dark:text-white">
@@ -45,7 +46,7 @@ const PlatformContent = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="h-10 w-10 rounded-full">
-                <img src="/images/user/user-02.png" alt="User" />
+                <Image  src="/images/user/user-02.png" alt="User" />
               </div>
               <div>
                 <h5 className="font-medium text-black dark:text-white">
@@ -65,7 +66,7 @@ const PlatformContent = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="h-10 w-10 rounded-full">
-                <img src="/images/user/user-03.png" alt="User" />
+                <Image src="/images/user/user-03.png" alt="User" />
               </div>
               <div>
                 <h5 className="font-medium text-black dark:text-white">
@@ -85,7 +86,7 @@ const PlatformContent = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="h-10 w-10 rounded-full">
-                <img src="/images/user/user-04.png" alt="User" />
+                <Image src="/images/user/user-04.png" alt="User" />
               </div>
               <div>
                 <h5 className="font-medium text-black dark:text-white">
