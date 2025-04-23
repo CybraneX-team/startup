@@ -23,7 +23,7 @@ const SignUp: React.FC = () => {
   useEffect(() => {
       const syncUser = async () => {
         try {
-          const response = await fetch("http://localhost:8000/api/auth/google-login", {
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/google-login`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
