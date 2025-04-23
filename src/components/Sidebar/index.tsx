@@ -164,7 +164,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
       const response = await makeReq.json()
       setUser(response)
       setUserState(response)
-      setnotificationMessages([...notificationMessages, response.message])
+      setnotificationMessages([...notificationMessages, ...response.message])
       setloader(false)
     }
   }

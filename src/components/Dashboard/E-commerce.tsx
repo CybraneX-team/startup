@@ -379,7 +379,6 @@ const orderedMetrics: MetricKey[] = [
 const ECommerce: React.FC = () => {
   const { 
     user, 
-    task, 
     setUser, 
     setUserState, 
     loader, 
@@ -387,10 +386,10 @@ const ECommerce: React.FC = () => {
     notificationMessages, 
     setnotificationMessages ,
     turnAmount,
-    setTurnAmount,
     selectedTaskIds,
     setSelectedTaskIds,
-    HeaderDark
+    HeaderDark,
+    userLoaded
   } = useUser();
   
   const router = useRouter();
@@ -402,17 +401,36 @@ const ECommerce: React.FC = () => {
   }, [user]);
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      // ✅ Ensure this runs only on the client
-      const token = localStorage.getItem("userToken");
-      if (!token) {
+    if (userLoaded) {
+      const token = typeof window !== "undefined" ? localStorage.getItem("userToken") : null;
+      
+
+  
+      if (!user || !user.username || !token) {
+
         router.push("/auth/signup");
+      } else {
       }
     }
-  }, [router]);
+  }, [userLoaded, user]);
+  
   useEffect(() => {
     setGameOverModal( user && user?.finances < 0  ? true : false )
   }, [user]);
+
+  useEffect(() => {
+    setSelectedTaskIds(
+      (prev)=>{
+        return prev.filter((elem: any)=>{
+          return user?.tasks.some((e)=>{
+            return e.taskId === elem.taskId && e.isBug === elem.isBug
+          })
+        })
+      }
+    )
+  }, [user])
+  
+
   const [modalInfo, setModalInfo] = useState<ModalInfo>({
     isOpen: false,
     title: "",
@@ -472,33 +490,14 @@ const ECommerce: React.FC = () => {
     
       setUser(response);
       setUserState(response);
-      setnotificationMessages([...notificationMessages, response.message]);
-    
-      setSelectedTaskIds((prev) => {
-        const updated = prev.filter((p) =>
-          (response.tasks as Task[])?.some((t) => t.taskId === p.taskId)
-        );
-        
-    
-        if (
-          updated.length === prev.length &&
-          updated.every((u, i) => u.taskId === prev[i].taskId)
-        ) {
-          return prev;
-        }
-    
-        return updated;
-      });
+      setnotificationMessages([...notificationMessages, ...response.message]);
+      
     }
-    
     
     // await delay(1000);
     setloader(false);
   }
-  
-  
-  
-  
+  // 67e0705d89fe231396228b83
   function getShortName(metricName: string): string {
     const metricMap: Record<string, string> = {
       userAcquisition: "UA",

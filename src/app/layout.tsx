@@ -9,6 +9,7 @@ import Loader from "@/components/common/Loader";
 import { UserProvider } from "@/context/UserContext";
 import { Bounce, ToastContainer } from "react-toastify";
 import Head from 'next/head';
+import { SessionProvider } from "next-auth/react";
 
 export default function RootLayout({
   children,
@@ -33,7 +34,9 @@ export default function RootLayout({
       <body suppressHydrationWarning={true} className="custom-scrollbar">
         <div className="dark:bg-boxdark-2 dark:text-bodydark">
           <UserProvider>
+          <SessionProvider>
           {loading ? <Loader /> : children}
+          </SessionProvider>
           </UserProvider>
         </div>
       </body>

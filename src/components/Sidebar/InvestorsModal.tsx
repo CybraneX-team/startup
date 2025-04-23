@@ -158,10 +158,13 @@ const InvestorsModal: React.FC<InvestorsModalProps> = ({ isOpen, onClose }) => {
                   <div className="flex items-center gap-4 mb-4">
                     {getInvestorImage(e.name) && (
                       <Image
-                        src={getInvestorImage(e.name).src}
-                        alt={e.name}
-                        className="h-24 w-24 object-contain"
-                      />
+                      src={getInvestorImage(e.name)?.src || "fallback_image_path"}
+                      alt={e.name || "Default Alt Text"}
+                      width={96} // 24 * 4px (Tailwind's 24 = 96px)
+                      height={96} // Same as above
+                      className="h-24 w-24 object-contain"
+                    />
+                    
                     )}
                     <div>
                       <h3 className="text-xl font-semibold text-gray-800 dark:text-white">{e.name}</h3>

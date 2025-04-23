@@ -40,7 +40,7 @@ const MentorCard: React.FC<MentorCardProps> = ({
       const response = await request.json()
       setUser(response) 
       setUserState(response)
-      setnotificationMessages([...notificationMessages, response.message])
+      setnotificationMessages([...notificationMessages, ...response.message])
       setShowDealModal(false);
     }else {
       console.error(

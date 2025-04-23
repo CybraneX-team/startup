@@ -5,6 +5,7 @@ import ClickOutside from "@/components/ClickOutside";
 import { useUser } from "@/context/UserContext";
 import { useRouter, usePathname  } from "next/navigation";
 import randomColor  from 'randomcolor';
+import { signOut } from "next-auth/react";
 const DropdownUser = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [bgColorDot, setbgColorDot] = useState(randomColor())
@@ -19,11 +20,13 @@ const DropdownUser = () => {
     }
   }, [user, userLoaded, pathname, router]);
 
-  function logOut () {
-    localStorage.removeItem("userToken")
-    localStorage.removeItem("userData")
+  function logOut() {
+    localStorage.removeItem("userToken");
+    localStorage.removeItem("userData");
     setUserState(null);
+    signOut({ callbackUrl: "/auth/signin" }); 
   }
+
   return (
     <ClickOutside onClick={() => setDropdownOpen(false)} className="relative">
       <Link

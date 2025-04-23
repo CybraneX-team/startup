@@ -134,7 +134,7 @@ const FilterButton: React.FC<FilterButtonProps> = ({
 }) => (
   <button
     onClick={onClick}
-    className={`flex items-center rounded-full px-4 py-1.5 text-sm transition-colors
+    className={` capitalize flex items-center rounded-full px-4 py-1.5 text-sm transition-colors
       ${
         isActive
           ? "bg-blue-50 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400"
@@ -347,7 +347,7 @@ const TaskGrid: React.FC = () => {
   );
 
   
-  const { user, setTask, setUser,notificationMessages ,setnotificationMessages, selectedTaskIds, setSelectedTaskIds } = useUser();
+  const { user, setTask, setUser,notificationMessages ,setnotificationMessages, userLoaded, setSelectedTaskIds } = useUser();
 
   // const [Tasks, setTasks] = useState([]);
   const router = useRouter();
@@ -368,9 +368,9 @@ const TaskGrid: React.FC = () => {
       router.push("/auth/signup");
       return;
     }
-  }, [user, router]);
-
-  const handleTaskToggle = useCallback((task: any) => {
+  }, [user, router, userLoaded]);
+      
+  const handleTaskToggle = (task: any) => {
     const newSelected = new Set(selectedTasks);
     const taskId = task._id;
   
@@ -392,7 +392,7 @@ const TaskGrid: React.FC = () => {
       });
       
     }
-  }, [selectedTasks, setTask, setSelectedTaskIds]);
+  };
   
   
   const handleCancelConfirm = () => {
@@ -432,7 +432,7 @@ const TaskGrid: React.FC = () => {
 
   const toggleFilter = (filter: string) => {
     const mappedFilter = filter === "Bugs" ? "bugs" : filter;
-  
+    
     setActiveFilters((prev) => {
       const newFilters = new Set(prev);
   
@@ -493,7 +493,7 @@ const TaskGrid: React.FC = () => {
   }, [user?.tasks, activeFilters, selectedTasks]);
   
 
-  const metrics = ["UA", "C1", "AOV", "COGS", "APC", "CPA", "Bugs"];
+  const metrics = ["UA", "C1", "AOV", "COGS", "APC", "CPA", "bugs"];
   const makeBrainstrom = async (turnAmount: string)=>{
     const token = localStorage.getItem("userToken");
     if (!token) {
@@ -514,7 +514,7 @@ const TaskGrid: React.FC = () => {
     if(makeReq.ok){
       const response = await makeReq.json();
       setUser(response);
-      setnotificationMessages([...notificationMessages, response.message])
+      setnotificationMessages([...notificationMessages, ...response.message])
     }
   }
   return (

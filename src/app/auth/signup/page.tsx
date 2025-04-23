@@ -1,13 +1,15 @@
 "use client";
-import React, { ChangeEvent, useState } from "react";
+import React, { ChangeEvent, useEffect, useState } from "react";
 import Link from "next/link";
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 import { useUser } from "@/context/UserContext";
 import { useRouter } from "next/navigation";
 import { Bounce, ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useSession, signIn } from "next-auth/react";
 import dynamic from "next/dynamic";
-import { Eye, EyeOff } from "lucide-react"; // <-- Install lucide-react if not present
+import { Eye, EyeOff } from "lucide-react"; 
+
 
 const DefaultLayout = dynamic(
   () => import("@/components/Layouts/DefaultLayout"),
@@ -17,6 +19,45 @@ const DefaultLayout = dynamic(
 const SignUp: React.FC = () => {
   const router = useRouter();
   const { setUser } = useUser();
+  const { data: session, status } = useSession();
+  useEffect(() => {
+      const syncUser = async () => {
+        try {
+          const response = await fetch("http://localhost:8000/api/auth/google-login", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              email: session?.user?.email,
+              username: session?.user?.name,
+            }),
+          });
+    
+          if (!response.ok) {
+            const error = await response.json();
+            console.error("Google login failed:", error.message);
+            return;
+          }
+    
+          const data = await response.json();
+          localStorage.setItem("userToken", data.token);
+          localStorage.setItem("userData", JSON.stringify(data));        
+          setUser(data);
+          router.push("/");
+        } catch (err) {
+          console.error("Sync error:", err);
+        }
+      };
+    
+      if (
+        status === "authenticated" &&
+        session?.user?.email &&
+        !localStorage.getItem("userToken") // ✅ avoid repeated sync
+      ) {
+        syncUser();
+      }
+    }, [session, status]);
   const [usercreds, setusercreds] = useState({
     username: "",
     email: "",
@@ -226,7 +267,10 @@ const SignUp: React.FC = () => {
                       className="w-full cursor-pointer rounded-lg border border-primary bg-primary p-4 text-white transition hover:bg-opacity-90"
                     />
                   </div>
-                  <button className="flex w-full items-center justify-center gap-3.5 rounded-lg border border-stroke bg-gray p-4 hover:bg-opacity-50 dark:border-strokedark dark:bg-meta-4 dark:hover:bg-opacity-50">
+                  <button 
+                    type="button"
+                   onClick={() => signIn("google", { callbackUrl: "/" })}
+                  className="flex w-full items-center justify-center gap-3.5 rounded-lg border border-stroke bg-gray p-4 hover:bg-opacity-50 dark:border-strokedark dark:bg-meta-4 dark:hover:bg-opacity-50">
                   <span className="h-5 w-5">
                   <svg viewBox="0 0 533.5 544.3" xmlns="http://www.w3.org/2000/svg" className="h-full w-full">
                     <path fill="#4285F4" d="M533.5 278.4c0-17.4-1.6-34-4.6-50.2H272v95h147.1c-6.3 34.4-25 63.5-53.4 83v68h86.1c50.2-46.2 79.7-114.2 79.7-195.8z" />

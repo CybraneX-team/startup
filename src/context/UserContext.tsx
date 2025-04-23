@@ -114,9 +114,10 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     useEffect(() => {
       const storedUser = localStorage.getItem("userData");
       if (storedUser) {
-        setUserState(JSON.parse(storedUser));
+        const parsedUser = JSON.parse(storedUser);
+        setUserState(parsedUser);
       }
-      setUserLoaded(true); // ✅
+      setUserLoaded(true);
     }, []);
 
     // const [selectedTasks, setSelectedTasks] = useState<Set<number>>(new Set());
@@ -138,12 +139,12 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     }, [user]);
     
   
-  useEffect(() => {
-    const storedUser = localStorage.getItem("userData");
-    if (storedUser) {
-      setUserState(JSON.parse(storedUser));
-    }
-  }, []);
+  // useEffect(() => {
+  //   const storedUser = localStorage.getItem("userData");
+  //   if (storedUser) {
+  //     setUserState(JSON.parse(storedUser));
+  //   }
+  // }, []);
   
 
   

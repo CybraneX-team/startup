@@ -32,7 +32,7 @@ const GameOverModal = () => {
       const response = await makeReq.json();
       setUser(response);
       setUserState(response);
-      setnotificationMessages([...notificationMessages, response.message]);
+      setnotificationMessages([...notificationMessages, ...response.message]);
       setloader(false);
     }
   }
@@ -40,11 +40,14 @@ const GameOverModal = () => {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
       <div className="bg-white dark:bg-[#1A232F] rounded-3xl p-8 text-center max-w-sm w-full shadow-xl space-y-6">
-        <Image
-          src={`${rocketImage.src}`}
-          alt="Rocket crash"
-          className="w-24 h-24 mx-auto"
-        />
+      <Image
+        src={`${rocketImage.src}`}
+        alt="Rocket crash"
+        width={96} 
+        height={96} 
+        className="w-24 h-24 mx-auto"
+      />
+
         <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
           Unfortunately, you’ve ran out of money
         </h2>
