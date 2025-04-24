@@ -59,6 +59,8 @@ export interface UserData {
   bugPercentage : number;
   myMentors : any[]
   turnNumber: number; 
+  userGames : string[];
+  lastRequestMade : string 
 }
 interface notificationMessagesType{
   message: string;

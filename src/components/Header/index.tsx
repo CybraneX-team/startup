@@ -5,6 +5,7 @@ import DropdownNotification from "./DropdownNotification";
 import DropdownUser from "./DropdownUser";
 import Image from "next/image";
 import { useUser } from "@/context/UserContext";
+import GameSwitchMenu from "./GameSwitchMenu";
 
 const Header = (props: {
   sidebarOpen: string | boolean | undefined;
@@ -83,10 +84,12 @@ const Header = (props: {
             {/* <DropdownMessage /> */}
             {/* <!-- Chat Notification Area --> */}
           </ul>
-
+          
           {/* <!-- User Area --> */}
           <DropdownUser />
           {/* <!-- User Area --> */}
+          {/* <!-- Sample Dropdown Menu --> */}
+          <GameSwitchMenu/>
         </div>
       </div>
     </header>

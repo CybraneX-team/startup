@@ -47,6 +47,7 @@ const InvestorsModal: React.FC<InvestorsModalProps> = ({ isOpen, onClose }) => {
         `${process.env.NEXT_PUBLIC_API_URL}/api/makeInvestment`,
         {
           method: "POST",
+          credentials: "include",
           headers: {
             "Content-Type": "application/json",
             token: `${localStorage.getItem("userToken")}`,
@@ -78,6 +79,7 @@ const InvestorsModal: React.FC<InvestorsModalProps> = ({ isOpen, onClose }) => {
     try {
       const makeReq = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/buyoutInvestor`, {
         method: "POST",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
           token: `${localStorage.getItem("userToken")}`,

@@ -11,6 +11,7 @@ import MentorsModal from "./MentorsModal";
 import TeamManagementModal from "./TeamManagementModal";
 import InvestorsModal from "./InvestorsModal";
 import { roleIcons } from "../roleIcons";
+import GameOptionsModal from "./GameOptionsModal";
 
 // Dynamically import ReactApexChart to avoid window is not defined errors
 const ReactApexChart = dynamic(() => import('react-apexcharts'), { ssr: false });
@@ -31,6 +32,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
   const [teamModalOpen, setTeamModalOpen] = useState(false);
   const [investorsModalOpen, setInvestorsModalOpen] = useState(false);
   const { user, setUser, setUserState, setnotificationMessages, notificationMessages, setloader } = useUser();
+  const [optionsModalOpen, setOptionsModalOpen] = useState(false);
 
   const finances = user?.finances || 0;
   const options: ApexOptions = {
@@ -151,6 +153,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
       `${process.env.NEXT_PUBLIC_API_URL}/api/resetGame`,
       {
         method : "POST",
+        credentials: "include",
         body: JSON.stringify({
           gameId : user?.gameId
         }),
@@ -166,6 +169,32 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
       setUserState(response)
       setnotificationMessages([...notificationMessages, ...response.message])
       setloader(false)
+    }
+  }
+  
+  async function startNewSimulation(){
+    try {
+      const makeReq = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/create-new-game`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+          token: `${localStorage.getItem("userToken")}`,
+        }
+      })
+  
+      if(makeReq.ok){
+        const response = await makeReq.json()
+        setUser(response)
+        setUserState(response);
+      }else {
+        console.error(
+          `Request failed with status ${makeReq.status}: ${makeReq.statusText}`,
+        );
+      }
+    } catch (error) {
+      console.error("An error occurred:", error);
+      
     }
   }
   return (
@@ -199,7 +228,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
             <h2 className="mb-3 text-sm font-semibold text-black dark:text-white">
               Business Idea
               <span
-                onClick={makeVisible}
+                 onClick={() => setOptionsModalOpen(true)}
                 className="ml-20 cursor-pointer text-xl"
               >
                 {" "}
@@ -207,7 +236,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
               </span>
             </h2>
 
-            <h2
+            {/* <h2
               className={`text-sm font-semibold my-2 cursor-pointer text-black dark:text-white ${
                 makevisible ? "block" : "hidden"
               }`}
@@ -215,7 +244,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
             >
               {" "}
               reset game{" "}
-            </h2>
+            </h2> */}
             <p className="rounded-lg bg-gray-100 p-3 text-sm text-gray-600 dark:text-white dark:bg-[#1C2E5B]">
               Subscription service that delivers a monthly package of pet care
               items
@@ -365,6 +394,16 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
           isOpen={investorsModalOpen}
           onClose={closeInvestorsModal}
         />
+      )}
+      {optionsModalOpen && (
+      <GameOptionsModal
+        isOpen={optionsModalOpen}
+        onClose={() => setOptionsModalOpen(false)}
+        onResetGame={resetTheGame}
+        onStartNewGame={
+          startNewSimulation
+        }
+      />
       )}
     </>
   );

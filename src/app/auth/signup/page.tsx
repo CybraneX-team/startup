@@ -25,6 +25,7 @@ const SignUp: React.FC = () => {
         try {
           const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/google-login`, {
             method: "POST",
+            credentials: "include",
             headers: {
               "Content-Type": "application/json",
             },
@@ -117,6 +118,7 @@ const SignUp: React.FC = () => {
       `${process.env.NEXT_PUBLIC_API_URL}/api/auth/register`,
       {
         method: "POST",
+        credentials: "include",
         body: JSON.stringify({
           username: usercreds.username,
           email: usercreds.email,

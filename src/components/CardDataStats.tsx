@@ -12,7 +12,22 @@ interface FilterButtonProps {
   isActive: boolean;
   onClick: () => void;
 }
+type BrainstormStats = {
+  turnsRequired: number;
+  taskToGenerate: number;
+};
+type Stage = "FFF" | "Angels" | "pre_seed" | "Seed" | "a"| "b"| "c"| "d";
 
+const brainstromTaskAmountMap: Record<Stage, BrainstormStats> = {
+  FFF: { turnsRequired: 1, taskToGenerate: 10 },
+  Angels: { turnsRequired: 1, taskToGenerate: 10 },
+  pre_seed: { turnsRequired: 1, taskToGenerate: 15 },
+  Seed: { turnsRequired: 1, taskToGenerate: 15 },
+  a: { turnsRequired: 1, taskToGenerate: 20 },
+  b: { turnsRequired: 1, taskToGenerate: 20 },
+  c: { turnsRequired: 1, taskToGenerate: 25 },
+  d: { turnsRequired: 1, taskToGenerate: 25 }
+};
 interface TaskCardProps {
   name: string;
   turnsRequired: number;
@@ -288,7 +303,7 @@ const BrainstormModal: React.FC<BrainstormModalProps> = ({
   onConfirm,
   onCancel,
 }) => {
-  const { setHeaderDark } = useUser();
+  const { setHeaderDark, turnAmount } = useUser();
 
   useEffect(() => {
     setHeaderDark(isOpen);
@@ -347,7 +362,7 @@ const TaskGrid: React.FC = () => {
   );
 
   
-  const { user, setTask, setUser,notificationMessages ,setnotificationMessages, userLoaded, setSelectedTaskIds } = useUser();
+  const { user, setTask, setUser,notificationMessages ,setnotificationMessages, userLoaded, setSelectedTaskIds, turnAmount } = useUser();
 
   // const [Tasks, setTasks] = useState([]);
   const router = useRouter();
@@ -495,6 +510,7 @@ const TaskGrid: React.FC = () => {
 
   const metrics = ["UA", "C1", "AOV", "COGS", "APC", "CPA", "bugs"];
   const makeBrainstrom = async (turnAmount: string)=>{
+
     const token = localStorage.getItem("userToken");
     if (!token) {
       alert("User is not authenticated. Please log in.");
@@ -502,12 +518,13 @@ const TaskGrid: React.FC = () => {
     }
     const makeReq = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/brainstrom`,{
       method: "POST",
+      credentials: "include",
       headers: {
         "Content-Type": "application/json",
         token: token,
       },
       body : JSON.stringify({
-        turnAmount,
+        turnAmount : turnAmount,
         gameId : user?.gameId
       })
     })
@@ -553,9 +570,13 @@ const TaskGrid: React.FC = () => {
       <BrainstormModal
         isOpen={brainstormModalOpen}
         turnsRequired={1}
-        tasksGenerated={15}
+        tasksGenerated={
+          brainstromTaskAmountMap[user?.startupStage as Stage || "FFF"].taskToGenerate ? 
+          brainstromTaskAmountMap[user?.startupStage as Stage || "FFF"].taskToGenerate :
+          15
+        }
         onConfirm={async () => {
-          await makeBrainstrom("4836");
+          await makeBrainstrom(turnAmount);
           setBrainstormModalOpen(false);
         }}
         onCancel={() => setBrainstormModalOpen(false)}

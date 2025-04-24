@@ -478,6 +478,7 @@ const ECommerce: React.FC = () => {
 
     const makeReq = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/turn`, {
       method: "POST",
+      credentials: "include",
       headers: {
         "Content-Type": "application/json",
         token: token,
@@ -664,35 +665,29 @@ const ECommerce: React.FC = () => {
     <div className="my-2 flex gap-3 overflow-x-auto lg:overflow-hidden">
       {stages.map((stage, index) => (
         <div
-          key={index}
-          onClick={(e) => handleStageClick(stage,e)}
-          onMouseEnter={() => setHoveredStage(stage)}
-          onMouseLeave={() => setHoveredStage(null)}     
-          className={`min-w-[9%] cursor-pointer 
-            px-5 py-2 text-center rounded-lg border transition-all
+        key={index}
+        onClick={(e) => handleStageClick(stage, e)}
+        onMouseEnter={() => setHoveredStage(stage)}
+        onMouseLeave={() => setHoveredStage(null)}
+        className={`min-w-[100px] max-w-[120px] cursor-pointer px-4 py-2 text-center rounded-lg border transition-all
+          ${user?.startupStage === stage
+            ? "bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
+            : "bg-gray-200 dark:bg-[#1C2E5B] border-transparent hover:bg-gray-300 dark:hover:bg-[#1C2E5B]"
+          }`}
+      >
+        <div className="flex items-center justify-center gap-1">
+          <span className={`text-sm font-medium whitespace-nowrap 
             ${user?.startupStage === stage 
-              ? "bg-white dark:bg-gray-700  border-gray-300 dark:border-gray-600" 
-              : "bg-gray-200 dark:bg-[#1C2E5B] border-transparent hover:bg-gray-300 dark:hover:bg-[#1C2E5B]"}`
-          }
-        >
-          <div className="flex items-center justify-center" 
-                 >
-            <span
-              className={`text-sm font-medium w-auto
-                ${user?.startupStage === stage 
-                  ? "text-black dark:text-white font-semibold" 
-                  : "text-gray-500 dark:text-gray-400 dark:bg-[#1C2E5B]"}`}
-            >
-              {stage}
-            </span>
-
-            {hoveredStage === stage && (
-          <span className="opacity-100 duration-200">
-            <InfoIcon size={12} className="ml-2 text-gray-500 dark:text-gray-400" />
+              ? "text-black dark:text-white font-semibold" 
+              : "text-gray-500 dark:text-gray-400"}`}>
+            {stage}
           </span>
-        )}
-          </div>
+          {hoveredStage === stage && (
+            <InfoIcon size={12} className="text-gray-500 dark:text-gray-400" />
+          )}
         </div>
+      </div>
+      
       ))}
     </div>
 

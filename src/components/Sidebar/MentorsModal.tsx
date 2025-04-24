@@ -26,6 +26,7 @@ const MentorCard: React.FC<MentorCardProps> = ({
   async function signMentor(mentorName : string) {
     const request = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/hireMentor`,{
       method : "POST", 
+      credentials: "include",
       body: JSON.stringify({
         mentorName : mentorName,
         gameId : user?.gameId

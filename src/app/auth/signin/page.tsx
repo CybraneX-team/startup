@@ -18,6 +18,7 @@ const SignIn: React.FC = () => {
       try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/google-login`, {
           method: "POST",
+          credentials: "include",
           headers: {
             "Content-Type": "application/json",
           },
@@ -69,6 +70,7 @@ const SignIn: React.FC = () => {
 
     const makeReq = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/login`, {
       method: "POST",
+      credentials: "include",
       body: JSON.stringify({
         email: usercreds.email,
         password: usercreds.password,
