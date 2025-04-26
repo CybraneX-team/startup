@@ -58,7 +58,7 @@ const SignUp: React.FC = () => {
       ) {
         syncUser();
       }
-    }, [session, status]);
+    }, [session, status, router, setUser]);
   const [usercreds, setusercreds] = useState({
     username: "",
     email: "",

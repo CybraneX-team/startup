@@ -413,7 +413,7 @@ const ECommerce: React.FC = () => {
       } else {
       }
     }
-  }, [userLoaded, user]);
+  }, [userLoaded, user, router]);
   
   useEffect(() => {
     setGameOverModal( user && user?.finances < 0  ? true : false )
@@ -429,7 +429,7 @@ const ECommerce: React.FC = () => {
         })
       }
     )
-  }, [user])
+  }, [user,  setSelectedTaskIds])
   
 
   const [modalInfo, setModalInfo] = useState<ModalInfo>({

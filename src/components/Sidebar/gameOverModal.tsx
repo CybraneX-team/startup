@@ -50,7 +50,7 @@ const GameOverModal = () => {
       />
 
         <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
-          Unfortunately, you've ran out of money
+          Unfortunately, you&apos;ve ran out of money
         </h2>
         <p className="text-gray-500 dark:text-gray-400">
           Try again and you will definitely have better luck next time.

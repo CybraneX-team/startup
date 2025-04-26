@@ -204,7 +204,7 @@ export default function StartupBasicsForm() {
       >
         <h3 className="text-xl font-bold mb-2">{template.businessName}</h3>
         <p className="text-sm text-gray-600 dark:text-gray-300">{template.industry}</p>
-        <p className="text-xs text-gray-500 dark:text-gray-400 italic mt-1">"{template.goal}"</p>
+        <p className="text-xs text-gray-500 dark:text-gray-400 italic mt-1">&quot;{template.goal}&ldquo;</p>
         <p className="text-xs text-gray-500 dark:text-gray-400">{template.productType}</p>
       </motion.div>
     ))}

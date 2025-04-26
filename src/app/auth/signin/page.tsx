@@ -52,7 +52,7 @@ const SignIn: React.FC = () => {
     ) {
       syncUser();
     }
-  }, [session, status]);
+  }, [session, status, router, setUser]);
   
   const [usercreds, setusercreds] = useState({
     email: "",
