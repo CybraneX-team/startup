@@ -11,13 +11,30 @@ const Header = (props: {
   sidebarOpen: string | boolean | undefined;
   setSidebarOpen: (arg0: boolean) => void;
 }) => {
-    const {HeaderDark} = useUser()
+    const {HeaderDark, user} = useUser()
   
   return (
-<header className={ ` sticky top-0 z-[900] flex w-full  ${HeaderDark ? 'bg-[#878C94]': "bg-white"}  dark:bg-boxdark dark:drop-shadow-none `}>      
+<header className={ ` sticky top-0 z-[900] flex w-full  ${HeaderDark ? 'bg-[#878C94]': "bg-white"}  dark:bg-boxdark dark:drop-shadow-none `}>   
+{!user?.isAiCustomizationDone && 
+               <div className="flex  justify-start gap-2 px-6  py-5.5 bg-gray-100 dark:bg-[#24303F]">
+               <Link href="/" className="flex items-center">
+                 <Image
+                   width={24}
+                   height={24}
+                   src={"/favicon.ico"}
+                   alt="Logo"
+                   priority
+                 />
+                 <h1 className="mx-2 text-xl font-semibold text-black dark:text-white">
+                   Startup Simulator
+                 </h1>
+               </Link>
+             </div>
+            }   
   <div className="flex flex-grow items-center justify-end px-4 py-4 md:px-6 2xl:px-11">
         <div className="flex items-center gap-2 sm:gap-4 lg:hidden">
           {/* <!-- Hamburger Toggle BTN --> */}
+
           <button
             aria-controls="sidebar"
             onClick={(e) => {
@@ -59,7 +76,7 @@ const Header = (props: {
             </span>
           </button>
           {/* <!-- Hamburger Toggle BTN --> */}
-
+         
           <Link className="block flex-shrink-0 lg:hidden" href="/">
             <Image
               width={32}
@@ -70,6 +87,7 @@ const Header = (props: {
           </Link>
         </div>
 
+        
         <div className="flex items-center gap-3 2xsm:gap-7 ">
           <ul className="flex items-center justify-end gap-2 2xsm:gap-4">
             {/* <!-- Dark Mode Toggler --> */}
@@ -86,10 +104,11 @@ const Header = (props: {
           </ul>
           
           {/* <!-- User Area --> */}
+          <GameSwitchMenu/>
+
           <DropdownUser />
           {/* <!-- User Area --> */}
           {/* <!-- Sample Dropdown Menu --> */}
-          <GameSwitchMenu/>
         </div>
       </div>
     </header>

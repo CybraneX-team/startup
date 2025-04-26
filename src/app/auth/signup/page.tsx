@@ -45,7 +45,7 @@ const SignUp: React.FC = () => {
           localStorage.setItem("userToken", data.token);
           localStorage.setItem("userData", JSON.stringify(data));        
           setUser(data);
-          router.push("/");
+          router.push("/formQuestion");
         } catch (err) {
           console.error("Sync error:", err);
         }
@@ -137,7 +137,7 @@ const SignUp: React.FC = () => {
       localStorage.setItem("userData", JSON.stringify(response));
       toast.success("Account created successfully");
       setTimeout(() => {
-        router.push("/");
+        router.push("/formQuestion");
       }, 1000);
     } else {
       toast.error("Something went wrong. Please try again.");

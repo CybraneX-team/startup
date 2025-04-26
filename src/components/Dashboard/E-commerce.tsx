@@ -389,7 +389,8 @@ const ECommerce: React.FC = () => {
     selectedTaskIds,
     setSelectedTaskIds,
     HeaderDark,
-    userLoaded
+    userLoaded,
+    loaderMessage
   } = useUser();
   
   const router = useRouter();
@@ -626,17 +627,17 @@ const ECommerce: React.FC = () => {
         theme="light"
         transition={Bounce}
       />
-      {loader === true ? (
-        <div className="relative left-[39%] top-[14em] z-99999 h-full w-full bg-black-2 ">
-          <div className="absolute flex flex-row gap-2">
-            <div className="h-4 w-4 animate-bounce rounded-full bg-blue-700 [animation-delay:.7s]"></div>
-            <div className="h-4 w-4 animate-bounce rounded-full bg-blue-700 [animation-delay:.3s]"></div>
-            <div className="h-4 w-4 animate-bounce rounded-full bg-blue-700 [animation-delay:.7s]"></div>
-          </div>
+      {loader && (
+      <div className="fixed inset-0 z-[99999] flex flex-col items-center justify-center bg-black bg-opacity-50">
+        <div className="flex gap-2 mb-4">
+          <div className="h-4 w-4 animate-bounce rounded-full bg-blue-700 [animation-delay:.1s]"></div>
+          <div className="h-4 w-4 animate-bounce rounded-full bg-blue-700 [animation-delay:.3s]"></div>
+          <div className="h-4 w-4 animate-bounce rounded-full bg-blue-700 [animation-delay:.5s]"></div>
         </div>
-      ) : (
-        <div></div>
-      )}
+        <p className="text-white text-sm font-medium mt-2">{loaderMessage}</p>
+      </div>
+    )}
+
       {
         gameOverModal ? <GameOverModal  /> : null
       }

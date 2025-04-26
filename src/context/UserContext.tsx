@@ -36,6 +36,10 @@ interface Employee {
   salary: number;
   quantity: number;
 }
+interface userGameType{
+  gameId: string;
+  gameName: string;
+}
 export interface UserData {
   finances: number;
   metrics: Metrics;
@@ -59,8 +63,10 @@ export interface UserData {
   bugPercentage : number;
   myMentors : any[]
   turnNumber: number; 
-  userGames : string[];
-  lastRequestMade : string 
+  userGames : userGameType[];
+  lastRequestMade : string ;
+  isAiCustomizationDone: boolean;
+  gameName: string;
 }
 interface notificationMessagesType{
   message: string;
@@ -91,6 +97,9 @@ interface UserContextType {
   userLoaded: boolean; 
   HeaderDark : boolean;
   setHeaderDark : (arg: boolean) => void;
+  loaderMessage: string;
+  setLoaderMessage: (msg: string) => void;
+
 }
 
 
@@ -112,7 +121,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     const [modalOpen, setModalOpen] = useState<boolean>(false)
     const [userLoaded, setUserLoaded] = useState(false);
     const [HeaderDark, setHeaderDark] = useState(false);
-
+    const [loaderMessage, setLoaderMessage] = useState("");
     useEffect(() => {
       const storedUser = localStorage.getItem("userData");
       if (storedUser) {
@@ -196,7 +205,9 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       setModalOpen,
       userLoaded,
       HeaderDark, 
-      setHeaderDark
+      setHeaderDark,
+      loaderMessage,
+      setLoaderMessage,
       }}>
       {children}
     </UserContext.Provider>

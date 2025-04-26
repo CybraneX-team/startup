@@ -12,7 +12,7 @@ import { useSession, signIn } from "next-auth/react";
 const SignIn: React.FC = () => {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const { setUser } = useUser();
+  const { setUser, user } = useUser();
   useEffect(() => {
     const syncUser = async () => {
       try {
@@ -35,10 +35,11 @@ const SignIn: React.FC = () => {
         }
   
         const data = await response.json();
+
         localStorage.setItem("userToken", data.token);
         localStorage.setItem("userData", JSON.stringify(data));        
         setUser(data);
-        router.push("/");
+        router.push(data?.isAiCustomizationDone ? "/" : "/formQuestion");
       } catch (err) {
         console.error("Sync error:", err);
       }
@@ -85,7 +86,7 @@ const SignIn: React.FC = () => {
       setUser(response);
       localStorage.setItem("userToken", response.token);
       localStorage.setItem("userData", JSON.stringify(response));
-      router.push("/");
+      router.push( response.isAiCustomizationDone ? "/" : "/formQuestion");
     } else {
       alert("Invalid credentials or server error.");
     }

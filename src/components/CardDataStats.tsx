@@ -384,7 +384,14 @@ const TaskGrid: React.FC = () => {
       return;
     }
   }, [user, router, userLoaded]);
-      
+  
+  useEffect(() => {
+    if (!user?.isAiCustomizationDone) {
+      router.push("/formQuestion");
+      return;
+    }
+  }, [user, router, userLoaded]);
+
   const handleTaskToggle = (task: any) => {
     const newSelected = new Set(selectedTasks);
     const taskId = task._id;

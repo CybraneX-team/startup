@@ -11,7 +11,7 @@ export default function DefaultLayout({
   children: React.ReactNode;
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { loader } = useUser();
+  const { loader, user } = useUser();
   const pathname = usePathname();
   const isAuthPage = pathname?.startsWith("/auth");
 
@@ -21,11 +21,11 @@ export default function DefaultLayout({
         <div className="absolute left-0 top-0 z-9999 h-full w-full bg-black-2 opacity-40"></div>
       )}
 
-      {!isAuthPage && (
+      {!isAuthPage && user?.isAiCustomizationDone  &&(
         <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
       )}
 
-      <div className={`relative flex flex-1 flex-col ${!isAuthPage ? 'lg:ml-72.5' : ''}`}>
+      <div className={`relative flex flex-1 flex-col ${!isAuthPage && user?.isAiCustomizationDone ? 'lg:ml-72.5' : ''}`}>
         <Header
           sidebarOpen={sidebarOpen}
           setSidebarOpen={setSidebarOpen}

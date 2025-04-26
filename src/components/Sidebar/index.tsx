@@ -364,6 +364,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
         </div>
       </aside>
 
+
       {/* Market Info Modal */}
       {marketModalOpen && (
         <MarketInfoModal 
