@@ -2,7 +2,7 @@
 import dynamic from "next/dynamic";
 import React, { useEffect, useState } from "react";
 import TaskGrid from "../CardDataStats";
-import { InfoIcon } from "lucide-react";
+import { InfoIcon, ArrowRight  } from "lucide-react";
 import TooltipModal from "@/components/TooltipModal";
 import { Bell } from "lucide-react";
 import SpotlightModal from "@/components/SpotlightModal";
@@ -420,6 +420,23 @@ const ECommerce: React.FC = () => {
   }, [user]);
 
   useEffect(() => {
+    // Function to check the screen size
+    const checkScreenSize = () => {
+      const isMobileScreen = window.matchMedia('(max-width: 1024px)').matches; // Tailwind's `lg` breakpoint
+      setIsMobile(isMobileScreen);
+    };
+
+    // Initial check
+    checkScreenSize();
+
+    // Add event listener for screen resize
+    window.addEventListener('resize', checkScreenSize);
+
+    // Cleanup event listener on component unmount
+    return () => window.removeEventListener('resize', checkScreenSize);
+  }, []);
+
+  useEffect(() => {
     setSelectedTaskIds(
       (prev)=>{
         return prev.filter((elem: any)=>{
@@ -440,6 +457,7 @@ const ECommerce: React.FC = () => {
   });
 
   const [selectedMetric, setSelectedMetric] = useState<string | null>(null);
+  const [showMore, setShowMore] = useState<boolean | null>(false);
   const [selectedStage, setSelectedStage] = useState<string | null>(null);
   const [showNotifications, setShowNotifications] = useState(false);
   const [gameOverModal, setGameOverModal] = useState(() => {
@@ -447,6 +465,7 @@ const ECommerce: React.FC = () => {
   });
   const [hoveredStage, setHoveredStage] = useState<string | null>(null);
   const dollarMetrics = ['AOV', 'Cogs', 'CLTV', 'ARPU', 'CPA', 'CM'];
+  const [isMobile, setIsMobile] = useState(false);
   async function makeTurn(turnAmount: string) {
     setloader(true);
     const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -646,9 +665,9 @@ const ECommerce: React.FC = () => {
         Startup Stages
       </h3>
       {user?.startupStage === "FFF" ? (
-        <p>Your goal is to reach 10 buyers</p>
+        <p >Your goal is to reach 10 buyers</p>
       ) : user?.startupStage === "Angels" ? (
-        <p>Your goal is to reach 100 buyers</p>
+        <p >Your goal is to reach 100 buyers</p>
       ) : user?.startupStage === "pre_seed" ? (
         <p>Your goal is to reach 500 buyers</p>
       ) : user?.startupStage === "Seed" ? (
@@ -663,44 +682,52 @@ const ECommerce: React.FC = () => {
         <p>Congratulations! You &apos; ve reached the highest stage 🚀</p>
       )}
 
-    <div className="my-2 flex gap-3 overflow-x-auto lg:overflow-hidden">
-      {stages.map((stage, index) => (
-        <div
-        key={index}
-        onClick={(e) => handleStageClick(stage, e)}
-        onMouseEnter={() => setHoveredStage(stage)}
-        onMouseLeave={() => setHoveredStage(null)}
-        className={`min-w-[100px] max-w-[120px] cursor-pointer px-4 py-2 text-center rounded-lg border transition-all
-          ${user?.startupStage === stage
+<div className="my-2 flex gap-3 overflow-x-auto lg:w-auto lg:overflow-hidden 
+  dark:bg-[#101d28] bg-white border border-gray-200 lg:dark:bg-transparent
+  lg:border-0 dark:border-gray-700 rounded-xl p-5 lg:bg-transparent lg:p-0 ">
+  {stages.map((stage, index) => (
+    <div
+      key={index}
+      onClick={(e) => handleStageClick(stage, e)}
+      onMouseEnter={() => setHoveredStage(stage)}
+      onMouseLeave={() => setHoveredStage(null)}
+      className={`min-w-[100px] max-w-[120px] cursor-pointer px-4 py-2 text-center rounded-lg border transition-all duration-200
+        ${
+          user?.startupStage === stage
             ? "bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
-            : "bg-gray-200 dark:bg-[#1C2E5B] border-transparent hover:bg-gray-300 dark:hover:bg-[#1C2E5B]"
+            : "bg-gray-100 dark:bg-[#1C2E5B] border-transparent hover:bg-gray-200 dark:hover:bg-[#223a5f]"
+        }`}
+    >
+      <div className="flex items-center justify-center gap-1">
+        <span className={`text-sm font-medium whitespace-nowrap 
+          ${
+            user?.startupStage === stage
+              ? "text-black dark:text-white font-semibold py-1 lg:py-0 text-center"
+              : "text-gray-600 dark:text-gray-400 py-1 text-center lg:py-0"
           }`}
-      >
-        <div className="flex items-center justify-center gap-1">
-          <span className={`text-sm font-medium whitespace-nowrap 
-            ${user?.startupStage === stage 
-              ? "text-black dark:text-white font-semibold" 
-              : "text-gray-500 dark:text-gray-400"}`}>
-            {stage}
-          </span>
-          {hoveredStage === stage && (
-            <InfoIcon size={12} className="text-gray-500 dark:text-gray-400" />
-          )}
-        </div>
+        >
+          {stage}
+        </span>
+        {hoveredStage === stage && (
+          <InfoIcon size={12} className="text-gray-400 dark:text-gray-400" />
+        )}
       </div>
-      
-      ))}
     </div>
-
+  ))}
+</div>
 
 
       <h3 className="text-sm text-gray-500 dark:text-gray-400">Metrics</h3>
-      <div className="my-2 flex gap-3 overflow-x-scroll lg:overflow-x-hidden">
+      <div 
+      className="my-2 rounded-lg lg:rounded-none grid grid-cols-3 lg:flex 
+      gap-5 lg:gap-3 overflow-x-scroll lg:overflow-x-hidden 
+      p-4 lg:p-0 lg:bg-transparent dark:lg:bg-transparent  h-auto">
       {user && user.metrics && orderedMetrics.map((metric, index) => (
     <div
       key={index}
       onClick={(e) => handleMetricClick(getShortName(metric), e)}
-      className="flex min-w-[9%] items-center justify-around rounded-xl border border-stroke bg-white px-2 py-3 dark:border-strokedark dark:bg-boxdark"
+      className="flex min-w-max lg:min-w-[9%]  lg:mx-0  items-center justify-around rounded-xl border 
+      border-stroke bg-white px-2 py-3 dark:border-strokedark dark:bg-boxdark "
     >
       <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
         {getShortName(metric)}
@@ -741,84 +768,148 @@ const ECommerce: React.FC = () => {
         anchorEl={modalInfo.anchorEl}
         selectedMetric={selectedMetric}
       />
-      <div className="mt-4 w-full pb-28 md:mt-4 2xl:mt-7.5">
+      <div className="mt-4 w-[110%] right-5 relative items-center lg:w-full lg:static pb-28 md:mt-4 2xl:mt-7.5">
         <TaskGrid />
       </div>
-      <div className={`fixed bottom-0 left-[18.77em] right-0 
-       ${HeaderDark ? 'bg-[#878C94]': "bg-white"}
-      flex w-[77em] items-end 
-      justify-between 
-      bg-white p-5
-       dark:bg-boxdark z-50`}>
-  {/* Notification Box */}
-  <div className={`w-[35em] max-w-[35%]`}>
-    <div className="rounded-xl bg-[#eff4fb9a] p-3 dark:bg-[#1A222C]">
-      <div className="flex justify-between items-center">
-        <h3
-          className={`text-sm ${
-            notificationMessages[notificationMessages.length - 1].isPositive
-              ? "text-emerald-600 dark:text-emerald-400"
-              : "text-red-600 dark:text-red-400"
-          }`}
-        >
-          {notificationMessages[notificationMessages.length - 1].message}
-        </h3>
-        <button
-          onClick={() => setShowNotifications(!showNotifications)}
-          className="text-gray-600 dark:text-gray-400"
-        >
-          {showNotifications ? (
-            <span className="flex items-center">
-              Hide notifications <Bell className="ml-1" size={16} />
-            </span>
-          ) : (
-            <span className="flex items-center">
-              Show notifications <Bell className="ml-1 text-red-500" size={16} />
-            </span>
-          )}
-        </button>
-      </div>
+    
+      <div className={`fixed bottom-0 left-0 right-0 w-full p-3 z-[9999]  lg:left-75
+${HeaderDark ? 'bg-[#878C94]' : "bg-white"} dark:bg-boxdark`}>
 
-      <div
-        className={`transition-all duration-300 overflow-y-scroll ${
-          showNotifications ? "max-h-40 mt-2" : "max-h-0"
-        }`}
-      >
-        <div className="text-sm">
-          {notificationMessages
-            .slice(0, notificationMessages.length - 1)
-            .map((e, i) => (
-              <p key={i} className={e.isPositive ? "text-green-600" : "text-red-500"}>
-                {e.message}
-              </p>
-            ))}
+    {/* ====== MOBILE VIEW ====== */}
+    <div className="flex flex-col lg:hidden w-full">
+
+        {/* Show More Toggle at TOP */}
+        <div onClick={() => setShowMore(!showMore)}
+            className="flex justify-center mb-2 cursor-pointer">
+            <p>{showMore ? "Show Less" : "Show More"}</p>
         </div>
-      </div>
-    </div>
-  </div>
 
-  {/* Make Turn & Stats */}
-  <div className="flex items-end space-x-10">
-    <div className="text-sm">
-      <p>Bugs</p>
-      <p className="font-semibold">{user?.bugPercentage}%</p>
+        {/* Notification Box if showMore is true */}
+        {showMore && (
+            <div className="rounded-xl  bg-[#eff4fb9a] p-3 mb-3 dark:bg-[#1A222C]">
+                <div className="flex justify-between items-center">
+                    <h3 className={`text-sm ${
+                        notificationMessages[notificationMessages.length - 1]?.isPositive
+                            ? "text-emerald-600 dark:text-emerald-400"
+                            : "text-red-600 dark:text-red-400"
+                    }`}>
+                        {notificationMessages[notificationMessages.length - 1]?.message || "No notifications"}
+                    </h3>
+                    <button onClick={() => setShowNotifications(!showNotifications)}
+                        className="text-gray-600 dark:text-gray-400">
+                        {showNotifications ? (
+                            <span className="flex items-center">
+                                Hide notifications <Bell className="ml-1" size={16} />
+                            </span>
+                        ) : (
+                            <span className="flex items-center">
+                                Show notifications <Bell className="ml-1 text-red-500" size={16} />
+                            </span>
+                        )}
+                    </button>
+                </div>
+
+                {/* Old notifications history (MOBILE) */}
+                {showNotifications && (
+                    <div className="max-h-24 overflow-y-scroll  mt-1 space-y-1 pr-1">
+                        {notificationMessages
+                            .slice(0, notificationMessages.length - 1)
+                            .reverse()
+                            .map((msg, idx) => (
+                                <p key={idx} className={msg.isPositive ? "text-green-500 text-xs" : "text-red-500 text-xs"}>
+                                    {msg.message}
+                                </p>
+                            ))}
+                    </div>
+                )}
+            </div>
+        )}
+
+        {/* Funds + Turn button side by side */}
+        <div className="flex justify-between items-center space-x-4">
+            <div className="text-sm">
+                <p>Current funds</p>
+                <p className="font-semibold">${user?.finances}</p>
+            </div>
+            <button onClick={() => makeTurn(turnAmount)}
+                className="flex flex-col items-center rounded-xl bg-[#4fc387] px-4 py-2">
+                <span className="font-semibold text-white">Make turn</span>
+                <div className="flex justify-between">
+                    <span className="font-semibold text-white">Income</span>
+                    <h3 className="font-bold text-white ml-2">{user ? turnAmount : ""}</h3>
+                </div>
+            </button>
+        </div>
     </div>
-    <div className="text-sm">
-      <p>Current funds</p>
-      <p className="font-semibold">${user?.finances}</p>
+
+    {/* ====== DESKTOP VIEW (LG and above) ====== */}
+    <div className="hidden lg:flex items-center justify-between w-full">
+
+        {/* Left side: Notification box with history */}
+        <div className="flex flex-col gap-2 bg-[#1A222C] rounded-xl px-4 py-2 max-w-[55%]">
+    <div className="flex justify-between items-start gap-2">
+        <p className={`text-sm ${
+            notificationMessages[notificationMessages.length - 1]?.isPositive
+                ? "text-emerald-600 dark:text-emerald-400"
+                : "text-red-600 dark:text-red-400"
+        }`}>
+            {notificationMessages[notificationMessages.length - 1]?.message || "Welcome to the game"}
+        </p>
+        <button onClick={() => setShowNotifications(!showNotifications)}
+            className="text-gray-400 whitespace-nowrap">
+            {showNotifications ? "Hide notifications" : (
+                <span className="flex items-center">
+                    Show notifications <Bell className="ml-1 text-red-500" size={16} />
+                </span>
+            )}
+        </button>
     </div>
-    <button
-      onClick={() => makeTurn(turnAmount)}
-      className="w-60 rounded-xl bg-[#4fc387] p-2"
-    >
-      <span className="text-center font-semibold text-white">Make turn</span>
-      <div className="flex justify-between">
-        <span className="font-semibold text-white">Income</span>
-        <h3 className="font-bold text-white">{user ? turnAmount : ""}</h3>
-      </div>
-    </button>
-  </div>
+
+    {/* Old notifications scroll area */}
+    {showNotifications && (
+        <div className="max-h-24 overflow-y-scroll mt-1 space-y-1 pr-1">
+            {notificationMessages
+                .slice(0, notificationMessages.length - 1)
+                .reverse()
+                .map((msg, idx) => (
+                    <p key={idx} className={msg.isPositive ? "text-green-500 text-xs" : "text-red-500 text-xs"}>
+                        {msg.message}
+                    </p>
+                ))}
+        </div>
+    )}
 </div>
+
+
+        {/* Right side: Bugs, Funds, Button */}
+        <div className="flex flex-col justify-end space-y-2 lg:relative lg:right-75 h-full ">
+        <div className="flex items-end space-x-8">
+            <div className="text-sm">
+                <p>Bugs</p>
+                <p className="font-semibold">{user?.bugPercentage}%</p>
+            </div>
+            <div className="text-sm">
+                <p>Current funds</p>
+                <p className="font-semibold">${user?.finances}</p>
+            </div>
+            <button onClick={() => makeTurn(turnAmount)}
+                className="rounded-xl bg-[#4fc387] px-6 lg:py-2 lg:px-2 py-3 w-72 lg:w-62 flex flex-col items-center justify-center space-y-1">
+
+                <span className="font-semibold text-white text-lg">Make turn</span>
+
+                <div className="flex justify-between w-full px-2">
+                    <span className="font-medium text-white">Income</span>
+                    <span className="font-bold text-white">
+                       ${user ? Number(turnAmount).toLocaleString() : ""}
+                    </span>
+                </div>
+
+            </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
       {/* </div> */}
     </>

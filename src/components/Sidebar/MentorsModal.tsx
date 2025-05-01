@@ -23,6 +23,7 @@ const MentorCard: React.FC<MentorCardProps> = ({
 }) => {
   const [showDealModal, setShowDealModal] = useState(false);
   const {user, setUser, setUserState, setnotificationMessages, notificationMessages } = useUser()
+
   async function signMentor(mentorName : string) {
     const request = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/hireMentor`,{
       method : "POST", 
@@ -49,10 +50,14 @@ const MentorCard: React.FC<MentorCardProps> = ({
       );
     }
   } 
+  const isSigned = user?.myMentors.some((elem) => elem.mentorName === title);
+
   return (
     <>
       <div
-        onClick={() => setShowDealModal(true)}
+        onClick={() => {
+          if (!isSigned) setShowDealModal(true);
+        }}
         className="min-w-[350px] cursor-pointer 
         flex-none rounded-xl border border-gray-200 bg-white p-5 hover:shadow-lg transition dark:bg-[#24303F]"
       >
@@ -142,7 +147,7 @@ const MentorsModal: React.FC<MentorsModalProps> = ({ isOpen, onClose }) => {
         );
   
         if (hasMatchingNames) {
-          setmentorsArray([...mentorsAvailable]);
+          setmentorsArray([...mentorsAvailable, ...myMentors]);
         } else {
           setmentorsArray([...mentorsAvailable, ...myMentors]);
         }
@@ -170,7 +175,7 @@ const MentorsModal: React.FC<MentorsModalProps> = ({ isOpen, onClose }) => {
         <div className="mb-6">
           <div className="flex items-center gap-2">
             <h2 className="text-2xl font-medium text-gray-800 dark:text-white">Available Mentors</h2>
-            <span className="text-2xl font-medium text-green-500">4</span>
+            <span className="text-2xl font-medium text-green-500">{user?.mentorsAvailable.length || 0}</span>
           </div>
           <p className="mt-2 text-sm  text-gray-600 dark:text-white">
             A startup mentor is someone who offers guidance and support, helping startup workers to develop their skills, grow their networks, and achieve their professional goals.

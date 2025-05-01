@@ -10,6 +10,7 @@ import { UserProvider } from "@/context/UserContext";
 import { Bounce, ToastContainer } from "react-toastify";
 import Head from 'next/head';
 import { SessionProvider } from "next-auth/react";
+import Script from "next/script";
 
 export default function RootLayout({
   children,
@@ -39,6 +40,10 @@ export default function RootLayout({
           </SessionProvider>
           </UserProvider>
         </div>
+        <Script
+          src="https://checkout.razorpay.com/v1/checkout.js"
+          strategy="beforeInteractive"
+        />
       </body>
     </html>
   );

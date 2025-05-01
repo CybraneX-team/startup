@@ -67,6 +67,7 @@ export interface UserData {
   lastRequestMade : string ;
   isAiCustomizationDone: boolean;
   gameName: string;
+  businessDescription : string;
 }
 interface notificationMessagesType{
   message: string;

@@ -33,6 +33,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
   const [investorsModalOpen, setInvestorsModalOpen] = useState(false);
   const { user, setUser, setUserState, setnotificationMessages, notificationMessages, setloader } = useUser();
   const [optionsModalOpen, setOptionsModalOpen] = useState(false);
+  const [showFullDesc, setShowFullDesc] = useState(false);
 
   const finances = user?.finances || 0;
   const options: ApexOptions = {
@@ -245,9 +246,21 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
               {" "}
               reset game{" "}
             </h2> */}
-            <p className="rounded-lg bg-gray-100 p-3 text-sm text-gray-600 dark:text-white dark:bg-[#1C2E5B]">
-              Subscription service that delivers a monthly package of pet care
-              items
+        <p className="relative rounded-lg bg-[#1A1F2E] bg-opacity-40 px-3 py-2 text-sm leading-relaxed text-gray-300 border border-gray-700">
+              {user.businessDescription
+                ? showFullDesc
+                  ? user.businessDescription
+                  : `${user.businessDescription.slice(0, 80)}...`
+                : "Subscription service that delivers a monthly package of pet care items."}
+
+              {user.businessDescription && user.businessDescription.length > 120 && (
+                <button
+                  onClick={() => setShowFullDesc(!showFullDesc)}
+                  className="ml-2 text-xs text-blue-400 hover:text-blue-300 underline"
+                >
+                  {showFullDesc ? "See less" : "See more"}
+                </button>
+              )}
             </p>
           </div>
 
