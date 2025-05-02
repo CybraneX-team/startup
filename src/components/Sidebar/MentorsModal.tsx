@@ -58,7 +58,7 @@ const MentorCard: React.FC<MentorCardProps> = ({
         onClick={() => {
           if (!isSigned) setShowDealModal(true);
         }}
-        className="min-w-[350px] cursor-pointer 
+        className="min-w-[310px] lg:min-w-[350px] cursor-pointer 
         flex-none rounded-xl border border-gray-200 bg-white p-5 hover:shadow-lg transition dark:bg-[#24303F]"
       >
         <div className="mb-4 flex items-center gap-3">
@@ -70,7 +70,7 @@ const MentorCard: React.FC<MentorCardProps> = ({
           <h3 className="text-xl font-medium text-gray-800 dark:text-white">{title}</h3>
         </div>
 
-        <p className="mb-6 text-sm w-90 text-gray-600 dark:text-white">{description}</p>
+        <p className="mb-6 text-sm w-70 lg:w-90 text-gray-600 dark:text-white">{description}</p>
 
         <div className="mb-3 flex items-center justify-between border-b border-gray-200 pb-3">
           <span className="text-sm font-medium text-gray-700 dark:text-white">Conditions (required stake)</span>
@@ -156,12 +156,12 @@ const MentorsModal: React.FC<MentorsModalProps> = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center ">
+    <div className="fixed inset-0 z-[99999] lg:z-[9999] flex  items-center justify-center ">
       {/* Full-screen overlay to dim entire application */}
       <div className="absolute inset-0 bg-black/30 " onClick={onClose}></div>
       
-      <div className="relative w-full max-w-5xl rounded-xl bg-white p-6 shadow-lg dark:bg-[#1A222C]">
-        {/* Close button */}
+      <div className="relative w-full max-w-xl mx-2 sm:mx-0 my-6 rounded-xl bg-white p-6 shadow-lg dark:bg-boxdark max-h-[90vh] overflow-y-auto">
+      {/* Close button */}
         <button 
           onClick={onClose}
           className="absolute right-4 top-4 text-gray-400 hover:text-gray-600"
@@ -185,7 +185,7 @@ const MentorsModal: React.FC<MentorsModalProps> = ({ isOpen, onClose }) => {
         
         {/* Scrollable cards container */}
         <div className="overflow-x-auto pb-4 custom-scrollbar">
-          <div className="flex gap-4 ">
+          <div className="flex flex-col lg:flex-row gap-4 ">
             {mentorsArray.map((mentor, index) => (
               <MentorCard
                 key={index}

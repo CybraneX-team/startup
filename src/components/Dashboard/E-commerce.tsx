@@ -695,7 +695,7 @@ const ECommerce: React.FC = () => {
         ${
           user?.startupStage === stage
             ? "bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
-            : "bg-gray-100 dark:bg-[#1C2E5B] border-transparent hover:bg-gray-200 dark:hover:bg-[#223a5f]"
+            : "bg-gray-200 dark:bg-[#1C2E5B] border-transparent hover:bg-gray-200 dark:hover:bg-[#223a5f]"
         }`}
     >
       <div className="flex items-center justify-center gap-1">
@@ -768,147 +768,123 @@ const ECommerce: React.FC = () => {
         anchorEl={modalInfo.anchorEl}
         selectedMetric={selectedMetric}
       />
-      <div className="mt-4 w-[110%] right-5 relative items-center lg:w-full lg:static pb-28 md:mt-4 2xl:mt-7.5">
-        <TaskGrid />
-      </div>
-    
-      <div className={`fixed bottom-0 left-0 right-0 w-full p-3 z-[9999]  lg:left-75
-${HeaderDark ? 'bg-[#878C94]' : "bg-white"} dark:bg-boxdark`}>
-
-    {/* ====== MOBILE VIEW ====== */}
-    <div className="flex flex-col lg:hidden w-full">
-
-        {/* Show More Toggle at TOP */}
-        <div onClick={() => setShowMore(!showMore)}
-            className="flex justify-center mb-2 cursor-pointer">
-            <p>{showMore ? "Show Less" : "Show More"}</p>
-        </div>
-
-        {/* Notification Box if showMore is true */}
-        {showMore && (
-            <div className="rounded-xl  bg-[#eff4fb9a] p-3 mb-3 dark:bg-[#1A222C]">
-                <div className="flex justify-between items-center">
-                    <h3 className={`text-sm ${
-                        notificationMessages[notificationMessages.length - 1]?.isPositive
-                            ? "text-emerald-600 dark:text-emerald-400"
-                            : "text-red-600 dark:text-red-400"
-                    }`}>
-                        {notificationMessages[notificationMessages.length - 1]?.message || "No notifications"}
-                    </h3>
-                    <button onClick={() => setShowNotifications(!showNotifications)}
-                        className="text-gray-600 dark:text-gray-400">
-                        {showNotifications ? (
-                            <span className="flex items-center">
-                                Hide notifications <Bell className="ml-1" size={16} />
-                            </span>
-                        ) : (
-                            <span className="flex items-center">
-                                Show notifications <Bell className="ml-1 text-red-500" size={16} />
-                            </span>
-                        )}
-                    </button>
-                </div>
-
-                {/* Old notifications history (MOBILE) */}
-                {showNotifications && (
-                    <div className="max-h-24 overflow-y-scroll  mt-1 space-y-1 pr-1">
-                        {notificationMessages
-                            .slice(0, notificationMessages.length - 1)
-                            .reverse()
-                            .map((msg, idx) => (
-                                <p key={idx} className={msg.isPositive ? "text-green-500 text-xs" : "text-red-500 text-xs"}>
-                                    {msg.message}
-                                </p>
-                            ))}
-                    </div>
-                )}
-            </div>
-        )}
-
-        {/* Funds + Turn button side by side */}
-        <div className="flex justify-between items-center space-x-4">
-            <div className="text-sm">
-                <p>Current funds</p>
-                <p className="font-semibold">${user?.finances}</p>
-            </div>
-            <button onClick={() => makeTurn(turnAmount)}
-                className="flex flex-col items-center rounded-xl bg-[#4fc387] px-4 py-2">
-                <span className="font-semibold text-white">Make turn</span>
-                <div className="flex justify-between">
-                    <span className="font-semibold text-white">Income</span>
-                    <h3 className="font-bold text-white ml-2">{user ? turnAmount : ""}</h3>
-                </div>
-            </button>
-        </div>
+     <div className="mt-4 w-full relative items-center lg:static pb-[120px] md:mt-4 2xl:mt-7.5">
+      <TaskGrid />
     </div>
 
-    {/* ====== DESKTOP VIEW (LG and above) ====== */}
-    <div className="hidden lg:flex items-center justify-between w-full">
+    <div className={`fixed bottom-0 right-0 w-full lg:w-[calc(100%-300px)] lg:ml-[250px] p-3 z-[9999]
+  ${HeaderDark ? 'bg-[#878C94]' : "bg-white"} dark:bg-boxdark
+  border-t border-gray-200 dark:border-gray-700
+  sm:max-h-[300px] max-h-[calc(100vh-6rem)] overflow-y-auto`}>
 
-        {/* Left side: Notification box with history */}
-        <div className="flex flex-col gap-2 bg-[#1A222C] rounded-xl px-4 py-2 max-w-[55%]">
-    <div className="flex justify-between items-start gap-2">
-        <p className={`text-sm ${
-            notificationMessages[notificationMessages.length - 1]?.isPositive
-                ? "text-emerald-600 dark:text-emerald-400"
-                : "text-red-600 dark:text-red-400"
-        }`}>
-            {notificationMessages[notificationMessages.length - 1]?.message || "Welcome to the game"}
-        </p>
-        <button onClick={() => setShowNotifications(!showNotifications)}
-            className="text-gray-400 whitespace-nowrap">
-            {showNotifications ? "Hide notifications" : (
-                <span className="flex items-center">
-                    Show notifications <Bell className="ml-1 text-red-500" size={16} />
-                </span>
+  
+  {/* ====== MOBILE VIEW ====== */}
+  <div className="flex flex-col lg:hidden w-full">
+    <div onClick={() => setShowMore(!showMore)} className="flex justify-center mb-2 cursor-pointer">
+      <p>{showMore ? "Show Less" : "Show More"}</p>
+    </div>
+
+    {showMore && (
+      <div className="rounded-xl bg-[#eff4fb9a] p-3 mb-3 dark:bg-[#1A222C]">
+        <div className="flex justify-between items-center">
+          <h3 className={`text-sm ${notificationMessages[notificationMessages.length - 1]?.isPositive
+            ? "text-emerald-600 dark:text-emerald-400"
+            : "text-red-600 dark:text-red-400"}`}>
+            {notificationMessages[notificationMessages.length - 1]?.message || "No notifications"}
+          </h3>
+          <button onClick={() => setShowNotifications(!showNotifications)} className="text-gray-600 dark:text-gray-400">
+            {showNotifications ? (
+              <span className="flex items-center">Hide <Bell className="ml-1" size={16} /></span>
+            ) : (
+              <span className="flex items-center">Show <Bell className="ml-1 text-red-500" size={16} /></span>
             )}
-        </button>
-    </div>
+          </button>
+        </div>
 
-    {/* Old notifications scroll area */}
-    {showNotifications && (
-        <div className="max-h-24 overflow-y-scroll mt-1 space-y-1 pr-1">
+        {showNotifications && (
+          <div className="max-h-24 overflow-y-scroll mt-1 space-y-1 pr-1">
             {notificationMessages
-                .slice(0, notificationMessages.length - 1)
-                .reverse()
-                .map((msg, idx) => (
-                    <p key={idx} className={msg.isPositive ? "text-green-500 text-xs" : "text-red-500 text-xs"}>
-                        {msg.message}
-                    </p>
-                ))}
-        </div>
+              .slice(0, notificationMessages.length - 1)
+              .reverse()
+              .map((msg, idx) => (
+                <p key={idx} className={msg.isPositive ? "text-green-500 text-xs" : "text-red-500 text-xs"}>
+                  {msg.message}
+                </p>
+              ))}
+          </div>
+        )}
+      </div>
     )}
-</div>
 
-
-        {/* Right side: Bugs, Funds, Button */}
-        <div className="flex flex-col justify-end space-y-2 lg:relative lg:right-75 h-full ">
-        <div className="flex items-end space-x-8">
-            <div className="text-sm">
-                <p>Bugs</p>
-                <p className="font-semibold">{user?.bugPercentage}%</p>
-            </div>
-            <div className="text-sm">
-                <p>Current funds</p>
-                <p className="font-semibold">${user?.finances}</p>
-            </div>
-            <button onClick={() => makeTurn(turnAmount)}
-                className="rounded-xl bg-[#4fc387] px-6 lg:py-2 lg:px-2 py-3 w-72 lg:w-62 flex flex-col items-center justify-center space-y-1">
-
-                <span className="font-semibold text-white text-lg">Make turn</span>
-
-                <div className="flex justify-between w-full px-2">
-                    <span className="font-medium text-white">Income</span>
-                    <span className="font-bold text-white">
-                       ${user ? Number(turnAmount).toLocaleString() : ""}
-                    </span>
-                </div>
-
-            </button>
-            </div>
+    <div className="flex justify-between items-center space-x-4">
+      <div className="text-sm">
+        <p>Current funds</p>
+        <p className="font-semibold">${user?.finances}</p>
+      </div>
+      <button onClick={() => makeTurn(turnAmount)}
+        className="flex flex-col items-center rounded-xl bg-[#4fc387] px-4 py-2">
+        <span className="font-semibold text-white">Make turn</span>
+        <div className="flex justify-between">
+          <span className="font-semibold text-white">Income</span>
+          <h3 className="font-bold text-white ml-2">{user ? turnAmount : ""}</h3>
         </div>
+      </button>
     </div>
+  </div>
+
+  {/* ====== DESKTOP VIEW ====== */}
+  <div className="hidden lg:flex items-center justify-between w-full">
+    <div className="flex flex-col gap-2 dark:bg-[#1A222C] bg-gray-100 rounded-xl px-4 py-2 w-full max-w-[500px] shadow-sm">
+      <div className="flex justify-between items-start gap-2">
+        <p className={`text-sm ${notificationMessages[notificationMessages.length - 1]?.isPositive
+          ? "text-emerald-600 dark:text-emerald-400"
+          : "text-red-600 dark:text-red-400"}`}>
+          {notificationMessages[notificationMessages.length - 1]?.message || "Welcome to the game"}
+        </p>
+        <button onClick={() => setShowNotifications(!showNotifications)} className="text-gray-500 hover:text-gray-700">
+          {showNotifications ? (
+            <span className="flex items-center">Hide <Bell className="ml-1 text-green-500" size={16} /></span>
+          ) : (
+            <span className="flex items-center">Show <Bell className="ml-1 text-red-500" size={16} /></span>
+          )}
+        </button>
+      </div>
+
+      {showNotifications && (
+        <div className="max-h-24 overflow-y-scroll mt-1 space-y-1 pr-1">
+          {notificationMessages
+            .slice(0, notificationMessages.length - 1)
+            .reverse()
+            .map((msg, idx) => (
+              <p key={idx} className={`text-xs ${msg.isPositive ? "text-green-500" : "text-red-500"}`}>
+                {msg.message}
+              </p>
+            ))}
+        </div>
+      )}
+    </div>
+
+    <div className="flex items-end space-x-8">
+      <div className="text-sm">
+        <p>Bugs</p>
+        <p className="font-semibold">{user?.bugPercentage}%</p>
+      </div>
+      <div className="text-sm">
+        <p>Current funds</p>
+        <p className="font-semibold">${user?.finances}</p>
+      </div>
+      <button onClick={() => makeTurn(turnAmount)}
+        className="rounded-xl bg-[#4fc387] px-6 lg:py-2 lg:px-2 py-3 w-72 lg:w-62 flex flex-col items-center justify-center space-y-1">
+        <span className="font-semibold text-white text-lg">Make turn</span>
+        <div className="flex justify-between w-full px-2">
+          <span className="font-medium text-white">Income</span>
+          <span className="font-bold text-white">${user ? Number(turnAmount).toLocaleString() : ""}</span>
+        </div>
+      </button>
+    </div>
+  </div>
 </div>
+
 
 
       {/* </div> */}

@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Info, Edit } from "lucide-react";
+import { Info, Edit, X } from "lucide-react";
 import dynamic from 'next/dynamic';
 import { ApexOptions } from "apexcharts";
 import { useUser } from "@/context/UserContext";
@@ -201,9 +201,10 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
   return (
     <>
       <aside
-        className={`fixed left-0   top-0 z-50 flex h-screen w-[300px]  flex-col overflow-y-hidden bg-white duration-300 ease-linear dark:bg-boxdark lg:translate-x-0 ${
+        className={`fixed left-0  z-99999 top-0 lg:z-50 flex h-screen w-[300px]  flex-col overflow-y-hidden bg-white duration-300 ease-linear dark:bg-boxdark lg:translate-x-0 ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
+        style={{ height: '100dvh' }} 
       >
         {/* Header - With gray background to match app header */}
         <div className="flex items-center  justify-between gap-2 px-6 py-5.5 bg-gray-100 dark:bg-gray-800">
@@ -215,10 +216,12 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
               alt="Logo"
               priority
             />
-            <h1 className="mx-2 text-xl font-semibold text-black dark:text-white">
-              Startup Simulator
+            <h1 
+            className="mx-2 text-xl font-semibold text-black dark:text-white">
+              Startup Simulator  
             </h1>
           </Link>
+           <div onClick={()=>{setSidebarOpen(false)}} className="lg:hidden text-red-500"> <X /> </div>
         </div>
 
         {/* Main Content */}
@@ -246,22 +249,23 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
               {" "}
               reset game{" "}
             </h2> */}
-        <p className="relative rounded-lg bg-[#1A1F2E] bg-opacity-40 px-3 py-2 text-sm leading-relaxed text-gray-300 border border-gray-700">
-              {user.businessDescription
-                ? showFullDesc
-                  ? user.businessDescription
-                  : `${user.businessDescription.slice(0, 80)}...`
-                : "Subscription service that delivers a monthly package of pet care items."}
+       <p className="relative rounded-lg bg-gray-100 text-gray-800 border  dark:bg-[#1A1F2E] dark:text-gray-300 dark:border-gray-700 bg-opacity-80 px-3 py-2 text-sm leading-relaxed">
+          {user.businessDescription
+            ? showFullDesc
+              ? user.businessDescription
+              : `${user.businessDescription.slice(0, 80)}...`
+            : "Subscription service that delivers a monthly package of pet care items."}
 
-              {user.businessDescription && user.businessDescription.length > 120 && (
-                <button
-                  onClick={() => setShowFullDesc(!showFullDesc)}
-                  className="ml-2 text-xs text-blue-400 hover:text-blue-300 underline"
-                >
-                  {showFullDesc ? "See less" : "See more"}
-                </button>
-              )}
-            </p>
+          {user.businessDescription && user.businessDescription.length > 120 && (
+            <button
+              onClick={() => setShowFullDesc(!showFullDesc)}
+              className="ml-2 text-xs text-blue-600 hover:text-blue-500 underline dark:text-blue-400 dark:hover:text-blue-300"
+            >
+              {showFullDesc ? "See less" : "See more"}
+            </button>
+          )}
+        </p>
+
           </div>
 
           {/* Financials Section */}
@@ -293,8 +297,8 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
               </div>
               
               {/* Donut Chart */}
-              <div className="-ml-17 relative">
-                <ReactApexChart
+              <div className="lg:-ml-17 md:-ml-12 -ml-5 relative">
+              <ReactApexChart
                   options={options}
                   series={series}
                   type="donut"

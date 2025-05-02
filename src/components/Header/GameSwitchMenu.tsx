@@ -107,8 +107,8 @@ const GameSwitchMenu = () => {
       </button>
 
       {isOpen && (
-        <ul className="absolute right-0 mt-2 w-60 rounded-lg border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800 shadow-xl z-50 overflow-hidden">
-          {user?.userGames?.length && user?.userGames?.length > 0 ? (
+        <ul className="absolute right-0 mt-2 max-w-[90vw] w-60 sm:w-72 rounded-lg border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800 shadow-xl z-50 overflow-hidden">
+        {user?.userGames?.length && user?.userGames?.length > 0 ? (
             user?.userGames.map((gameObject: userGameType , index: number) => (
               <li
                 key={index}

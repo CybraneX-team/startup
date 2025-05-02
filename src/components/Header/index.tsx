@@ -14,104 +14,70 @@ const Header = (props: {
     const {HeaderDark, user} = useUser()
   
   return (
-<header className={ ` sticky top-0 z-[900] flex w-full  ${HeaderDark ? 'bg-[#878C94]': "bg-white"}  dark:bg-boxdark dark:drop-shadow-none `}>   
-{!user?.isAiCustomizationDone && 
-               <div className="flex  justify-start gap-2 px-6  py-5.5 bg-gray-100 dark:bg-[#24303F]">
-               <Link href="/" className="flex items-center">
-                 <Image
-                   width={24}
-                   height={24}
-                   src={"/favicon.ico"}
-                   alt="Logo"
-                   priority
-                 />
-                 <h1 className="mx-2 text-xl font-semibold text-black dark:text-white">
-                   Startup Simulator
-                 </h1>
-               </Link>
-             </div>
-            }   
-  <div className="flex flex-grow items-center justify-end px-4 py-4 md:px-6 2xl:px-11">
-        <div className="flex items-center gap-2 sm:gap-4 lg:hidden">
-          {/* <!-- Hamburger Toggle BTN --> */}
+<header className={`sticky top-0 z-[900] w-full ${HeaderDark ? 'bg-[#878C94]' : "bg-white"} dark:bg-boxdark dark:drop-shadow-none`}>
 
-          <button
-            aria-controls="sidebar"
-            onClick={(e) => {
-              e.stopPropagation();
-              props.setSidebarOpen(!props.sidebarOpen);
-            }}
-            className="z-[999] block rounded-sm border border-stroke bg-white p-1.5 shadow-sm dark:border-strokedark dark:bg-boxdark lg:hidden"
-          >
-            <span className="relative block h-5.5 w-5.5 cursor-pointer">
-              <span className="du-block absolute right-0 h-full w-full">
-                <span
-                  className={`relative left-0 top-0 my-1 block h-0.5 w-0 rounded-sm bg-black delay-[0] duration-200 ease-in-out dark:bg-white ${
-                    !props.sidebarOpen && "!w-full delay-300"
-                  }`}
-                ></span>
-                <span
-                  className={`relative left-0 top-0 my-1 block h-0.5 w-0 rounded-sm bg-black delay-150 duration-200 ease-in-out dark:bg-white ${
-                    !props.sidebarOpen && "delay-400 !w-full"
-                  }`}
-                ></span>
-                <span
-                  className={`relative left-0 top-0 my-1 block h-0.5 w-0 rounded-sm bg-black delay-200 duration-200 ease-in-out dark:bg-white ${
-                    !props.sidebarOpen && "!w-full delay-500"
-                  }`}
-                ></span>
-              </span>
-              <span className="absolute right-0 h-full w-full rotate-45">
-                <span
-                  className={`absolute left-2.5 top-0 block h-full w-0.5 rounded-sm bg-black delay-300 duration-200 ease-in-out dark:bg-white ${
-                    !props.sidebarOpen && "!h-0 !delay-[0]"
-                  }`}
-                ></span>
-                <span
-                  className={`delay-400 absolute left-0 top-2.5 block h-0.5 w-full rounded-sm bg-black duration-200 ease-in-out dark:bg-white ${
-                    !props.sidebarOpen && "!h-0 !delay-200"
-                  }`}
-                ></span>
-              </span>
-            </span>
-          </button>
-          {/* <!-- Hamburger Toggle BTN --> */}
-         
-          <Link className="block flex-shrink-0 lg:hidden" href="/">
-            <Image
-              width={32}
-              height={32}
-              src={"/images/logo/logo-icon.svg"}
-              alt="Logo"
-            />
-          </Link>
-        </div>
+{/* Top banner if AI customization not done */}
+{/* {!user?.isAiCustomizationDone && 
+  <div className="flex justify-start gap-2 px-4 py-3 bg-gray-100 dark:bg-[#24303F]">
+    <Link href="/" className="flex items-center gap-2">
+      <Image
+        width={24}
+        height={24}
+        src={"/favicon.ico"}
+        alt="Logo"
+        priority
+      />
+      <h1 className="text-lg font-semibold text-black dark:text-white">
+        Startup Simulator
+      </h1>
+    </Link>
+  </div>
+} */}
 
-        
-        <div className="flex items-center gap-3 2xsm:gap-7 ">
-          <ul className="flex items-center justify-end gap-2 2xsm:gap-4">
-            {/* <!-- Dark Mode Toggler --> */}
-            <DarkModeSwitcher />
-            {/* <!-- Dark Mode Toggler --> */}
+{/* Main Header Row (ALWAYS flex row for both mobile and desktop) */}
+<div className="flex flex-wrap sm:flex-nowrap items-center justify-between px-4 py-3 md:px-6 2xl:px-11 gap-2">
 
-            {/* <!-- Notification Menu Area --> */}
-            {/* <DropdownNotification /> */}
-            {/* <!-- Notification Menu Area --> */}
+  {/* Left: Hamburger and Logo */}
+  <div className="flex items-center gap-2">
+    {/* Hamburger only on mobile */}
+    <button
+      aria-controls="sidebar"
+      onClick={(e) => {
+        e.stopPropagation();
+        props.setSidebarOpen(!props.sidebarOpen);
+      }}
+      className="rounded-sm border border-stroke bg-white p-2 dark:border-strokedark dark:bg-boxdark lg:hidden"
+    >
+      <span className="block w-5 h-0.5 bg-black dark:bg-white mb-1"></span>
+      <span className="block w-5 h-0.5 bg-black dark:bg-white mb-1"></span>
+      <span className="block w-5 h-0.5 bg-black dark:bg-white"></span>
+    </button>
 
-            {/* <!-- Chat Notification Area --> */}
-            {/* <DropdownMessage /> */}
-            {/* <!-- Chat Notification Area --> */}
-          </ul>
-          
-          {/* <!-- User Area --> */}
-          <GameSwitchMenu/>
+    {/* Logo (always visible) */}
+    {/* <Link href="/" className="flex items-center gap-2">
+      <Image
+        width={24}
+        height={24}
+        src={"/images/logo/logo-icon.svg"}
+        alt="Logo"
+      />
+      <h1 className="text-lg font-semibold text-black dark:text-white hidden sm:block">
+        Startup Simulator
+      </h1>
+    </Link> */}
+  </div>
 
-          <DropdownUser />
-          {/* <!-- User Area --> */}
-          {/* <!-- Sample Dropdown Menu --> */}
-        </div>
-      </div>
-    </header>
+  {/* Right Controls */}
+  <div className="flex flex-nowrap items-center gap-2 sm:gap-3">
+    <DarkModeSwitcher />
+    <GameSwitchMenu />
+    <DropdownUser />
+  </div>
+
+</div>
+</header>
+
+
   );
 };
 

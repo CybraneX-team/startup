@@ -155,7 +155,8 @@ export default function StartupBasicsForm() {
   return (
     <DefaultLayout> 
       {/* Quick Startup Idea Cards */}
-      <div className={` ${user?.isAiCustomizationDone ? 'left-[86%] top-[31%]' : 'left-[66%] top-[31%]' } top-[31%] fixed`}>
+      <div className={` ${user?.isAiCustomizationDone ? 
+        'left-[86%] top-[31%]' : 'left-[66%] top-[31%]' } top-[31%] hidden  xl:block fixed`}>
         <Image
         src={formImage}
         width={ user?.isAiCustomizationDone ? 200 :  400}

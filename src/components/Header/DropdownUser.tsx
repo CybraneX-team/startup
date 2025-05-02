@@ -8,8 +8,9 @@ import randomColor  from 'randomcolor';
 import { signOut } from "next-auth/react";
 const DropdownUser = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [bgColorDot, setbgColorDot] = useState(randomColor())
   const { user, userLoaded, setUserState } = useUser();
+  const [bgColorDot, setbgColorDot] = useState(user ? randomColor() : "#6B7280") // fallback gray
+
   const colorClass = `${bgColorDot}`
   const router = useRouter()
   const pathname = usePathname();
@@ -34,17 +35,16 @@ const DropdownUser = () => {
         className="flex items-center gap-4"
         href="#"
       >
-        <span className="flex text-right lg:block ">
-          <div className="flex w-10 h-auto">          
-          <span
-          style={{ backgroundColor: colorClass }}
-          className="px-3 py-2 h-auto rounded-full text-white dark:text-black font-bold text-sm text-center"
-        >
-          {user?.username ? user.username.charAt(0).toUpperCase() : "No User"}
-        </span>
+       <div className="flex w-10 h-auto">
+       <span
+        style={{ backgroundColor: user ? colorClass : "#6B7280" }}
+        className="h-12 w-12 rounded-full flex items-center justify-center text-white dark:text-black font-bold text-[10px] text-center leading-tight"
+      >
+        {user?.username ? user.username.charAt(0).toUpperCase() : "No User"}
+      </span>
 
-        </div>
-        </span>
+    </div>
+
         {/* <span className="h-12 w-12 rounded-full">
           <Image
             width={112}
@@ -77,9 +77,10 @@ const DropdownUser = () => {
 
       {/* <!-- Dropdown Start --> */}
       {dropdownOpen && (
-        <div
-          className={`absolute right-0 mt-4 flex w-62.5 flex-col rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark`}
-        >
+       <div
+       className={`absolute right-0 mt-4 flex flex-col rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark max-w-[90vw] w-60 sm:w-72`}
+     >
+     
           {/* <ul className="flex flex-col gap-5 border-b border-stroke px-6 py-7.5 dark:border-strokedark">
             <li>
               <Link
@@ -155,7 +156,7 @@ const DropdownUser = () => {
           </ul> */}
           <button 
           onClick={logOut}
-          className="flex items-center gap-3.5 px-6 py-4 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base">
+          className="flex items-center gap-3.5 px-6 py-4 text-sm font-medium duration-a300 ease-in-out hover:text-primary lg:text-base">
             <svg
               className="fill-current"
               width="22"

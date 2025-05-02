@@ -10,7 +10,7 @@ const MarketInfoModal = ({ isOpen, onClose }: MarketInfoModalProps) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center">
+    <div className="fixed inset-0 z-[99999] mx-8 my-4 lg:my-0 lg:mx-0 flex items-center justify-center">
       {/* Full-screen overlay */}
       <div
         className="absolute inset-0 bg-black/30 dark:bg-black/50"

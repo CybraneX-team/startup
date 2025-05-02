@@ -19,7 +19,7 @@ const GameOptionsModal = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+    <div className="fixed inset-0 z-99999 lg:z-50 flex items-center justify-center bg-black bg-opacity-40">
       <div className="relative w-[90%] max-w-md rounded-2xl bg-white dark:bg-[#1F2937] p-6 shadow-2xl">
 
         {/* Close Icon */}
