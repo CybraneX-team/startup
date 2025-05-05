@@ -6,10 +6,11 @@ import DropdownUser from "./DropdownUser";
 import Image from "next/image";
 import { useUser } from "@/context/UserContext";
 import GameSwitchMenu from "./GameSwitchMenu";
+import { Coins } from "lucide-react";
 
 const Header = (props: {
-  sidebarOpen: string | boolean | undefined;
-  setSidebarOpen: (arg0: boolean) => void;
+  sidebarOpen: string | boolean | undefined | any;
+  setSidebarOpen: (arg0: boolean) => void | any;
 }) => {
     const {HeaderDark, user} = useUser()
   
@@ -69,6 +70,15 @@ const Header = (props: {
 
   {/* Right Controls */}
   <div className="flex flex-nowrap items-center gap-2 sm:gap-3">
+  <div
+  className="hidden lg:flex items-center gap-2 px-4 py-1.5 rounded-full bg-gradient-to-r from-cyan-400 to-blue-500 dark:from-blue-600 dark:to-cyan-600 text-sm font-semibold text-white shadow-md transition-all duration-300 transform  hover:shadow-blue-500/50 cursor-pointer"
+>
+  <Coins className="w-4 h-4 text-white animate-bounce-slow group-hover:animate-none" />
+  <span className="tracking-wide">Credits: {user?.credits} </span>
+</div>
+
+
+
     <DarkModeSwitcher />
     <GameSwitchMenu />
     <DropdownUser />

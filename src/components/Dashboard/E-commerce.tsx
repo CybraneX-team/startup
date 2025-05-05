@@ -448,6 +448,75 @@ const ECommerce: React.FC = () => {
     )
   }, [user,  setSelectedTaskIds])
   
+  const [confirmationAction, setConfirmationAction] = useState<null | 'skip' | 'buyout' | 'prevent'>(null);
+
+ 
+
+  async function handleBugPrevention() {
+    const token = localStorage.getItem("userToken");
+  
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/credits/bugPrevention`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        token: token || "",
+      },
+      body: JSON.stringify({ gameId: user?.gameId }),
+    });
+  
+    const data = await response.json();
+  
+    if (response.ok) {
+      setUser(data);
+      setUserState(data);
+      toast.success("Bug prevention activated 🛡️");
+    } else {
+      toast.error(data.message || "Could not activate bug prevention");
+    }
+  }
+
+  async function handleBuyoutBug() {
+    const token = localStorage.getItem("userToken");
+  
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/credits/buyoutBug`, {
+      method: "POST",
+      credentials : "include",
+      headers: {
+        "Content-Type": "application/json",
+        token: token || "",
+      },
+      body: JSON.stringify({ gameId: user?.gameId }),
+    });
+  
+    const data = await response.json();
+  
+    if (response.ok) {
+      setUser(data);
+      setUserState(data);
+      setnotificationMessages([...notificationMessages, ...data.message])
+      toast.success(data.message?.[0]?.message || "Bug bought out 🧹");
+    } else {
+      toast.error(data.message || "Could not buyout bug");
+    }
+  }
+  
+  const handleConfirmBugAction = () => {
+    if (!user) return;
+  
+    switch (confirmationAction) {
+      case 'skip':
+      case 'buyout':
+        handleBuyoutBug();
+        break;
+      case 'prevent':
+        handleBugPrevention();
+        break;
+    }
+  
+    setConfirmationAction(null);
+    setShowSkipBugModal(false);
+  };
+  
 
   const [modalInfo, setModalInfo] = useState<ModalInfo>({
     isOpen: false,
@@ -459,7 +528,9 @@ const ECommerce: React.FC = () => {
   const [selectedMetric, setSelectedMetric] = useState<string | null>(null);
   const [showMore, setShowMore] = useState<boolean | null>(false);
   const [selectedStage, setSelectedStage] = useState<string | null>(null);
+  const [showBoostModal, setShowBoostModal] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [showSkipBugModal, setShowSkipBugModal] = useState(false);
   const [gameOverModal, setGameOverModal] = useState(() => {
     return user?.finances !== undefined && user.finances < 0;
   });
@@ -493,7 +564,8 @@ const ECommerce: React.FC = () => {
       employees: user?.teamMembers,
       turnAmount,
       bugIds : bugId,
-      taskIds : taskId
+      taskIds : taskId,
+      preventBug : user?.preventBug
     }
 
     const makeReq = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/turn`, {
@@ -771,77 +843,118 @@ const ECommerce: React.FC = () => {
      <div className="mt-4 w-full relative items-center lg:static pb-[120px] md:mt-4 2xl:mt-7.5">
       <TaskGrid />
     </div>
-
-    <div className={`fixed bottom-0 right-0 w-full lg:w-[calc(100%-300px)] lg:ml-[250px] p-3 z-[9999]
-  ${HeaderDark ? 'bg-[#878C94]' : "bg-white"} dark:bg-boxdark
-  border-t border-gray-200 dark:border-gray-700
-  sm:max-h-[300px] max-h-[calc(100vh-6rem)] overflow-y-auto`}>
-
-  
-  {/* ====== MOBILE VIEW ====== */}
-  <div className="flex flex-col lg:hidden w-full">
-    <div onClick={() => setShowMore(!showMore)} className="flex justify-center mb-2 cursor-pointer">
-      <p>{showMore ? "Show Less" : "Show More"}</p>
+    <div
+  className={`fixed bottom-0 right-0 z-[9999] w-full lg:w-[calc(100%-300px)] lg:ml-[250px] 
+    px-4 py-3 bg-white dark:bg-boxdark border-t border-gray-200 dark:border-gray-700`}
+>
+  {/* MOBILE & TABLET: Up to md screens */}
+  <div className="flex flex-col gap-3 md:hidden">
+    {/* Show More Toggle */}
+    <div
+      onClick={() => setShowMore(!showMore)}
+      className="flex justify-center mb-1 cursor-pointer"
+    >
+      <p className="text-sm font-medium text-blue-600 dark:text-blue-300">
+        {showMore ? "Show Less" : "Show More"}
+      </p>
     </div>
 
+    {/* Conditionally Shown Extra Info */}
     {showMore && (
-      <div className="rounded-xl bg-[#eff4fb9a] p-3 mb-3 dark:bg-[#1A222C]">
-        <div className="flex justify-between items-center">
-          <h3 className={`text-sm ${notificationMessages[notificationMessages.length - 1]?.isPositive
-            ? "text-emerald-600 dark:text-emerald-400"
-            : "text-red-600 dark:text-red-400"}`}>
-            {notificationMessages[notificationMessages.length - 1]?.message || "No notifications"}
-          </h3>
-          <button onClick={() => setShowNotifications(!showNotifications)} className="text-gray-600 dark:text-gray-400">
-            {showNotifications ? (
-              <span className="flex items-center">Hide <Bell className="ml-1" size={16} /></span>
-            ) : (
-              <span className="flex items-center">Show <Bell className="ml-1 text-red-500" size={16} /></span>
-            )}
-          </button>
+      <>
+        {/* Notifications */}
+        <div className="rounded-xl bg-gray-100 dark:bg-[#1A222C] p-3 mb-2">
+          <div className="flex justify-between items-center">
+            <h3
+              className={`text-sm ${
+                notificationMessages[notificationMessages.length - 1]?.isPositive
+                  ? "text-emerald-600 dark:text-emerald-400"
+                  : "text-red-600 dark:text-red-400"
+              }`}
+            >
+              {notificationMessages[notificationMessages.length - 1]?.message || "No notifications"}
+            </h3>
+            <button
+              onClick={() => setShowNotifications(!showNotifications)}
+              className="text-gray-600 dark:text-gray-400"
+            >
+              {showNotifications ? (
+                <span className="flex items-center">Hide <Bell className="ml-1" size={16} /></span>
+              ) : (
+                <span className="flex items-center">Show <Bell className="ml-1 text-red-500" size={16} /></span>
+              )}
+            </button>
+          </div>
+          {showNotifications && (
+            <div className="max-h-24 overflow-y-scroll mt-1 space-y-1 pr-1">
+              {notificationMessages
+                .slice(0, notificationMessages.length - 1)
+                .reverse()
+                .map((msg, idx) => (
+                  <p
+                    key={idx}
+                    className={`text-xs ${msg.isPositive ? "text-green-500" : "text-red-500"}`}
+                  >
+                    {msg.message}
+                  </p>
+                ))}
+            </div>
+          )}
         </div>
 
-        {showNotifications && (
-          <div className="max-h-24 overflow-y-scroll mt-1 space-y-1 pr-1">
-            {notificationMessages
-              .slice(0, notificationMessages.length - 1)
-              .reverse()
-              .map((msg, idx) => (
-                <p key={idx} className={msg.isPositive ? "text-green-500 text-xs" : "text-red-500 text-xs"}>
-                  {msg.message}
-                </p>
-              ))}
+        {/* Bugs and Funds */}
+        <div className="flex justify-between text-sm">
+          <div>
+            <p>Bugs</p>
+            <div className="flex items-center gap-2">
+              <span className="font-semibold">{user?.bugPercentage}%</span>
+              <button
+                onClick={() => setShowSkipBugModal(true)}
+                className="text-xs bg-blue-100 dark:bg-blue-900 px-3 py-1 rounded-full text-blue-800 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-800"
+              >
+                ⚙️ Manage Bug
+              </button>
+            </div>
           </div>
-        )}
-      </div>
+          <div>
+            <p>Funds</p>
+            <p className="font-semibold">${user?.finances}</p>
+          </div>
+        </div>
+      </>
     )}
 
-    <div className="flex justify-between items-center space-x-4">
-      <div className="text-sm">
-        <p>Current funds</p>
-        <p className="font-semibold">${user?.finances}</p>
+    {/* Always Visible Turn Button */}
+    <button
+      onClick={() => makeTurn(turnAmount)}
+      className="w-full flex flex-col items-center rounded-xl bg-[#4fc387] px-4 py-3"
+    >
+      <span className="font-semibold text-white">Make turn</span>
+      <div className="flex justify-between w-full">
+        <span className="text-white text-sm">Income</span>
+        <span className="font-bold text-white ml-2">${turnAmount}</span>
       </div>
-      <button onClick={() => makeTurn(turnAmount)}
-        className="flex flex-col items-center rounded-xl bg-[#4fc387] px-4 py-2">
-        <span className="font-semibold text-white">Make turn</span>
-        <div className="flex justify-between">
-          <span className="font-semibold text-white">Income</span>
-          <h3 className="font-bold text-white ml-2">{user ? turnAmount : ""}</h3>
-        </div>
-      </button>
-    </div>
+    </button>
   </div>
 
-  {/* ====== DESKTOP VIEW ====== */}
-  <div className="hidden lg:flex items-center justify-between w-full">
-    <div className="flex flex-col gap-2 dark:bg-[#1A222C] bg-gray-100 rounded-xl px-4 py-2 w-full max-w-[500px] shadow-sm">
+  {/* TABLET & DESKTOP: md and above */}
+  <div className="hidden md:flex flex-col xl:flex-row xl:items-center items-start justify-between w-full gap-4">
+    {/* Notifications */}
+    <div className="flex flex-col gap-2 dark:bg-[#1A222C] bg-gray-100 rounded-xl px-4 py-2 w-full max-w-full xl:max-w-[500px] shadow-sm">
       <div className="flex justify-between items-start gap-2">
-        <p className={`text-sm ${notificationMessages[notificationMessages.length - 1]?.isPositive
-          ? "text-emerald-600 dark:text-emerald-400"
-          : "text-red-600 dark:text-red-400"}`}>
+        <p
+          className={`text-sm ${
+            notificationMessages[notificationMessages.length - 1]?.isPositive
+              ? "text-emerald-600 dark:text-emerald-400"
+              : "text-red-600 dark:text-red-400"
+          }`}
+        >
           {notificationMessages[notificationMessages.length - 1]?.message || "Welcome to the game"}
         </p>
-        <button onClick={() => setShowNotifications(!showNotifications)} className="text-gray-500 hover:text-gray-700">
+        <button
+          onClick={() => setShowNotifications(!showNotifications)}
+          className="text-gray-500 hover:text-gray-700"
+        >
           {showNotifications ? (
             <span className="flex items-center">Hide <Bell className="ml-1 text-green-500" size={16} /></span>
           ) : (
@@ -849,14 +962,16 @@ const ECommerce: React.FC = () => {
           )}
         </button>
       </div>
-
       {showNotifications && (
         <div className="max-h-24 overflow-y-scroll mt-1 space-y-1 pr-1">
           {notificationMessages
             .slice(0, notificationMessages.length - 1)
             .reverse()
             .map((msg, idx) => (
-              <p key={idx} className={`text-xs ${msg.isPositive ? "text-green-500" : "text-red-500"}`}>
+              <p
+                key={idx}
+                className={`text-xs ${msg.isPositive ? "text-green-500" : "text-red-500"}`}
+              >
                 {msg.message}
               </p>
             ))}
@@ -864,26 +979,201 @@ const ECommerce: React.FC = () => {
       )}
     </div>
 
-    <div className="flex items-end space-x-8">
-      <div className="text-sm">
-        <p>Bugs</p>
-        <p className="font-semibold">{user?.bugPercentage}%</p>
+    {/* Bugs + Funds + Turn */}
+    <div className="flex flex-col ml-20 sm:flex-row xl:items-end gap-4 w-full  justify-between">
+      {/* Bugs and Funds */}
+      <div className="flex gap-6 w-full sm:w-auto justify-between">
+        <div className="text-sm">
+          <p>Bugs</p>
+          <div className="flex items-center gap-2">
+            <span className="font-semibold">{user?.bugPercentage}%</span>
+            <button
+              onClick={() => setShowSkipBugModal(true)}
+              className="text-xs bg-blue-100 dark:bg-blue-900 px-3 py-1 rounded-full text-blue-800 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-800"
+            >
+              ⚙️ Manage Bug
+            </button>
+          </div>
+        </div>
+
+        <div className="text-sm">
+          <p>Funds</p>
+          <p className="font-semibold">${user?.finances}</p>
+        </div>
       </div>
-      <div className="text-sm">
-        <p>Current funds</p>
-        <p className="font-semibold">${user?.finances}</p>
-      </div>
-      <button onClick={() => makeTurn(turnAmount)}
-        className="rounded-xl bg-[#4fc387] px-6 lg:py-2 lg:px-2 py-3 w-72 lg:w-62 flex flex-col items-center justify-center space-y-1">
+
+      {/* Make Turn Button */}
+      <button
+        onClick={() => makeTurn(turnAmount)}
+        className="w-full sm:w-72 rounded-xl bg-[#4fc387] px-6 py-3 flex flex-col items-center justify-center space-y-1"
+      >
         <span className="font-semibold text-white text-lg">Make turn</span>
         <div className="flex justify-between w-full px-2">
           <span className="font-medium text-white">Income</span>
-          <span className="font-bold text-white">${user ? Number(turnAmount).toLocaleString() : ""}</span>
+          <span className="font-bold text-white">${turnAmount}</span>
         </div>
       </button>
     </div>
   </div>
 </div>
+
+
+
+
+
+
+{confirmationAction && (
+  <div className="fixed inset-0 z-[999999] flex items-center m-5 justify-center bg-black bg-opacity-50">
+    <div className="bg-white dark:bg-boxdark p-6 rounded-xl w-full max-w-sm shadow-lg text-center">
+      <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">Confirm Action</h2>
+      <p className="text-sm text-gray-600 dark:text-gray-300 mb-6">
+        Are you sure you want to {confirmationAction === 'skip'
+          ? 'skip the bug fix duration (60 credits)?'
+          : confirmationAction === 'buyout'
+          ? 'buy out this bug (60 credits)?'
+          : 'use Bug Prevention Insurance (25 credits)?'}
+      </p>
+
+      <div className="flex justify-center gap-4">
+        <button
+          onClick={handleConfirmBugAction}
+          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg"
+        >
+          Confirm
+        </button>
+        <button
+          onClick={() => setConfirmationAction(null)}
+          className="border border-gray-300 hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-800 text-gray-700 dark:text-white px-4 py-2 rounded-lg"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
+
+{showSkipBugModal && (
+  <div className="fixed inset-0 z-[99999] flex items-center m-5 lg:m-0 justify-center bg-black bg-opacity-50">
+    <div className="bg-white dark:bg-boxdark p-6 rounded-xl w-full max-w-sm shadow-lg text-center">
+      <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-2">Manage Bug</h2>
+      <p className="text-sm text-gray-500 dark:text-gray-300 mb-4">
+        Choose how you want to resolve or prevent bugs. Options vary in cost and effect.
+      </p>
+
+      <div className="flex flex-col space-y-3">
+        {/* <button
+          onClick={() => setConfirmationAction('skip')}
+          className="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-lg"
+        >
+          ⚡ Skip Bug Fix Duration
+        </button>
+        <p className="text-xs text-gray-500 dark:text-gray-400 -mt-2 mb-2">
+          Instantly solves a bug without using any funds. Cost: 60 credits.
+        </p> */}
+
+        {/* <div className="relative border-t pt-2 border-gray-300 dark:border-gray-600">
+          <p className="text-xs uppercase text-gray-400 dark:text-gray-500">OR</p>
+        </div> */}
+
+        <button
+          onClick={() => setConfirmationAction('buyout')}
+          className="bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-lg"
+        >
+          🛠 Buyout Bug
+        </button>
+        <p className="text-xs text-gray-500 dark:text-gray-400 -mt-2 mb-2">
+          Permanently removes one active bug without a turn. Best for critical issues. Cost: 60 credits.
+        </p>
+
+        <div className="relative border-t pt-2 border-gray-300 dark:border-gray-600">
+          <p className="text-xs uppercase text-gray-400 dark:text-gray-500">OR</p>
+        </div>
+
+        <button
+          onClick={() => setConfirmationAction('prevent')}
+          className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg"
+        >
+          🛡️ Bug Prevention Insurance
+        </button>
+        <p className="text-xs text-gray-500 dark:text-gray-400 -mt-2">
+          Prevents bugs from triggering this turn. Usable once every 3 turns. Cost: 25 credits.
+        </p>
+
+        <button
+          onClick={() => setShowSkipBugModal(false)}
+          className="border border-gray-300 hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-800 text-gray-700 dark:text-white px-4 py-2 rounded-lg"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
+
+
+
+{/* ⚡ Floating Boost Button */}
+{/* <button
+  onClick={() => setShowBoostModal(true)}
+  className="fixed bottom-4 left-4 z-[9999] bg-purple-600 hover:bg-purple-700 text-white px-4 py-3 rounded-full shadow-lg"
+>
+  ⚡
+</button> */}
+
+{/* ⚡ Boost Modal */}
+{showBoostModal && (
+  <div className="fixed inset-0 z-[99999] bg-black bg-opacity-50 flex items-center justify-center">
+    <div className="bg-white dark:bg-boxdark rounded-xl w-full max-w-md p-6 shadow-lg">
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-lg font-semibold text-gray-800 dark:text-white">Special Task Speed Boost</h2>
+        <button
+          onClick={() => setShowBoostModal(false)}
+          className="text-gray-500 hover:text-gray-700 dark:text-gray-300"
+        >
+          ✕
+        </button>
+      </div>
+
+      <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+        Auto-complete any 1-turn task instantly. Saves time and opens up bandwidth for higher-value tasks. <br />
+        <span className="text-indigo-500 font-medium">Cost: 50 credits</span>
+      </p>
+
+      <div className="space-y-3 max-h-60 overflow-y-auto">
+        {[
+          { id: 1, name: "Fix Signup Flow", credits: 50 },
+          { id: 2, name: "Optimize CTA", credits: 50 },
+          { id: 3, name: "Polish UI Spacing", credits: 50 },
+        ].map((task) => (
+          <div key={task.id} className="flex justify-between items-center p-3 rounded-lg border border-gray-200 dark:border-gray-700">
+            <div>
+              <h3 className="text-sm font-semibold text-gray-800 dark:text-white">{task.name}</h3>
+              <p className="text-xs text-gray-500 dark:text-gray-400">1-turn task — Cost: 50 credits</p>
+            </div>
+            <button
+              onClick={() => {
+                console.log(`Boosted task: ${task.name}`);
+                setShowBoostModal(false);
+              }}
+              className="bg-indigo-600 hover:bg-indigo-700 text-white text-sm px-3 py-1.5 rounded-lg"
+            >
+              Boost
+            </button>
+          </div>
+        ))}
+      </div>
+
+      <button
+        onClick={() => setShowBoostModal(false)}
+        className="mt-4 w-full text-sm border border-gray-300 hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-800 px-4 py-2 rounded-lg text-gray-700 dark:text-white"
+      >
+        Cancel
+      </button>
+    </div>
+  </div>
+)}
 
 
 

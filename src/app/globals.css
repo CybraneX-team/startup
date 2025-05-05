@@ -132,3 +132,22 @@
 .dark .custom-scrollbar {
   scrollbar-color: #6B7280 transparent;
 }
+/* Override default sparkle animation speed */
+.slow-sparkle span {
+  animation-duration: 6s !important; /* slower than default (2–3s) */
+}
+
+@layer utilities {
+  .animate-bounce-slow {
+    animation: bounce-slow 2s infinite;
+  }
+
+  @keyframes bounce-slow {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-3px);
+    }
+  }
+}

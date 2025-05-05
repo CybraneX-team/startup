@@ -4,6 +4,12 @@ import { Users, CheckSquare } from "lucide-react";
 import { useUser } from "@/context/UserContext";
 import { useRouter } from "next/navigation";
 import { toast, ToastContainer, Bounce } from "react-toastify";
+import { Sparkles } from "lucide-react"; // Optional icon
+import Sparkle from 'react-sparkle'; // ✅ Add this import
+
+
+
+
 // import { FixedSizeList as List } from 'react-window';
 
 interface FilterButtonProps {
@@ -296,14 +302,29 @@ interface BrainstormModalProps {
   onCancel: () => void;
 }
 
-const BrainstormModal: React.FC<BrainstormModalProps> = ({
+
+
+
+interface BrainstormModalProps {
+  isOpen: boolean;
+  turnsRequired: number;
+  tasksGenerated: number;
+  onConfirm: () => void;
+  onCancel: () => void;
+  powerBoost : boolean;
+  setPowerBoost : any
+}
+
+const BrainstormModal = ({
   isOpen,
   turnsRequired,
   tasksGenerated,
   onConfirm,
   onCancel,
-}) => {
-  const { setHeaderDark, turnAmount } = useUser();
+  powerBoost,
+  setPowerBoost
+}: BrainstormModalProps) => {
+  const { setHeaderDark } = useUser();
 
   useEffect(() => {
     setHeaderDark(isOpen);
@@ -312,9 +333,11 @@ const BrainstormModal: React.FC<BrainstormModalProps> = ({
 
   if (!isOpen) return null;
 
+  const extraTasks = powerBoost ? 5 : 0;
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="w-full max-w-md rounded-2xl bg-white p-6 dark:bg-[#1A232F] dark:text-white">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 px-4 sm:px-0">
+      <div className="w-full max-w-md rounded-2xl bg-white p-6 dark:bg-[#1A232F] dark:text-white relative">
         <h2 className="mb-4 text-xl font-semibold text-gray-900 dark:text-white">
           Would you like to start a brainstorm session?
         </h2>
@@ -328,17 +351,54 @@ const BrainstormModal: React.FC<BrainstormModalProps> = ({
             <span className="text-gray-900 dark:text-white">{turnsRequired}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-gray-600 dark:text-gray-400">Amount of generated tasks</span>
-            <span className="text-gray-900 dark:text-white">{tasksGenerated}</span>
+            <span className="text-gray-600 dark:text-gray-400">Tasks generated</span>
+            <span className="text-gray-900 dark:text-white">
+              {tasksGenerated + extraTasks}
+              {extraTasks > 0 && (
+                <span className="text-xs text-emerald-400 ml-1">(+{extraTasks})</span>
+              )}
+            </span>
           </div>
+        </div>
+
+        {/* Power Boost Section with Sparkle Animation */}
+        <div className="relative mb-6 flex items-center justify-between rounded-lg bg-emerald-50 px-4 py-3 overflow-hidden dark:bg-emerald-900/20">
+          {/* Sparkle animation layer */}
+          <Sparkle
+            flickerSpeed="slowest"
+            color={"darkgreen"}
+            count={10}
+            minSize={5}
+            maxSize={10}
+            overflowPx={0}
+            fadeOutSpeed={15}
+            flicker={false}
+          />
+
+          <div className="z-10 flex items-center gap-2 text-sm">
+            <Sparkles className="h-4 w-4 text-emerald-500" />
+            <span className="text-gray-700 dark:text-gray-300">
+              Power Boost: +5 tasks for 30 credits
+            </span>
+          </div>
+
+          <label className="z-10 relative inline-flex items-center cursor-pointer">
+            <input
+              type="checkbox"
+              className="sr-only peer"
+              checked={powerBoost}
+              onChange={() => setPowerBoost(!powerBoost)}
+            />
+            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-emerald-500 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-emerald-500"></div>
+          </label>
         </div>
 
         <div className="flex flex-col gap-2">
           <button
-            onClick={onConfirm}
+            onClick={() => onConfirm()}
             className="w-full rounded-lg bg-emerald-500 py-2.5 text-white hover:bg-emerald-600"
           >
-            Yes, start brainstorming
+            Yes, start brainstorming {powerBoost ? "(with Power Boost)" : ""}
           </button>
           <button
             onClick={onCancel}
@@ -352,10 +412,15 @@ const BrainstormModal: React.FC<BrainstormModalProps> = ({
   );
 };
 
+
+
+
+
 const TaskGrid: React.FC = () => {
   // const [selectedTasks, setSelectedTasks] = useState<Set<number>>(new Set());
   const [selectedTasks, setSelectedTasks] = useState<Set<string>>(new Set());
   const [brainstormModalOpen, setBrainstormModalOpen] = useState(false);
+  const [powerBoost, setPowerBoost] = useState(false);
 
   const [activeFilters, setActiveFilters] = useState<Set<string>>(
     new Set(["all"]),
@@ -532,13 +597,15 @@ const TaskGrid: React.FC = () => {
       },
       body : JSON.stringify({
         turnAmount : turnAmount,
-        gameId : user?.gameId
+        gameId : user?.gameId,
+        brainstromBoost: powerBoost
       })
     })
     if(makeReq.ok){
       const response = await makeReq.json();
       setUser(response);
       setnotificationMessages([...notificationMessages, ...response.message])
+      setPowerBoost(false)
     }
   }
   return (
@@ -587,6 +654,8 @@ const TaskGrid: React.FC = () => {
           setBrainstormModalOpen(false);
         }}
         onCancel={() => setBrainstormModalOpen(false)}
+        powerBoost={powerBoost}
+        setPowerBoost={setPowerBoost}
       />
 
       <div className="flex flex-col space-y-4 px-4">

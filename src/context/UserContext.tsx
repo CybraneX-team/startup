@@ -68,6 +68,8 @@ export interface UserData {
   isAiCustomizationDone: boolean;
   gameName: string;
   businessDescription : string;
+  credits : number;
+  preventBug  : boolean;
 }
 interface notificationMessagesType{
   message: string;
@@ -100,7 +102,6 @@ interface UserContextType {
   setHeaderDark : (arg: boolean) => void;
   loaderMessage: string;
   setLoaderMessage: (msg: string) => void;
-
 }
 
 
@@ -139,16 +140,18 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         !user ||
         user.salaries === undefined ||
         user.rent === undefined ||
-        !user.metrics?.contributionMargin
+        user.metrics?.contributionMargin === undefined
       ) {
         setTurnAmount("");
         return;
       }
     
-      const value = Math.floor(((-user.salaries) + (-user.rent)) - user.metrics.contributionMargin);
+      // Always subtract absolute value of contribution margin
+      const value = Math.floor(((-user.salaries) + (-user.rent)) -Math.floor(Math.abs(user.metrics.contributionMargin)));
       const sign = value < 0 ? '-' : '+';
       setTurnAmount(`${sign}${Math.abs(value)}`);
     }, [user]);
+    
     
   
   // useEffect(() => {

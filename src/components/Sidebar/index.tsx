@@ -31,7 +31,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
   const [mentorsModalOpen, setMentorsModalOpen] = useState(false);
   const [teamModalOpen, setTeamModalOpen] = useState(false);
   const [investorsModalOpen, setInvestorsModalOpen] = useState(false);
-  const { user, setUser, setUserState, setnotificationMessages, notificationMessages, setloader } = useUser();
+  const { user, setUser, setUserState, setnotificationMessages, notificationMessages, setloader, setHeaderDark } = useUser();
   const [optionsModalOpen, setOptionsModalOpen] = useState(false);
   const [showFullDesc, setShowFullDesc] = useState(false);
 
@@ -150,6 +150,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
 
   async function resetTheGame(){
     setloader(true)
+    
     const makeReq = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/api/resetGame`,
       {
@@ -181,7 +182,10 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
         headers: {
           "Content-Type": "application/json",
           token: `${localStorage.getItem("userToken")}`,
-        }
+        },
+        body: JSON.stringify({
+          gameId: user?.gameId
+        })
       })
   
       if(makeReq.ok){
@@ -232,7 +236,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
             <h2 className="mb-3 text-sm font-semibold text-black dark:text-white">
               Business Idea
               <span
-                 onClick={() => setOptionsModalOpen(true)}
+                 onClick={() =>{ setOptionsModalOpen(true); setHeaderDark(true) }}
                 className="ml-20 cursor-pointer text-xl"
               >
                 {" "}
@@ -416,7 +420,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
       {optionsModalOpen && (
       <GameOptionsModal
         isOpen={optionsModalOpen}
-        onClose={() => setOptionsModalOpen(false)}
+        onClose={() => {setOptionsModalOpen(false) ; setHeaderDark(false) }}
         onResetGame={resetTheGame}
         onStartNewGame={
           startNewSimulation
