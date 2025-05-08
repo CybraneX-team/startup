@@ -5,10 +5,7 @@ import { useUser } from "@/context/UserContext";
 import { useRouter } from "next/navigation";
 import { toast, ToastContainer, Bounce } from "react-toastify";
 import { Sparkles } from "lucide-react"; // Optional icon
-import Sparkle from 'react-sparkle'; // ✅ Add this import
-
-
-
+import Sparkle from "react-sparkle"; // ✅ Add this import
 
 // import { FixedSizeList as List } from 'react-window';
 
@@ -22,7 +19,7 @@ type BrainstormStats = {
   turnsRequired: number;
   taskToGenerate: number;
 };
-type Stage = "FFF" | "Angels" | "pre_seed" | "Seed" | "a"| "b"| "c"| "d";
+type Stage = "FFF" | "Angels" | "pre_seed" | "Seed" | "a" | "b" | "c" | "d";
 
 const brainstromTaskAmountMap: Record<Stage, BrainstormStats> = {
   FFF: { turnsRequired: 1, taskToGenerate: 10 },
@@ -32,7 +29,7 @@ const brainstromTaskAmountMap: Record<Stage, BrainstormStats> = {
   a: { turnsRequired: 1, taskToGenerate: 20 },
   b: { turnsRequired: 1, taskToGenerate: 20 },
   c: { turnsRequired: 1, taskToGenerate: 25 },
-  d: { turnsRequired: 1, taskToGenerate: 25 }
+  d: { turnsRequired: 1, taskToGenerate: 25 },
 };
 interface TaskCardProps {
   name: string;
@@ -77,16 +74,18 @@ const CancelTaskModal: React.FC<CancelTaskModalProps> = ({
   onConfirm,
   onCancel,
 }) => {
-  const {setHeaderDark} = useUser()
+  const { setHeaderDark } = useUser();
   useEffect(() => {
     setHeaderDark(isOpen);
     return () => setHeaderDark(false);
   }, [isOpen, setHeaderDark]); // ✅ Include setHeaderDark in deps
-  
+
   if (!isOpen) return null;
-  
+
   return (
-    <div className={`fixed inset-0 z-50  flex items-center justify-center bg-black bg-opacity-50`}>
+    <div
+      className={`fixed inset-0 z-50  flex items-center justify-center bg-black bg-opacity-50`}
+    >
       <div className="w-full max-w-md rounded-2xl bg-white p-6 dark:bg-[#1A232F] dark:text-white">
         <h2 className="mb-4 text-xl font-semibold text-gray-900 dark:text-white">
           Cancel task?
@@ -103,8 +102,12 @@ const CancelTaskModal: React.FC<CancelTaskModalProps> = ({
                 Turns required
               </span>
               <div className="flex items-center gap-1">
-                <span className="text-sm text-gray-900 dark:text-white">{turns.current}</span>
-                <span className="text-sm text-gray-500 dark:text-gray-400">/{turns.total}</span>
+                <span className="text-sm text-gray-900 dark:text-white">
+                  {turns.current}
+                </span>
+                <span className="text-sm text-gray-500 dark:text-gray-400">
+                  /{turns.total}
+                </span>
               </div>
             </div>
 
@@ -155,7 +158,7 @@ const FilterButton: React.FC<FilterButtonProps> = ({
 }) => (
   <button
     onClick={onClick}
-    className={` capitalize flex items-center rounded-full px-4 py-1.5 text-sm transition-colors
+    className={` flex items-center rounded-full px-4 py-1.5 text-sm capitalize transition-colors
       ${
         isActive
           ? "bg-blue-50 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400"
@@ -196,32 +199,36 @@ const TaskCard: React.FC<TaskCardProps> = ({
     };
     return metricMap[metricName] || metricName;
   }
-  function signTeller (metricName: string) : string {
-    const nameOfMetric = getShortName(metricName)
-    if(
-      nameOfMetric === "UA" || 
-      nameOfMetric ==="C1"  || 
-      nameOfMetric ==="AOV" || 
-      nameOfMetric ==="APC"
-    ){
-      return "+"
-    }else{
-      return ""
+  function signTeller(metricName: string): string {
+    const nameOfMetric = getShortName(metricName);
+    if (
+      nameOfMetric === "UA" ||
+      nameOfMetric === "C1" ||
+      nameOfMetric === "AOV" ||
+      nameOfMetric === "APC"
+    ) {
+      return "+";
+    } else {
+      return "";
     }
   }
-  function symbolToShow (metricName: string): boolean {
-    const nameOfMetric = getShortName(metricName)
+  function symbolToShow(metricName: string): boolean {
+    const nameOfMetric = getShortName(metricName);
     if (nameOfMetric === "C1") {
-      return true
+      return true;
     }
-    return false
+    return false;
   }
-  function showDollarSign(metricName: string) : string {
-    const nameOfMetric = getShortName(metricName)
-    if (nameOfMetric === "AOV" || nameOfMetric === "COGS" || nameOfMetric === "CPA"){
-      return "$"
-    }else{
-      return ""
+  function showDollarSign(metricName: string): string {
+    const nameOfMetric = getShortName(metricName);
+    if (
+      nameOfMetric === "AOV" ||
+      nameOfMetric === "COGS" ||
+      nameOfMetric === "CPA"
+    ) {
+      return "$";
+    } else {
+      return "";
     }
   }
   return (
@@ -240,7 +247,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
             className={`text-md mb-4 truncate font-semibold
             ${isSelected ? "text-green-700 dark:text-green-400" : "text-black dark:text-white"}`}
           >
-            {isBug? `🐛 Bug: ${name}` : name}
+            {isBug ? `🐛 Bug: ${name}` : name}
           </h3>
 
           <div className="space-y-3">
@@ -253,32 +260,37 @@ const TaskCard: React.FC<TaskCardProps> = ({
                 Effect on Metrics
               </span>
               <span className="text-emerald-600 dark:text-emerald-400">
-              {metricsImpact &&
-                Object.entries(metricsImpact)
-                  .filter(([, value]) => value !== undefined && value !== 0)
-                  .map(([key, value]) => `${getShortName(key)}: ${signTeller(key)} ${showDollarSign(key)} ${value}
-                  ${symbolToShow(key) ? "%" : "" }`)
-                  .join(" , ")}
-            </span>
-
+                {metricsImpact &&
+                  Object.entries(metricsImpact)
+                    .filter(([, value]) => value !== undefined && value !== 0)
+                    .map(
+                      ([
+                        key,
+                        value,
+                      ]) => `${getShortName(key)}: ${signTeller(key)} ${showDollarSign(key)} ${value}
+                  ${symbolToShow(key) ? "%" : ""}`,
+                    )
+                    .join(" , ")}
+              </span>
             </div>
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
               <span className="whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
                 Required team members
               </span>
               <div className="flex flex-wrap gap-2">
-              {requiredTeamMembers &&
-              Object.entries(requiredTeamMembers).map(([member, count], index) =>
-                count > 0 ? (
-                  <div
-                    key={index}
-                    className="flex items-center gap-1 rounded bg-gray-100 px-2 py-1 text-xs dark:bg-gray-700"
-                  >
-                    <Users className="h-3 w-3" />
-                    <span>{member}</span> <span>{count}</span>
-                  </div>
-                ) : null
-              )}
+                {requiredTeamMembers &&
+                  Object.entries(requiredTeamMembers).map(
+                    ([member, count], index) =>
+                      count > 0 ? (
+                        <div
+                          key={index}
+                          className="flex items-center gap-1 rounded bg-gray-100 px-2 py-1 text-xs dark:bg-gray-700"
+                        >
+                          <Users className="h-3 w-3" />
+                          <span>{member}</span> <span>{count}</span>
+                        </div>
+                      ) : null,
+                  )}
               </div>
             </div>
           </div>
@@ -302,17 +314,14 @@ interface BrainstormModalProps {
   onCancel: () => void;
 }
 
-
-
-
 interface BrainstormModalProps {
   isOpen: boolean;
   turnsRequired: number;
   tasksGenerated: number;
   onConfirm: () => void;
   onCancel: () => void;
-  powerBoost : boolean;
-  setPowerBoost : any
+  powerBoost: boolean;
+  setPowerBoost: any;
 }
 
 const BrainstormModal = ({
@@ -322,7 +331,7 @@ const BrainstormModal = ({
   onConfirm,
   onCancel,
   powerBoost,
-  setPowerBoost
+  setPowerBoost,
 }: BrainstormModalProps) => {
   const { setHeaderDark } = useUser();
 
@@ -337,32 +346,42 @@ const BrainstormModal = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 px-4 sm:px-0">
-      <div className="w-full max-w-md rounded-2xl bg-white p-6 dark:bg-[#1A232F] dark:text-white relative">
+      <div className="relative w-full max-w-md rounded-2xl bg-white p-6 dark:bg-[#1A232F] dark:text-white">
         <h2 className="mb-4 text-xl font-semibold text-gray-900 dark:text-white">
           Would you like to start a brainstorm session?
         </h2>
         <p className="mb-6 text-sm text-gray-600 dark:text-gray-400">
-          You can brainstorm with your team and generate more tasks. All employees are involved in brainstorming and will not continue to work on active ones.
+          You can brainstorm with your team and generate more tasks. All
+          employees are involved in brainstorming and will not continue to work
+          on active ones.
         </p>
 
         <div className="mb-6 space-y-3 text-sm">
           <div className="flex justify-between">
-            <span className="text-gray-600 dark:text-gray-400">Turns required</span>
-            <span className="text-gray-900 dark:text-white">{turnsRequired}</span>
+            <span className="text-gray-600 dark:text-gray-400">
+              Turns required
+            </span>
+            <span className="text-gray-900 dark:text-white">
+              {turnsRequired}
+            </span>
           </div>
           <div className="flex justify-between">
-            <span className="text-gray-600 dark:text-gray-400">Tasks generated</span>
+            <span className="text-gray-600 dark:text-gray-400">
+              Tasks generated
+            </span>
             <span className="text-gray-900 dark:text-white">
               {tasksGenerated + extraTasks}
               {extraTasks > 0 && (
-                <span className="text-xs text-emerald-400 ml-1">(+{extraTasks})</span>
+                <span className="ml-1 text-xs text-emerald-400">
+                  (+{extraTasks})
+                </span>
               )}
             </span>
           </div>
         </div>
 
         {/* Power Boost Section with Sparkle Animation */}
-        <div className="relative mb-6 flex items-center justify-between rounded-lg bg-emerald-50 px-4 py-3 overflow-hidden dark:bg-emerald-900/20">
+        <div className="relative mb-6 flex items-center justify-between overflow-hidden rounded-lg bg-emerald-50 px-4 py-3 dark:bg-emerald-900/20">
           {/* Sparkle animation layer */}
           <Sparkle
             flickerSpeed="slowest"
@@ -382,14 +401,14 @@ const BrainstormModal = ({
             </span>
           </div>
 
-          <label className="z-10 relative inline-flex items-center cursor-pointer">
+          <label className="relative z-10 inline-flex cursor-pointer items-center">
             <input
               type="checkbox"
-              className="sr-only peer"
+              className="peer sr-only"
               checked={powerBoost}
               onChange={() => setPowerBoost(!powerBoost)}
             />
-            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-emerald-500 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-emerald-500"></div>
+            <div className="peer h-6 w-11 rounded-full bg-gray-200 after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-emerald-500 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-emerald-500 dark:border-gray-600 dark:bg-gray-700"></div>
           </label>
         </div>
 
@@ -412,10 +431,6 @@ const BrainstormModal = ({
   );
 };
 
-
-
-
-
 const TaskGrid: React.FC = () => {
   // const [selectedTasks, setSelectedTasks] = useState<Set<number>>(new Set());
   const [selectedTasks, setSelectedTasks] = useState<Set<string>>(new Set());
@@ -426,8 +441,16 @@ const TaskGrid: React.FC = () => {
     new Set(["all"]),
   );
 
-  
-  const { user, setTask, setUser,notificationMessages ,setnotificationMessages, userLoaded, setSelectedTaskIds, turnAmount } = useUser();
+  const {
+    user,
+    setTask,
+    setUser,
+    notificationMessages,
+    setnotificationMessages,
+    userLoaded,
+    setSelectedTaskIds,
+    turnAmount,
+  } = useUser();
 
   // const [Tasks, setTasks] = useState([]);
   const router = useRouter();
@@ -441,7 +464,6 @@ const TaskGrid: React.FC = () => {
     taskId: null,
     task: null,
   });
-  
 
   useEffect(() => {
     if (!user?.gameId) {
@@ -449,7 +471,7 @@ const TaskGrid: React.FC = () => {
       return;
     }
   }, [user, router, userLoaded]);
-  
+
   useEffect(() => {
     if (!user?.isAiCustomizationDone) {
       router.push("/formQuestion");
@@ -460,7 +482,7 @@ const TaskGrid: React.FC = () => {
   const handleTaskToggle = (task: any) => {
     const newSelected = new Set(selectedTasks);
     const taskId = task._id;
-  
+
     if (newSelected.has(taskId)) {
       setCancelModal({ isOpen: true, taskId, task });
     } else {
@@ -469,32 +491,30 @@ const TaskGrid: React.FC = () => {
       setTask(taskId);
       setSelectedTaskIds((prev) => {
         const alreadyExists = prev.some((idObj) =>
-          task.isBug ? idObj.bugId === task._id : idObj.taskId === task.taskId
+          task.isBug ? idObj.bugId === task._id : idObj.taskId === task.taskId,
         );
         if (alreadyExists) return prev;
-      
+
         return task.isBug
           ? [...prev, { bugId: task._id }]
           : [...prev, { taskId: task.taskId }];
       });
-      
     }
   };
-  
-  
+
   const handleCancelConfirm = () => {
     if (cancelModal.taskId) {
       // Remove from selectedTasks set
       setSelectedTasks((prev) => {
         const newSelected = new Set(prev);
-        newSelected.delete(cancelModal.taskId? cancelModal.taskId : "" );
+        newSelected.delete(cancelModal.taskId ? cancelModal.taskId : "");
         return newSelected;
       });
-  
+
       // Remove from selectedTaskIds array
       setSelectedTaskIds((prev) => {
         if (!cancelModal.task) return prev;
-  
+
         return prev.filter((idObj) => {
           if (cancelModal.task.isBug) {
             return idObj.bugId !== cancelModal.task._id;
@@ -504,45 +524,40 @@ const TaskGrid: React.FC = () => {
         });
       });
     }
-  
+
     // Close modal
     setCancelModal({ isOpen: false, taskId: null, task: null });
   };
-  
-  
-  
 
   const handleCancelDismiss = () => {
     setCancelModal({ isOpen: false, taskId: null, task: null });
   };
-  
 
   const toggleFilter = (filter: string) => {
     const mappedFilter = filter === "Bugs" ? "bugs" : filter;
-    
+
     setActiveFilters((prev) => {
       const newFilters = new Set(prev);
-  
+
       if (mappedFilter === "all") {
         return new Set(["all"]);
       }
-  
+
       newFilters.delete("all");
-  
+
       if (newFilters.has(mappedFilter)) {
         newFilters.delete(mappedFilter);
-  
+
         if (newFilters.size === 0) {
           return new Set(["all"]);
         }
       } else {
         newFilters.add(mappedFilter);
       }
-  
+
       return newFilters;
     });
   };
-  
 
   function getShortName(metricName: string): string {
     const metricMap: Record<string, string> = {
@@ -556,19 +571,17 @@ const TaskGrid: React.FC = () => {
       costPerAcquisition: "CPA",
       contributionMargin: "CM",
       buyerCount: "B",
-      bugPercentage : "bugPercentage"
+      bugPercentage: "bugPercentage",
     };
     return metricMap[metricName] || metricName;
   }
 
   const filteredTasks = useMemo(() => {
     if (!user?.tasks) return [];
-  
+
     return user.tasks.filter((task: any, index: number) => {
       if (activeFilters.has("all")) return true;
       if (activeFilters.has("in_progress")) return selectedTasks.has(task._id);
-      ;
-  
       if (task.metricsImpact) {
         return Object.entries(task.metricsImpact).some(([metric, value]) => {
           const shortMetric = getShortName(metric);
@@ -578,36 +591,37 @@ const TaskGrid: React.FC = () => {
       return false;
     });
   }, [user?.tasks, activeFilters, selectedTasks]);
-  
 
   const metrics = ["UA", "C1", "AOV", "COGS", "APC", "CPA", "bugs"];
-  const makeBrainstrom = async (turnAmount: string)=>{
-
+  const makeBrainstrom = async (turnAmount: string) => {
     const token = localStorage.getItem("userToken");
     if (!token) {
       alert("User is not authenticated. Please log in.");
       return;
     }
-    const makeReq = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/brainstrom`,{
-      method: "POST",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-        token: token,
+    const makeReq = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/brainstrom`,
+      {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+          token: token,
+        },
+        body: JSON.stringify({
+          turnAmount: turnAmount,
+          gameId: user?.gameId,
+          brainstromBoost: powerBoost,
+        }),
       },
-      body : JSON.stringify({
-        turnAmount : turnAmount,
-        gameId : user?.gameId,
-        brainstromBoost: powerBoost
-      })
-    })
-    if(makeReq.ok){
+    );
+    if (makeReq.ok) {
       const response = await makeReq.json();
       setUser(response);
-      setnotificationMessages([...notificationMessages, ...response.message])
-      setPowerBoost(false)
+      setnotificationMessages([...notificationMessages, ...response.message]);
+      setPowerBoost(false);
     }
-  }
+  };
   return (
     <>
       <ToastContainer
@@ -645,9 +659,11 @@ const TaskGrid: React.FC = () => {
         isOpen={brainstormModalOpen}
         turnsRequired={1}
         tasksGenerated={
-          brainstromTaskAmountMap[user?.startupStage as Stage || "FFF"].taskToGenerate ? 
-          brainstromTaskAmountMap[user?.startupStage as Stage || "FFF"].taskToGenerate :
-          15
+          brainstromTaskAmountMap[(user?.startupStage as Stage) || "FFF"]
+            .taskToGenerate
+            ? brainstromTaskAmountMap[(user?.startupStage as Stage) || "FFF"]
+                .taskToGenerate
+            : 15
         }
         onConfirm={async () => {
           await makeBrainstrom(turnAmount);
@@ -663,7 +679,7 @@ const TaskGrid: React.FC = () => {
           <div className="flex flex-wrap gap-2">
             <FilterButton
               label="All tasks"
-              count={user?.tasks.length}
+              count={user?.tasks?.length}
               isActive={activeFilters.has("all")}
               onClick={() => toggleFilter("all")}
             />
@@ -689,16 +705,15 @@ const TaskGrid: React.FC = () => {
             </button>
           </div>
           <button
-          className="flex self-end rounded-lg bg-white px-3 py-2 text-xs font-medium text-black shadow-xl dark:bg-blue-900/50 dark:text-blue-400"
-          onClick={() => setBrainstormModalOpen(true)}
-        >
-          Brainstorm
-        </button>
-
+            className="flex self-end rounded-lg bg-white px-3 py-2 text-xs font-medium text-black shadow-xl dark:bg-blue-900/50 dark:text-blue-400"
+            onClick={() => setBrainstormModalOpen(true)}
+          >
+            Brainstorm
+          </button>
         </div>
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6">
-        {filteredTasks?.map((task: any, index) => (
+          {filteredTasks?.map((task: any, index) => (
             <TaskCard
               key={index}
               {...task}
@@ -706,8 +721,6 @@ const TaskGrid: React.FC = () => {
               onToggle={() => handleTaskToggle(task)}
             />
           ))}
-
-          
         </div>
       </div>
     </>

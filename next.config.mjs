@@ -1,5 +1,15 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  images: {
+    domains: ["localhost"],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "cdn.sanity.io",
+        port: "",
+      },
+    ],
+  },
   // Disable automatic CSS generation for layout and page files
   experimental: {
     // This will prevent Next.js from generating CSS files for layout and page components
@@ -13,18 +23,18 @@ const nextConfig = {
       fs: false,
       // Add other polyfills if needed
     };
-    
+
     return config;
   },
   // Optimize CSS loading for specific paths
   async headers() {
     return [
       {
-        source: '/_next/static/css/:path*',
+        source: "/_next/static/css/:path*",
         headers: [
           {
-            key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
           },
         ],
       },
@@ -34,8 +44,8 @@ const nextConfig = {
   async rewrites() {
     return [
       {
-        source: '/_next/static/css/app/:path*',
-        destination: '/empty.css',
+        source: "/_next/static/css/app/:path*",
+        destination: "/empty.css",
       },
     ];
   },
