@@ -15,15 +15,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html suppressHydrationWarning lang="en">
-      {/*
-        <head /> will contain the components returned by the nearest parent
-        head.js. Find out more at https://beta.nextjs.org/docs/api-reference/file-conventions/head
-      */}
-      <head />
-
-      <body
-        className={`flex w-screen bg-[#FCFCFC]  dark:bg-black ${inter.className}`}
+    <div className="">
+      <div
+        // suppressHydrationWarning={true}
+        className={`flex w-screen flex-col bg-[#FCFCFC]  dark:bg-black ${inter.className}`}
       >
         <Providers>
           <Header />
@@ -31,8 +26,8 @@ export default function RootLayout({
           <Footer />
           <ScrollToTop />
         </Providers>
-      </body>
-    </html>
+      </div>
+    </div>
   );
 }
 
