@@ -19,216 +19,182 @@ const InvestorsModal: React.FC<InvestorsModalProps> = ({ isOpen, onClose }) => {
 
   useEffect(() => {
     if (user) {
-      const investmentsMade = user.investmentsMade || [];
-      const availableInvestments = user.availableInvestments || [];
-
-      const hasMatchingNames = investmentsMade.some((investmentMade) =>
-        availableInvestments.some(
-          (available) => available.name === investmentMade.name
-        )
-      );
-
-      if (hasMatchingNames) {
-        setInvestmentsArray([...availableInvestments]);
-      } else {
-        setInvestmentsArray([...availableInvestments, ...investmentsMade]);
-      }
+      const made = user.investmentsMade || [];
+      const avail = user.availableInvestments || [];
+      const merged = made.some((m) => avail.some((a) => a.name === m.name))
+        ? [...avail]
+        : [...avail, ...made];
+      setInvestmentsArray(merged);
     }
   }, [user]);
 
   if (!isOpen) return null;
 
-  const signInvestmentOnClick = async (investmentSigned: any) => {
-    try {
-      const makeReq = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/makeInvestment`,
-        {
-          method: "POST",
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-            token: `${localStorage.getItem("userToken")}`,
-          },
-          body: JSON.stringify({
-            investmentSigned,
-            investmentAmount: investmentSigned.money,
-            investorsShare: investmentSigned.share,
-            gameId: user?.gameId,
-          }),
-        }
-      );
-
-      if (makeReq.ok) {
-        const response = await makeReq.json();
-        setUser(response);
-        setUserState(response);
-      } else {
-        console.error(`Request failed with status ${makeReq.status}: ${makeReq.statusText}`);
-      }
-    } catch (error) {
-      console.error("An error occurred:", error);
+  const signInvestment = async (e: any) => {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/makeInvestment`, {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+        token: localStorage.getItem("userToken") || "",
+      },
+      body: JSON.stringify({
+        investmentSigned: e,
+        investmentAmount: e.money,
+        investorsShare: e.share,
+        gameId: user?.gameId,
+      }),
+    });
+    if (res.ok) {
+      const json = await res.json();
+      setUser(json);
+      setUserState(json);
     }
   };
 
-  const buyoutInvestment = async (investmentToBuyout: any) => {
-    try {
-      const makeReq = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/buyoutInvestor`, {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-          token: `${localStorage.getItem("userToken")}`,
-        },
-        body: JSON.stringify({
-          gameId: user?.gameId,
-          investmentName: investmentToBuyout.name,
-          buyoutAmount: investmentToBuyout.buyout,
-        }),
-      });
-
-      if (makeReq.ok) {
-        const response = await makeReq.json();
-        setUser(response);
-        setUserState(response);
-      } else {
-        console.error(`Request failed with status ${makeReq.status}: ${makeReq.statusText}`);
-      }
-    } catch (error) {
-      console.error("An error occurred:", error);
+  const buyoutInvestment = async (e: any) => {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/buyoutInvestor`, {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+        token: localStorage.getItem("userToken") || "",
+      },
+      body: JSON.stringify({
+        gameId: user?.gameId,
+        investmentName: e.name,
+        buyoutAmount: e.buyout,
+      }),
+    });
+    if (res.ok) {
+      const json = await res.json();
+      setUser(json);
+      setUserState(json);
     }
   };
 
   return (
     <>
-      <div className="fixed inset-0 z-[99999] flex items-center justify-center px-2 sm:px-0">
-        <div className="absolute inset-0 bg-black/30" onClick={onClose}></div>
+      <div className="fixed md:top-20 top-10 lg:top-8 lg:w-full  m-5 lg:m-0 z-[99999] flex justify-center items-center bg-black/40 px-2">
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4  lg:right-32  md:right-15 z-50 text-red-500 hover:text-red-600"
+        >
+          <X className="h-6 w-6" />
+        </button>
 
-        <div className="relative w-full max-w-screen-xl my-6 mx-2 sm:mx-auto rounded-xl bg-white p-6 shadow-lg dark:bg-[#1A232F] max-h-[90vh] overflow-y-auto">
-          <button
-            onClick={onClose}
-            className="absolute right-7 lg:right-3 lg:top-4 text-red-500 hover:text-red-600"
-          >
-            <X className="h-6 w-6" />
-          </button>
 
-          <div className="mb-6">
-            <div className="flex items-center gap-2">
-              <h2 className="text-2xl font-medium text-gray-800 dark:text-white">
-                Available Investors
-              </h2>
-              <span className="text-2xl font-medium text-green-500">
-                {user?.availableInvestments.length}
-              </span>
-            </div>
-            <p className="mt-2 text-sm text-gray-600 dark:text-white">
-              Each round new investors will be available to you. In addition to
-              funds, they will provide invaluable knowledge, in exchange for
-              shares in your company.
+        {/* Modal Container */}
+        <div className="relative w-full max-w-[95vw] sm:max-w-[90vw] md:max-w-[85vw] lg:max-w-screen-xl max-h-[90vh] bg-white dark:bg-[#1A232F] rounded-xl shadow-lg overflow-y-auto overflow-x-hidden">
+
+          {/* Header */}
+          <div className="p-6 border-b border-gray-200 dark:border-gray-700 sticky top-0 bg-white dark:bg-[#1A232F] z-40">
+            <h2 className="text-2xl font-medium text-gray-800 dark:text-white inline">
+              Available Investors{" "}
+            </h2>
+            <span className="text-2xl font-medium text-green-500">
+              {user?.availableInvestments.length}
+            </span>
+            <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
+              Each round, new investors will be available to you. They bring
+              funds and benefits in exchange for shares.
             </p>
           </div>
 
-          {/* Responsive Card Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2  lg:flex  gap-6">
-            {investmentsArray.map((e, index) => {
-              const isSigned = user?.investmentsMade.some((inv) => inv.name === e.name);
+          {/* Cards */}
+          <div className="sm:overflow-x-auto overflow-y-auto">
+            <div className="flex flex-col sm:flex-row gap-4 p-6  lg:w-80 sm:min-w-full">
+              {investmentsArray.map((e, i) => {
+                const signed = user?.investmentsMade.some((inv: any) => inv.name === e.name);
 
-              return (
-                <div
-                  key={index}
-                  className="rounded-xl  border border-gray-200 p-5 bg-white dark:bg-[#1A232F] 
-                  hover:shadow-md transition-shadow cursor-pointer"
-                  onClick={() => {
-                    setSelectedInvestor(e);
-                    isSigned ? setShowBuyoutConfirm(true) : setShowSignConfirm(true);
-                  }}
-                >
-                  <div className="flex lg:w-95 items-center gap-4 mb-4">
-                    {getInvestorImage(e.name) && (
-                      <div className="h-24 w-24 flex-shrink-0 shadow-md rounded-full overflow-hidden">
-                        <Image
-                          src={getInvestorImage(e.name)?.src || "fallback_image_path"}
-                          alt={e.name || "Default Alt Text"}
-                          width={96}
-                          height={96}
-                          className="h-full w-full object-contain"
-                        />
+                return (
+                  <div
+                    key={i}
+                    className="w-full sm:w-[320px] flex-shrink-0 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#1A232F] p-5"
+                  >
+                    <div className="flex items-center gap-4 mb-4">
+                      {getInvestorImage(e.name) && (
+                        <div className="h-20 w-20 rounded-full overflow-hidden">
+                          <Image
+                            src={getInvestorImage(e.name)?.src}
+                            alt={e.name}
+                            width={80}
+                            height={80}
+                            className="object-cover"
+                          />
+                        </div>
+                      )}
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
+                          {e.name}
+                        </h3>
+                        <p className="text-sm italic text-blue-500 dark:text-blue-400">
+                          {e.quote}
+                        </p>
                       </div>
-                    )}
-                    <div>
-                      <h3 className="text-xl font-semibold text-gray-800 dark:text-white">
-                        {e.name}
-                      </h3>
-                      <p className="text-sm italic text-blue-500 dark:text-blue-400">{e.quote}</p>
-                    </div>
-                  </div>
-
-                  <div className="mb-6 text-sm text-gray-600 dark:text-gray-100">{e.description}</div>
-
-                  <div className="space-y-4 border-t border-gray-200 pt-4">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-gray-600 dark:text-white">Investment</span>
-                      <span className="text-sm font-medium text-green-600">${e.money}</span>
                     </div>
 
-                    {isSigned && (
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm text-gray-600 dark:text-white">Buyout price</span>
-                        <span className="text-sm font-medium text-green-600">
-                          ${e.buyout?.toLocaleString()}
+                    <p className="mb-4 text-sm text-gray-600 dark:text-gray-300">{e.description}</p>
+
+                    <div className="space-y-3 border-t border-gray-200 dark:border-gray-700 pt-3 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-gray-600 dark:text-white">Investment</span>
+                        <span className="text-green-600">${e.money}</span>
+                      </div>
+                      {signed && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-600 dark:text-white">Buyout price</span>
+                          <span className="text-green-600">${e.buyout}</span>
+                        </div>
+                      )}
+                      <div className="flex justify-between">
+                        <span className="text-gray-600 dark:text-white">Investor&apos;s share</span>
+                        <span className="text-blue-500">{e.share}%</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600 dark:text-white flex items-center">
+                          <span className="h-2 w-2 rounded-full bg-blue-500 mr-2" />
+                          Advantages
+                        </span>
+                        <span className="text-blue-500">
+                          {e.bug_percent_point < 0
+                            ? `Decreases bugs by ${Math.abs(e.bug_percent_point)}%`
+                            : `Increases bugs by ${e.bug_percent_point}%`}
                         </span>
                       </div>
-                    )}
-
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-gray-600 dark:text-white">
-                        Investor&apos;s share
-                      </span>
-                      <span className="text-sm font-medium text-blue-500">{e.share}%</span>
                     </div>
 
-                    <div className="flex items-center justify-between">
-                      <span className="flex items-center text-sm text-gray-600 dark:text-white">
-                        <span className="mr-2 inline-block h-2 w-2 rounded-full bg-blue-500" />
-                        Advantages
-                      </span>
-                      <span className="text-sm text-blue-500">
-                        {e.bug_percent_point < 0
-                          ? `Decreases bugs by ${Math.abs(e.bug_percent_point)}%`
-                          : `Increases bugs by ${e.bug_percent_point}%`}
-                      </span>
+                    <div className="mt-4 text-right">
+                      {signed ? (
+                        <span className="rounded border border-green-600 px-2 py-1 text-sm font-semibold text-green-600">
+                          SIGNED
+                        </span>
+                      ) : (
+                        <button
+                          onClick={() => {
+                            setSelectedInvestor(e);
+                            setShowSignConfirm(true);
+                          }}
+                          className="mt-2 rounded border border-gray-300 px-3 py-1 text-sm hover:border-green-500"
+                        >
+                          Sign Investment
+                        </button>
+                      )}
                     </div>
                   </div>
-
-                  <div className="mt-4 text-right">
-                    {isSigned ? (
-                      <span className="rounded border border-green-600 px-2 py-1 font-semibold text-green-600">
-                        SIGNED
-                      </span>
-                    ) : (
-                      <span
-                        onClick={() => {
-                          setSelectedInvestor(e);
-                          setShowSignConfirm(true);
-                        }}
-                        className="inline-block rounded-xl border px-4 py-2 mt-2 transition-all duration-200 border-gray-300 hover:border-green-400 text-sm font-medium"
-                      >
-                        Sign Investment
-                      </span>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Confirm Modals */}
+      {/* Confirm Modal */}
       {(showSignConfirm || showBuyoutConfirm) && selectedInvestor && (
         <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/50 px-4">
           <div className="rounded-xl bg-white dark:bg-[#1A232F] p-6 shadow-xl max-w-sm w-full text-gray-800 dark:text-white">
             <h2 className="text-lg font-semibold mb-2">
-              {showSignConfirm ? "Make a deal with investor?" : "Buyout share from investor?"}
+              {showSignConfirm ? "Make a deal with investor?" : "Buyout investor’s share?"}
             </h2>
             <p className="mb-2">{selectedInvestor.name}</p>
             <p className="text-sm">
@@ -242,7 +208,7 @@ const InvestorsModal: React.FC<InvestorsModalProps> = ({ isOpen, onClose }) => {
             <p className="text-sm mb-4">
               {showSignConfirm ? (
                 <>
-                  Advantages:{" "}
+                  Advantage:{" "}
                   <span className="text-blue-500">
                     {selectedInvestor.bug_percent_point < 0
                       ? `Reduces bugs by ${Math.abs(selectedInvestor.bug_percent_point)}%`
@@ -270,7 +236,7 @@ const InvestorsModal: React.FC<InvestorsModalProps> = ({ isOpen, onClose }) => {
               <button
                 onClick={() => {
                   if (showSignConfirm) {
-                    signInvestmentOnClick(selectedInvestor);
+                    signInvestment(selectedInvestor);
                   } else {
                     buyoutInvestment(selectedInvestor);
                   }
@@ -280,7 +246,7 @@ const InvestorsModal: React.FC<InvestorsModalProps> = ({ isOpen, onClose }) => {
                 }}
                 className="px-4 py-2 rounded bg-green-500 text-white"
               >
-                Yes, {showSignConfirm ? "sign it" : "buyout"}
+                Yes
               </button>
             </div>
           </div>

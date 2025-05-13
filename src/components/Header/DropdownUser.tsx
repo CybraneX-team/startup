@@ -38,7 +38,7 @@ const DropdownUser = () => {
        <div className="flex w-10 h-auto">
        <span
         style={{ backgroundColor: user ? colorClass : "#6B7280" }}
-        className="h-12 w-12 rounded-full flex items-center justify-center text-white dark:text-black font-bold text-[10px] text-center leading-tight"
+        className="h-10 w-24 rounded-full flex items-center justify-center text-white dark:text-black font-bold text-[10px] text-center leading-tight"
       >
         {user?.username ? user.username.charAt(0).toUpperCase() : "No User"}
       </span>

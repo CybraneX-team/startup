@@ -1,6 +1,10 @@
 "use client";
 
+import { isTokenExpired } from "@/tokenUtil";
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { toast } from "react-toastify";
+import { useRouter } from "next/navigation";
+
 
 interface Metrics {
   userAcquisition: number;
@@ -124,15 +128,28 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     const [userLoaded, setUserLoaded] = useState(false);
     const [HeaderDark, setHeaderDark] = useState(false);
     const [loaderMessage, setLoaderMessage] = useState("");
-    useEffect(() => {
-      const storedUser = localStorage.getItem("userData");
-      if (storedUser) {
-        const parsedUser = JSON.parse(storedUser);
-        setUserState(parsedUser);
-      }
-      setUserLoaded(true);
-    }, []);
 
+    const router = useRouter();
+    
+
+    useEffect(() => {
+      const storedToken = localStorage.getItem("userToken");
+      const storedUser = localStorage.getItem("userData");
+    
+      if (storedToken && isTokenExpired(storedToken)) {
+        // Auto logout if token expired
+        localStorage.removeItem("userToken");
+        localStorage.removeItem("userData");
+        setUserState(null);
+        toast.warn("Session expired. Please sign in again.");
+        router.push("/auth/signin");
+      } else if (storedUser && storedToken) {
+        setUserState(JSON.parse(storedUser));
+      }
+    
+      setUserLoaded(true);
+    }, [router]);
+    
     // const [selectedTasks, setSelectedTasks] = useState<Set<number>>(new Set());
     
     useEffect(() => {

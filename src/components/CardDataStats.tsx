@@ -1,6 +1,6 @@
 "use client";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { Users, CheckSquare } from "lucide-react";
+import { Users, CheckSquare,ChevronDown } from "lucide-react";
 import { useUser } from "@/context/UserContext";
 import { useRouter } from "next/navigation";
 import { toast, ToastContainer, Bounce } from "react-toastify";
@@ -33,6 +33,7 @@ const brainstromTaskAmountMap: Record<Stage, BrainstormStats> = {
 };
 interface TaskCardProps {
   name: string;
+  description : string;
   turnsRequired: number;
   metricsImpact: {
     conversionFirstPurchase: number;
@@ -182,8 +183,11 @@ const TaskCard: React.FC<TaskCardProps> = ({
   requiredTeam,
   isBug,
   isSelected,
+  description,
   onToggle,
 }) => {
+  const [showDescription, setShowDescription] = useState(false);
+
   function getShortName(metricName: string): string {
     const metricMap: Record<string, string> = {
       userAcquisition: "UA",
@@ -231,80 +235,120 @@ const TaskCard: React.FC<TaskCardProps> = ({
       return "";
     }
   }
-  return (
-    <div
-      className={`w-full cursor-pointer rounded-xl border p-4 shadow-sm transition-all duration-200 hover:shadow-md
-        ${
-          isSelected
-            ? "border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-900/20"
-            : "border-stroke bg-white dark:border-strokedark dark:bg-boxdark"
-        }`}
-      onClick={onToggle}
-    >
-      <div className="flex items-start justify-between gap-4">
-        <div className="min-w-0 flex-1">
+return (
+ <div
+  onClick={onToggle}
+  className={`
+    self-start w-full rounded-xl hover:cursor-pointer border p-4 shadow-sm transition-all duration-200 hover:shadow-md
+    ${isSelected
+      ? "border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-900/20"
+      : "border-stroke bg-white dark:border-strokedark dark:bg-boxdark"
+    }`}
+>
+
+    <div className="flex items-start justify-between gap-4">
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center justify-between">
           <h3
-            className={`text-md mb-4 truncate font-semibold
-            ${isSelected ? "text-green-700 dark:text-green-400" : "text-black dark:text-white"}`}
+            className={`text-md mb-2 truncate font-semibold ${
+              isSelected
+                ? "text-green-700 dark:text-green-400"
+                : "text-black dark:text-white"
+            }`}
           >
             {isBug ? `🐛 Bug: ${name}` : name}
           </h3>
+       
+          {/* Toggle Description Arrow */}
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowDescription((prev) => !prev);
+            }}
+            className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 transition"
+          >
+            <ChevronDown
+              className={`h-4 w-4 text-gray-600 dark:text-gray-300 transition-transform duration-200 ${
+                showDescription ? "rotate-180" : ""
+              }`}
+            />
+          </button>
+        </div>
 
-          <div className="space-y-3">
-            <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
-              <span>Turns required</span>
-              <span>{turnsRequired}</span>
-            </div>
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-gray-600 dark:text-gray-400">
-                Effect on Metrics
-              </span>
-              <span className="text-emerald-600 dark:text-emerald-400">
-                {metricsImpact &&
-                  Object.entries(metricsImpact)
-                    .filter(([, value]) => value !== undefined && value !== 0)
-                    .map(
-                      ([
-                        key,
-                        value,
-                      ]) => `${getShortName(key)}: ${signTeller(key)} ${showDollarSign(key)} ${value}
-                  ${symbolToShow(key) ? "%" : ""}`,
-                    )
-                    .join(" , ")}
-              </span>
-            </div>
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-              <span className="whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
-                Required team members
-              </span>
-              <div className="flex flex-wrap gap-2">
-                {requiredTeamMembers &&
-                  Object.entries(requiredTeamMembers).map(
-                    ([member, count], index) =>
-                      count > 0 ? (
-                        <div
-                          key={index}
-                          className="flex items-center gap-1 rounded bg-gray-100 px-2 py-1 text-xs dark:bg-gray-700"
-                        >
-                          <Users className="h-3 w-3" />
-                          <span>{member}</span> <span>{count}</span>
-                        </div>
-                      ) : null,
-                  )}
-              </div>
+                
+
+        <div className="space-y-3">
+          <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
+            <span>Turns required</span>
+            <span>{turnsRequired}</span>
+          </div>
+
+          <div className="flex items-center justify-between text-sm">
+            <span className="text-gray-600 dark:text-gray-400">
+              Effect on Metrics
+            </span>
+            <span className="text-emerald-600 dark:text-emerald-400 text-right">
+              {metricsImpact &&
+                Object.entries(metricsImpact)
+                  .filter(([, value]) => value !== undefined && value !== 0)
+                  .map(
+                    ([key, value]) =>
+                      `${getShortName(key)}: ${signTeller(key)} ${showDollarSign(
+                        key
+                      )}${value}${symbolToShow(key) ? "%" : ""}`
+                  )
+                  .join(" , ")}
+            </span>
+          </div>
+
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+            <span className="whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
+              Required team members
+            </span>
+            <div className="flex flex-wrap gap-2">
+              {requiredTeamMembers &&
+                Object.entries(requiredTeamMembers).map(([member, count], index) =>
+                  count > 0 ? (
+                    <div
+                      key={index}
+                      className="flex items-center gap-1 rounded bg-gray-100 px-2 py-1 text-xs dark:bg-gray-700"
+                    >
+                      <Users className="h-3 w-3" />
+                      <span>{member}</span> <span>{count}</span>
+                    </div>
+                  ) : null
+                )}
             </div>
           </div>
         </div>
-        <div className="flex-shrink-0">
-          {isSelected ? (
-            <CheckSquare className="h-6 w-6 text-green-500" />
-          ) : (
-            <div className="h-6 w-6 rounded-full border-2 border-gray-300 dark:border-gray-600" />
-          )}
-        </div>
+      </div>
+
+      {/* Toggle Selection Button */}
+      <div
+        className="flex-shrink-0"
+        onClick={(e) => {
+          e.stopPropagation();
+          onToggle();
+        }}
+      >
+        {isSelected ? (
+          <CheckSquare className="h-6 w-6 text-green-500 cursor-pointer" />
+        ) : (
+          <div className="h-6 w-6 rounded-full border-2 border-gray-300 dark:border-gray-600 cursor-pointer" />
+        )}
+        
       </div>
     </div>
-  );
+    {showDescription && (
+  <div className="mt-3 text-sm text-gray-700 dark:text-gray-300">
+    {description}
+  </div>
+)}
+  </div>
+);
+
+;
 };
 interface BrainstormModalProps {
   isOpen: boolean;
@@ -711,17 +755,19 @@ const TaskGrid: React.FC = () => {
             Brainstorm
           </button>
         </div>
+<div className="flex flex-wrap gap-4">
+  {filteredTasks.map((task: any) => (
+    <div key={task.name} className="w-full md:w-[48%]">
+      <TaskCard
+        key={task.name}
+        {...task}
+        isSelected={selectedTasks.has(task._id)}
+        onToggle={() => handleTaskToggle(task)}
+      />
+    </div>
+  ))}
+</div>
 
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6">
-          {filteredTasks?.map((task: any, index) => (
-            <TaskCard
-              key={index}
-              {...task}
-              isSelected={selectedTasks.has(task._id)}
-              onToggle={() => handleTaskToggle(task)}
-            />
-          ))}
-        </div>
       </div>
     </>
   );

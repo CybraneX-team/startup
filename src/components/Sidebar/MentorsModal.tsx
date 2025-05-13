@@ -156,11 +156,11 @@ const MentorsModal: React.FC<MentorsModalProps> = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[99999] lg:z-[9999] flex  items-center justify-center ">
-      {/* Full-screen overlay to dim entire application */}
+<div className="fixed inset-0 z-[99999] flex items-center justify-center">
+
       <div className="absolute inset-0 bg-black/30 " onClick={onClose}></div>
       
-      <div className="relative w-full max-w-xl mx-2 sm:mx-0 my-6 rounded-xl bg-white p-6 shadow-lg dark:bg-boxdark max-h-[90vh] overflow-y-auto">
+<div className="relative w-full max-w-4xl mx-4 sm:mx-auto my-6 rounded-xl bg-white p-6 shadow-lg dark:bg-boxdark max-h-[95vh] overflow-y-auto">
       {/* Close button */}
         <button 
           onClick={onClose}

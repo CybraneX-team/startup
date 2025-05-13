@@ -61,12 +61,13 @@ const SubscriptionPlansPage = () => {
      }, []);
 
 
-    const openRazorpayCheckout = (subscriptionId: string) => {
+    const openRazorpayCheckout = (subscriptionId: string, customerId: string) => {
         const options = {
           key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID!,
           name: "Startup Simulator",
           description: "Subscription for game access",
           subscription_id: subscriptionId,
+          customerId : customerId, 
           handler: async (response: any) => {
             const verifyRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/razorpay/verify-subscription`, {
               method: "POST",
@@ -110,7 +111,7 @@ const SubscriptionPlansPage = () => {
         const data = await response.json();
       
         if (data.subscriptionId) {
-          openRazorpayCheckout(data.subscriptionId);
+          openRazorpayCheckout(data.subscriptionId, data.customerId);
         } else {
           toast.error("Subscription failed. Please try again.");
         }
