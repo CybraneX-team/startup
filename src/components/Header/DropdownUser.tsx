@@ -25,7 +25,7 @@ const DropdownUser = () => {
     localStorage.removeItem("userToken");
     localStorage.removeItem("userData");
     setUserState(null);
-    signOut({ callbackUrl: "/auth/signin" }); 
+    signOut({ callbackUrl: `/auth/signin` }); 
   }
 
   return (

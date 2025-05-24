@@ -83,7 +83,7 @@ const GameOptionsModal = ({
     <AlertCircle size={16} className="text-yellow-600 dark:text-yellow-300" />
     <span className="break-words text-sm">Starting a new simulation will cost</span>
   </div>
-  <span className="text-violet-700 dark:text-violet-400 font-semibold">200 credits</span>
+  <span className="text-violet-700 dark:text-violet-400 font-semibold">2000 credits</span>
           </div>
 
           </div>

@@ -2,6 +2,7 @@
 const nextConfig = {
   images: {
     domains: ["localhost"],
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: "https",
@@ -9,6 +10,7 @@ const nextConfig = {
         port: "",
       },
     ],
+    
   },
   // Disable automatic CSS generation for layout and page files
   experimental: {

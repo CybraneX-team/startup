@@ -137,6 +137,31 @@
   animation-duration: 6s !important; /* slower than default (2–3s) */
 }
 
+/* Reactour customization */
+.reactour__dot {
+  z-index: 20 !important;
+  transform: translateY(10px);
+}
+
+.reactour__controls {
+  padding: 0 1.5rem !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+}
+
+.reactour__close {
+  z-index: 30;
+}
+
+.reactour__popover {
+  overflow: visible !important;
+  border-radius: 1rem !important;
+  padding: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
 @layer utilities {
   .animate-bounce-slow {
     animation: bounce-slow 2s infinite;

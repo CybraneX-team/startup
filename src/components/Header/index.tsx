@@ -12,7 +12,7 @@ const Header = (props: {
   sidebarOpen: string | boolean | undefined | any;
   setSidebarOpen: (arg0: boolean) => void | any;
 }) => {
-    const {HeaderDark, user} = useUser()
+    const {HeaderDark, user, elonStep} = useUser()
   
   return (
 <header className={`sticky top-0 z-[900] w-full ${HeaderDark ? 'bg-[#878C94]' : "bg-white"} dark:bg-boxdark dark:drop-shadow-none`}>
@@ -70,12 +70,22 @@ const Header = (props: {
 
   {/* Right Controls */}
   <div className="flex flex-nowrap items-center gap-2 sm:gap-3">
+  {elonStep === 6 ? (
+  <div className="flex items-center gap-2 px-4 py-2 rounded-xl ring-2 ring-yellow-400 animate-pulse bg-white/10 dark:bg-white/10 backdrop-blur-md shadow-lg transition-all duration-300 text-yellow-200 dark:text-yellow-100 font-semibold">
+    <Coins className="w-4 h-4 text-yellow-300 animate-bounce" />
+    <span className="text-sm tracking-wide">Credits: {user?.credits}</span>
+  </div>
+) : (
   <div
-  className="hidden lg:flex items-center gap-2 px-4 py-1.5 rounded-full bg-gradient-to-r from-cyan-400 to-blue-500 dark:from-blue-600 dark:to-cyan-600 text-sm font-semibold text-white shadow-md transition-all duration-300 transform  hover:shadow-blue-500/50 cursor-pointer"
->
-  <Coins className="w-4 h-4 text-white animate-bounce-slow group-hover:animate-none" />
-  <span className="tracking-wide">Credits: {user?.credits} </span>
-</div>
+    className="hidden lg:flex items-center gap-2 px-4 py-1.5 rounded-full bg-gradient-to-r from-cyan-400 to-blue-500 dark:from-blue-600 dark:to-cyan-600 text-sm font-semibold text-white shadow-md transition-all duration-300 transform hover:shadow-blue-500/50 cursor-pointer"
+  >
+    <Coins className="w-4 h-4 text-white animate-bounce-slow group-hover:animate-none" />
+    <span className="px-3 py-1 rounded-full text-sm font-semibold tracking-wide">
+      Credits: {user?.credits}
+    </span>
+  </div>
+)}
+
 
 
 

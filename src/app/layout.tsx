@@ -9,6 +9,7 @@ import Loader from "@/components/common/Loader";
 import { UserProvider } from "@/context/UserContext";
 import { Bounce, ToastContainer } from "react-toastify";
 import Head from 'next/head';
+import { TourProvider } from '@reactour/tour'
 import { SessionProvider } from "next-auth/react";
 import Script from "next/script";
 

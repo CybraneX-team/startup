@@ -75,7 +75,7 @@ const CancelTaskModal: React.FC<CancelTaskModalProps> = ({
   onConfirm,
   onCancel,
 }) => {
-  const { setHeaderDark } = useUser();
+  const { setHeaderDark, setloader } = useUser();
   useEffect(() => {
     setHeaderDark(isOpen);
     return () => setHeaderDark(false);
@@ -441,7 +441,7 @@ const BrainstormModal = ({
           <div className="z-10 flex items-center gap-2 text-sm">
             <Sparkles className="h-4 w-4 text-emerald-500" />
             <span className="text-gray-700 dark:text-gray-300">
-              Power Boost: +5 tasks for 30 credits
+              Power Boost: +5 tasks for 600 credits
             </span>
           </div>
 
@@ -494,6 +494,7 @@ const TaskGrid: React.FC = () => {
     userLoaded,
     setSelectedTaskIds,
     turnAmount,
+    setloader
   } = useUser();
 
   // const [Tasks, setTasks] = useState([]);
@@ -637,12 +638,15 @@ const TaskGrid: React.FC = () => {
   }, [user?.tasks, activeFilters, selectedTasks]);
 
   const metrics = ["UA", "C1", "AOV", "COGS", "APC", "CPA", "bugs"];
-  const makeBrainstrom = async (turnAmount: string) => {
+const makeBrainstrom = async (turnAmount: string) => {
+  setloader(true);
+  try {
     const token = localStorage.getItem("userToken");
     if (!token) {
       alert("User is not authenticated. Please log in.");
       return;
     }
+
     const makeReq = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/api/brainstrom`,
       {
@@ -657,15 +661,27 @@ const TaskGrid: React.FC = () => {
           gameId: user?.gameId,
           brainstromBoost: powerBoost,
         }),
-      },
+      }
     );
+
     if (makeReq.ok) {
       const response = await makeReq.json();
       setUser(response);
       setnotificationMessages([...notificationMessages, ...response.message]);
       setPowerBoost(false);
+    } else {
+      const errorResponse = await makeReq.json();
+      console.error("Failed to make brainstrom request:", errorResponse);
+      alert(errorResponse.message || "Something went wrong.");
     }
-  };
+  } catch (error) {
+    console.error("Error in makeBrainstrom:", error);
+    alert("An error occurred while making the request.");
+  } finally {
+    setloader(false);
+  }
+};
+
   return (
     <>
       <ToastContainer
@@ -756,10 +772,10 @@ const TaskGrid: React.FC = () => {
           </button>
         </div>
 <div className="flex flex-wrap gap-4">
-  {filteredTasks.map((task: any) => (
-    <div key={task.name} className="w-full md:w-[48%]">
+  {filteredTasks.map((task: any, index: number) => (
+    <div key={index} className="w-full md:w-[48%]">
       <TaskCard
-        key={task.name}
+        key={index }
         {...task}
         isSelected={selectedTasks.has(task._id)}
         onToggle={() => handleTaskToggle(task)}

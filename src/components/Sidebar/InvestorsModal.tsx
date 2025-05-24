@@ -116,7 +116,7 @@ const InvestorsModal: React.FC<InvestorsModalProps> = ({ isOpen, onClose }) => {
                       {getInvestorImage(e.name) && (
                         <div className="h-20 w-20 rounded-full overflow-hidden">
                           <Image
-                            src={getInvestorImage(e.name)?.src}
+                            src={getInvestorImage(e.name) ?? "/elon.png"} 
                             alt={e.name}
                             width={80}
                             height={80}

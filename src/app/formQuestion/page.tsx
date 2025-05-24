@@ -54,7 +54,10 @@ export default function StartupBasicsForm() {
 
   useEffect(() => {
     if (!user?.isAiCustomizationDone || !user) {
-      router.push("/formQuestion");
+      router.push("/auth/signin");
+      return
+    }else{
+      router.push("/");
       return
     }
   }, [user, router, userLoaded]);

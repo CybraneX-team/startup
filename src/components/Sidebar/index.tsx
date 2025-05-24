@@ -31,7 +31,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
   const [mentorsModalOpen, setMentorsModalOpen] = useState(false);
   const [teamModalOpen, setTeamModalOpen] = useState(false);
   const [investorsModalOpen, setInvestorsModalOpen] = useState(false);
-  const { user, setUser, setUserState, setnotificationMessages, notificationMessages, setloader, setHeaderDark } = useUser();
+  const { user, setUser, setUserState, setnotificationMessages, notificationMessages, setloader, setHeaderDark, elonStep } = useUser();
   const [optionsModalOpen, setOptionsModalOpen] = useState(false);
   const [showFullDesc, setShowFullDesc] = useState(false);
 
@@ -79,7 +79,14 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
   };
   const [chartData, setChartData] = useState<{ series: number[]; options: ApexOptions } | null>(null);
 
-  
+  useEffect(()=>{
+    if (elonStep === 3 ) {
+      setSidebarOpen(true)
+      return 
+    }else{
+      setSidebarOpen(false)
+    }
+  }, [elonStep])
   useEffect(() => {
     if (user?.financesBreakdown) {
       const breakdown = user.financesBreakdown as financesBreakdown;
@@ -205,7 +212,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
   return (
     <>
       <aside
-        className={`fixed left-0  z-99999 top-0 lg:z-50 flex h-screen w-[300px]  flex-col overflow-y-hidden bg-white duration-300 ease-linear dark:bg-boxdark lg:translate-x-0 ${
+        className={`fixed left-0  ${elonStep === 3 ? 'z-9999' : 'z-999999'} top-0 lg:z-50 flex h-screen w-[300px]  flex-col overflow-y-hidden bg-white duration-300 ease-linear dark:bg-boxdark lg:translate-x-0 ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
         style={{ height: '100dvh' }} 
@@ -288,14 +295,16 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
               <span className="text-gray-600 mt-1  dark:text-white">Founder</span>
               <span className="font-medium mx-1 my-1 text-[#6577F3]">{renderValue(breakdown["Founder"])}%</span>
           </div>
-          <div className="flex text-sm" onClick={openInvestorsModal} >
+          <div className={`flex text-sm ${elonStep ===3 ? `animate-pulse ring-1 dark:ring-blue-600 rounded-lg my-1` : ""}`} 
+          onClick={openInvestorsModal} >
           <span className="inline-block h-3 w-3 mx-1 my-2 rounded-full cursor-pointer
-           bg-[#A5D6A7]"></span>
-            <span className="text-gray-600 mt-1 dark:text-white">Investors</span>
+           bg-[#A5D6A7] investment-step-1"></span>
+            <span className="text-gray-600 mt-1 dark:text-white ">Investors</span>
             <span className="font-medium mx-1 my-1 text-[#A5D6A7]">{renderValue(breakdown.Investors)}%</span> </div>
-          <div className="flex  text-sm"  onClick={openMentorsModal}>
+          <div className={`flex text-sm ${elonStep ===3 ? `animate-pulse ring-1 dark:ring-blue-600 rounded-lg my-1` : ""}`}  
+          onClick={openMentorsModal}>
             <span className="inline-block h-3 w-3 mx-1  my-2 rounded-full cursor-pointer
-             bg-[#8FD0EF]"></span>
+             bg-[#8FD0EF] mentor-step-1"></span>
             <span className="text-gray-600 mt-1 dark:text-white">Mentors</span>
             <span className="font-medium my-1 text-[#8FD0EF]">{renderValue(breakdown.Mentor)}%</span> </div>
               </div>
@@ -333,7 +342,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
               </div>
               <div className="flex justify-between">
                 <span className="text-sm text-gray-600 dark:text-white">Marketing</span>
-                <span className="text-sm font-medium  tabular-nums text-red-500">-${user.marketing
+                <span className="text-sm font-medium  tabular-nums text-red-500">${user.marketing
                   ? user.marketing : "3600"}</span>
               </div>
               <div className="flex justify-between">

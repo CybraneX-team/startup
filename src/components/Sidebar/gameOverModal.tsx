@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import rocketImage from '../../rocket.png';
+// import rocketImage from '../../rocket.png';
 import { useUser } from '@/context/UserContext';
 import Image from 'next/image';
 import { AlertCircle, CreditCard, X } from 'lucide-react';
@@ -98,7 +98,7 @@ const GameOverModal = () => {
         <div className="bg-white dark:bg-[#1A232F] dark:border dark:border-blue-500 rounded-3xl p-6 sm:p-8 text-center w-full max-w-sm space-y-6 shadow-xl mx-4">
           {/* Image */}
           <Image
-            src={`${rocketImage.src}`}
+            src={`/rocket.png`}
             alt="Rocket crash"
             width={96}
             height={96}
@@ -139,7 +139,7 @@ const GameOverModal = () => {
               className="w-full flex flex-wrap items-center justify-center gap-2 py-3 px-2 bg-violet-600 hover:bg-violet-700 text-white font-bold rounded-xl text-sm sm:text-base text-center"
             >
               <span className="whitespace-nowrap">Resume From Where You Left</span>
-              <span className="whitespace-nowrap">(200 Credits)</span>
+              <span className="whitespace-nowrap">(2000 Credits)</span>
               <CreditCard size={18} />
             </button>
           </div>
@@ -155,7 +155,7 @@ const GameOverModal = () => {
               Are you sure?
             </h3>
             <p className="text-sm text-gray-600 dark:text-gray-300">
-              Resuming will cost <span className="font-bold text-violet-600 dark:text-violet-400">200 credits</span>.
+              Resuming will cost <span className="font-bold text-violet-600 dark:text-violet-400">2000 credits</span>.
             </p>
             <div className="flex justify-center gap-4 pt-2">
               <button

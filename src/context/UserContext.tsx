@@ -74,6 +74,7 @@ export interface UserData {
   businessDescription : string;
   credits : number;
   preventBug  : boolean;
+  hint? : string;
 }
 interface notificationMessagesType{
   message: string;
@@ -106,6 +107,8 @@ interface UserContextType {
   setHeaderDark : (arg: boolean) => void;
   loaderMessage: string;
   setLoaderMessage: (msg: string) => void;
+  elonStep : number;
+  setElonStep : (step: number) => void;
 }
 
 
@@ -123,6 +126,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         isPositive: true
       }
     ])
+    const [elonStep, setElonStep] = useState(0);
     const [turnAmount, setTurnAmount] = useState<string>("");
     const [modalOpen, setModalOpen] = useState<boolean>(false)
     const [userLoaded, setUserLoaded] = useState(false);
@@ -164,7 +168,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       }
     
       // Always subtract absolute value of contribution margin
-      const value = Math.floor(((-user.salaries) + (-user.rent)) -Math.floor(Math.abs(user.metrics.contributionMargin)));
+      const value = Math.floor(((-user.salaries) + (-user.rent)) + Math.floor(Math.abs(user.metrics.contributionMargin)));
       const sign = value < 0 ? '-' : '+';
       setTurnAmount(`${sign}${Math.abs(value)}`);
     }, [user]);
@@ -229,6 +233,8 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       setHeaderDark,
       loaderMessage,
       setLoaderMessage,
+      elonStep, 
+      setElonStep
       }}>
       {children}
     </UserContext.Provider>

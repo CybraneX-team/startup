@@ -1,6 +1,6 @@
 "use client";
 import dynamic from "next/dynamic";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import TaskGrid from "../CardDataStats";
 import { InfoIcon, ArrowRight  } from "lucide-react";
 import TooltipModal from "@/components/TooltipModal";
@@ -13,6 +13,13 @@ import { useRouter } from "next/navigation";
 import { Bounce, toast, ToastContainer } from "react-toastify";
 import "@/components/Dashboard/index.css";
 import GameOverModal from "../Sidebar/gameOverModal";
+import ElonAssistant from "@/components/Elon";
+
+import TypewriterText from "@/components/TypewriterText/TypewriterText";
+// import elonMusk from "@/app/elon.png";
+import Image from "next/image";
+import { motion } from "framer-motion";
+
 const MapOne = dynamic(() => import("@/components/Maps/MapOne"), {
   ssr: false,
 });
@@ -390,7 +397,10 @@ const ECommerce: React.FC = () => {
     setSelectedTaskIds,
     HeaderDark,
     userLoaded,
-    loaderMessage
+    loaderMessage,
+    elonStep,
+    setElonStep,
+    setLoaderMessage
   } = useUser();
   
   const router = useRouter();
@@ -436,6 +446,15 @@ const ECommerce: React.FC = () => {
     return () => window.removeEventListener('resize', checkScreenSize);
   }, []);
 
+
+// useEffect(() => {
+//   const timer = setTimeout(() => {
+//     setIsOpen(true);
+//     setCurrentStep(0);
+//   }, 1000); // Wait 1 second after mount
+
+//   return () => clearTimeout(timer);
+// }, [setCurrentStep, setIsOpen]);
   useEffect(() => {
     setSelectedTaskIds(
       (prev)=>{
@@ -448,9 +467,41 @@ const ECommerce: React.FC = () => {
     )
   }, [user,  setSelectedTaskIds])
   
+
+  useEffect(() => {
+   if (elonStep === 5) {
+     setShowMore(true)
+   }else{
+     setShowMore(false)
+   }
+  }, [elonStep])
+  
+
   const [confirmationAction, setConfirmationAction] = useState<null | 'skip' | 'buyout' | 'prevent'>(null);
 
- 
+  //  const { setIsOpen, setCurrentStep } = useTour();
+
+    const [chatModalOpen, setChatModalOpen] = useState(false);
+    const [isTyping, setIsTyping] = useState(false);
+
+    const [chatMessages, setChatMessages] = useState([
+      { sender: 'elon', text: "Hey there! I'm Elon, your AI Advisor 🤖. Ask me anything about your startup — metrics, hiring, bugs, you name it." }
+    ]);
+    const [userInput, setUserInput] = useState("");
+
+ useEffect(() => {
+  const scrollTarget = messagesEndRef.current;
+  if (scrollTarget) {
+    scrollTarget.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+}, [chatMessages, isTyping]);
+useEffect(() => {
+  const el = document.querySelector("textarea");
+  if (el) {
+    el.style.height = "auto";
+    el.style.height = `${el.scrollHeight}px`;
+  }
+}, [userInput]);
 
   async function handleBugPrevention() {
     const token = localStorage.getItem("userToken");
@@ -465,7 +516,7 @@ const ECommerce: React.FC = () => {
     });
   
     const data = await response.json();
-  
+    console.log("data", data)
     if (response.ok) {
       setUser(data);
       setUserState(data);
@@ -534,8 +585,12 @@ const ECommerce: React.FC = () => {
   const [gameOverModal, setGameOverModal] = useState(() => {
     return user?.finances !== undefined && user.finances < 0;
   });
+  const [hintModalOpen, setHintModalOpen] = useState(false);
+  const [hintContent, setHintContent] = useState("");
+
   const [hoveredStage, setHoveredStage] = useState<string | null>(null);
   const dollarMetrics = ['AOV', 'Cogs', 'CLTV', 'ARPU', 'CPA', 'CM'];
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const [isMobile, setIsMobile] = useState(false);
   async function makeTurn(turnAmount: string) {
     setloader(true);
@@ -703,21 +758,10 @@ const ECommerce: React.FC = () => {
     return value.toString().split(".")[1]?.length || 0;
   }
   
+
   return (
     <>
-      <ToastContainer
-        position="top-right"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick={false}
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="light"
-        transition={Bounce}
-      />
+    <ElonAssistant  onStepChange={setElonStep} />
       {loader && (
       <div className="fixed inset-0 z-[99999] flex flex-col items-center justify-center bg-black bg-opacity-50">
         <div className="flex gap-2 mb-4">
@@ -754,9 +798,11 @@ const ECommerce: React.FC = () => {
         <p>Congratulations! You &apos; ve reached the highest stage 🚀</p>
       )}
 
-<div className="my-2 flex gap-3 overflow-x-auto lg:w-auto lg:overflow-hidden 
-  dark:bg-[#101d28] bg-white border border-gray-200 lg:dark:bg-transparent
-  lg:border-0 dark:border-gray-700 rounded-xl p-5 lg:bg-transparent lg:p-0 ">
+<div className={`my-2 flex gap-3 overflow-x-auto  transition-all duration-300 rounded-xl
+    ${elonStep === 1 ? 'ring-1 ring-[#3C50E0] animate-pulse py-4  bg-yellow-100 dark:bg-yellow-900' : ''} 
+    lg:w-auto lg:overflow-hidden 
+    dark:bg-[#101d28] bg-white border border-gray-200 
+    lg:dark:bg-transparent lg:border-0 dark:border-gray-700 p-5 lg:bg-transparent lg:p-0`}>
   {stages.map((stage, index) => (
     <div
       key={index}
@@ -764,6 +810,7 @@ const ECommerce: React.FC = () => {
       onMouseEnter={() => setHoveredStage(stage)}
       onMouseLeave={() => setHoveredStage(null)}
       className={`min-w-[100px] max-w-[120px] cursor-pointer px-4 py-2 text-center rounded-lg border transition-all duration-200
+        ${elonStep ===1 ? "my-2 mx-0.2"  :  ""}
         ${
           user?.startupStage === stage
             ? "bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
@@ -791,15 +838,22 @@ const ECommerce: React.FC = () => {
 
       <h3 className="text-sm text-gray-500 dark:text-gray-400">Metrics</h3>
       <div 
-      className="my-2 rounded-lg lg:rounded-none grid grid-cols-3 lg:flex 
-      gap-5 lg:gap-3 overflow-x-scroll lg:overflow-x-hidden 
-      p-4 lg:p-0 lg:bg-transparent dark:lg:bg-transparent  h-auto">
+      className={`my-2 grid grid-cols-3 lg:flex 
+    gap-5 lg:gap-3 overflow-x-scroll lg:overflow-x-hidden
+    p-4 lg:p-0 
+    h-auto
+    ${elonStep === 2 
+      ? '  ring-1 ring-[#3C50E0] animate-pulse rounded-xl' 
+      : ''}
+  `}>
       {user && user.metrics && orderedMetrics.map((metric, index) => (
     <div
       key={index}
       onClick={(e) => handleMetricClick(getShortName(metric), e)}
-      className="flex min-w-max lg:min-w-[9%]  lg:mx-0  items-center justify-around rounded-xl border 
-      border-stroke bg-white px-2 py-3 dark:border-strokedark dark:bg-boxdark "
+      className={`flex min-w-max lg:min-w-[9%]  lg:mx-0  items-center justify-around rounded-xl border 
+      border-stroke bg-white px-2 py-3 dark:border-strokedark dark:bg-boxdark
+       ${elonStep === 2 ? "my-2 mx-0.2"  :  ""}
+       `}
     >
       <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
         {getShortName(metric)}
@@ -832,6 +886,18 @@ const ECommerce: React.FC = () => {
 
 
 </div>
+<div className="mt-4 mb-6 flex justify-end w-full">
+<button
+  onClick={() => setChatModalOpen(true)}
+  className="flex items-center gap-2 text-sm font-medium bg-yellow-300 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300 px-4 py-2 rounded-xl shadow-sm hover:bg-yellow-200 dark:hover:bg-yellow-800 transition duration-200 ease-in-out w-full sm:w-auto sm:min-w-[180px] justify-center"
+>
+  💡 Ask AI Advisor
+</button>
+
+
+
+</div>
+
       <SpotlightModal
         isOpen={modalInfo.isOpen}
         onClose={handleModalClose}
@@ -840,11 +906,13 @@ const ECommerce: React.FC = () => {
         anchorEl={modalInfo.anchorEl}
         selectedMetric={selectedMetric}
       />
-     <div className="mt-4 w-full relative items-center lg:static pb-[120px] md:mt-4 2xl:mt-7.5">
+     <div className={`mt-4 w-full relative items-center 
+     ${elonStep === 4 ? "ring-1 ring-blue-600 p-4 rounded-2xl animate-pulse" : ''}
+      lg:static pb-[120px] md:mt-4 2xl:mt-7.5`}>
       <TaskGrid />
     </div>
     <div
-  className={`fixed bottom-0 right-0 z-[9999] w-full lg:w-[calc(100%-300px)] lg:ml-[250px] 
+  className={`fixed bottom-0 right-0 z-[999] w-full lg:w-[calc(100%-300px)] lg:ml-[250px] 
     px-4 py-3 bg-white dark:bg-boxdark border-t border-gray-200 dark:border-gray-700`}
 >
   {/* MOBILE & TABLET: Up to md screens */}
@@ -906,14 +974,23 @@ const ECommerce: React.FC = () => {
         <div className="flex justify-between text-sm">
           <div>
             <p>Bugs</p>
-            <div className="flex items-center gap-2">
+            <div className={`flex items-center 
+               ${elonStep === 6 ? "ring-1 ring-blue-600 p-4 rounded-2xl animate-pulse" : ''}
+              gap-2`}>
               <span className="font-semibold">{user?.bugPercentage}%</span>
-              <button
-                onClick={() => setShowSkipBugModal(true)}
-                className="text-xs bg-blue-100 dark:bg-blue-900 px-3 py-1 rounded-full text-blue-800 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-800"
-              >
-                ⚙️ Manage Bug
-              </button>
+          <button
+            onClick={() => setShowSkipBugModal(true)}
+            className={`
+              text-xs px-3 py-1 rounded-full 
+              bg-blue-100 text-blue-800 hover:bg-blue-200 
+              dark:bg-blue-900 dark:text-blue-300 dark:hover:bg-blue-800
+
+              ${elonStep === 5 ? "ring-2 ring-yellow-400 animate-pulse bg-yellow-100 dark:bg-yellow-800" : ""}
+            `}
+          >
+            ⚙️ Manage Bug
+          </button>
+
             </div>
           </div>
           <div>
@@ -927,7 +1004,9 @@ const ECommerce: React.FC = () => {
     {/* Always Visible Turn Button */}
     <button
       onClick={() => makeTurn(turnAmount)}
-      className="w-full flex flex-col items-center rounded-xl bg-[#4fc387] px-4 py-3"
+      className={`w-full flex flex-col items-center rounded-xl bg-[#4fc387] px-4 py-3
+         ${elonStep === 7 ? 'ring-2 ring-yellow-400 animate-pulse dark:ring-yellow-500' : ''}
+        `}
     >
       <span className="font-semibold text-white">Make turn</span>
       <div className="flex justify-between w-full">
@@ -986,13 +1065,20 @@ const ECommerce: React.FC = () => {
         <div className="text-sm">
           <p>Bugs</p>
           <div className="flex items-center gap-2">
-            <span className="font-semibold">{user?.bugPercentage}%</span>
+            <span className="font-semibold joyride-step-4">{user?.bugPercentage}%</span>
             <button
-              onClick={() => setShowSkipBugModal(true)}
-              className="text-xs bg-blue-100 dark:bg-blue-900 px-3 py-1 rounded-full text-blue-800 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-800"
-            >
-              ⚙️ Manage Bug
-            </button>
+  onClick={() => setShowSkipBugModal(true)}
+  className={`
+    text-xs px-3 py-1 rounded-full 
+    bg-blue-100 text-blue-800 hover:bg-blue-200 
+    dark:bg-blue-900 dark:text-blue-300 dark:hover:bg-blue-800
+
+    ${elonStep === 5 ? "ring-2 ring-yellow-400 animate-pulse bg-yellow-100 dark:bg-yellow-800" : ""}
+  `}
+>
+  ⚙️ Manage Bug
+</button>
+
           </div>
         </div>
 
@@ -1003,16 +1089,19 @@ const ECommerce: React.FC = () => {
       </div>
 
       {/* Make Turn Button */}
-      <button
-        onClick={() => makeTurn(turnAmount)}
-        className="w-full sm:w-72 rounded-xl bg-[#4fc387] px-6 py-3 flex flex-col items-center justify-center space-y-1"
-      >
-        <span className="font-semibold text-white text-lg">Make turn</span>
-        <div className="flex justify-between w-full px-2">
-          <span className="font-medium text-white">Income</span>
-          <span className="font-bold text-white">${turnAmount}</span>
-        </div>
-      </button>
+   <button
+  onClick={() => makeTurn(turnAmount)}
+  className={`w-full sm:w-72 rounded-xl bg-[#4fc387] px-6 py-3 flex flex-col items-center justify-center space-y-1
+    ${elonStep === 7 ? 'ring-2 ring-yellow-400 animate-pulse dark:ring-yellow-500' : ''}
+  `}
+>
+  <span className="font-semibold text-white text-lg">Make turn</span>
+  <div className="flex justify-between w-full px-2">
+    <span className="font-medium text-white">Income</span>
+    <span className="font-bold text-white">${turnAmount}</span>
+  </div>
+</button>
+
     </div>
   </div>
 </div>
@@ -1083,7 +1172,7 @@ const ECommerce: React.FC = () => {
           🛠 Buyout Bug
         </button>
         <p className="text-xs text-gray-500 dark:text-gray-400 -mt-2 mb-2">
-          Permanently removes one active bug without a turn. Best for critical issues. Cost: 60 credits.
+          Permanently removes one active bug without a turn. Best for critical issues. Cost: 600 credits.
         </p>
 
         <div className="relative border-t pt-2 border-gray-300 dark:border-gray-600">
@@ -1097,7 +1186,7 @@ const ECommerce: React.FC = () => {
           🛡️ Bug Prevention Insurance
         </button>
         <p className="text-xs text-gray-500 dark:text-gray-400 -mt-2">
-          Prevents bugs from triggering this turn. Usable once every 3 turns. Cost: 25 credits.
+          Prevents bugs from triggering this turn. Usable once every 3 turns. Cost: 250 credits.
         </p>
 
         <button
@@ -1112,17 +1201,184 @@ const ECommerce: React.FC = () => {
 )}
 
 
+{chatModalOpen && (
+  <div className="fixed m-5 lg:m-0 inset-0 z-[99999] flex items-center justify-center bg-black/40 backdrop-blur-sm">
+    <motion.div
+      initial={{ opacity: 0, scale: 0.95, y: 30 }}
+      animate={{ opacity: 1, scale: 1, y: 0 }}
+      exit={{ opacity: 0, scale: 0.95, y: 30 }}
+      transition={{ duration: 0.3 }}
+      className="w-full max-w-lg h-[90vh] max-h-[650px] flex flex-col p-5 rounded-3xl shadow-2xl bg-white dark:bg-[#1b1f23]/70 dark:backdrop-blur-xl border border-gray-300 dark:border-gray-700"
+    >
+      {/* Header */}
+      <div className="flex justify-between items-center mb-3">
+        <h2 className="text-xl font-bold text-gray-900 dark:text-white">AI Advisor</h2>
+        <button
+          onClick={() => {
+            setChatModalOpen(false);
+            setChatMessages([
+              {
+                sender: 'elon',
+                text: "Hey there! I'm Elon, your AI Advisor 🤖. Ask me anything about your startup — metrics, hiring, bugs, you name it.",
+              },
+            ]);
+          }}
+          className="text-gray-600 hover:text-red-500 dark:text-gray-400 dark:hover:text-red-400 text-lg"
+        >
+          ✕
+        </button>
+      </div>
 
+      {/* Chat Scrollable Area */}
+      <div
+        className="flex-1 overflow-y-auto space-y-4 pr-1 custom-scrollbar"
+        ref={(el) => {
+          if (el && !isTyping) {
+            const lastMessage = el.lastElementChild;
+            if (lastMessage) {
+              lastMessage.scrollIntoView({ behavior: "smooth", block: "start" });
+            }
+          }
+        }}
+      >
+        {chatMessages.map((msg, idx) => {
+          const isUser = msg.sender === 'user';
+          return (
+            <motion.div
+              key={idx}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: idx * 0.04 }}
+              className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}
+            >
+              <div className={`flex items-start gap-3 max-w-[85%] ${isUser ? 'flex-row-reverse' : ''}`}>
+                {isUser ? (
+                  <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-sm">
+                    {user?.username?.[0]?.toUpperCase() || "U"}
+                  </div>
+                ) : (
+                  <Image
+                    src="/elon.png"
+                    alt="AI"
+                    width={32}
+                    height={32}
+                    className="rounded-full object-cover flex-shrink-0"
+                  />
+                )}
+                <div className={`whitespace-pre-wrap break-words px-4 py-3 rounded-2xl text-sm shadow-md ${
+                  isUser
+                    ? "bg-blue-600 text-white"
+                    : "bg-gray-100 dark:bg-[#2d3746]/70 text-gray-900 dark:text-white"
+                }`}>
+                  {idx === 0 && !isUser
+                    ? <TypewriterText text={msg.text} speed={20} />
+                    : <p>{msg.text}</p>}
+                </div>
+              </div>
+            </motion.div>
+          );
+        })}
 
-{/* ⚡ Floating Boost Button */}
-{/* <button
-  onClick={() => setShowBoostModal(true)}
-  className="fixed bottom-4 left-4 z-[9999] bg-purple-600 hover:bg-purple-700 text-white px-4 py-3 rounded-full shadow-lg"
->
-  ⚡
-</button> */}
+        {isTyping && (
+          <div className="flex items-start gap-2">
+            <Image src="/elon.png" alt="AI" width={32} height={32} className="rounded-full" />
+            <div className="bg-gray-100 dark:bg-[#2c3440]/80 px-4 py-2 rounded-2xl text-sm shadow-md">
+              <div className="flex space-x-1 animate-pulse">
+                <span className="w-2 h-2 bg-gray-500 dark:bg-gray-300 rounded-full" />
+                <span className="w-2 h-2 bg-gray-500 dark:bg-gray-300 rounded-full" />
+                <span className="w-2 h-2 bg-gray-500 dark:bg-gray-300 rounded-full" />
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
 
-{/* ⚡ Boost Modal */}
+      {/* Suggestions */}
+      <div className="mt-2 mb-2 bg-gray-100 dark:bg-[#1e2630]/60 p-2 rounded-xl shadow-inner max-h-[72px] overflow-y-auto">
+        <p className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Need help? Try one of these:</p>
+        <div className="flex flex-wrap gap-2">
+          {[
+            "How can I increase my user acquisition quickly?",
+            "What metrics should I prioritize at the FFF stage?",
+            "How do I reduce the bug percentage in my startup?",
+            "Should I hire a developer or a salesperson right now?",
+            "What tasks give the best ROI in the 'pre-seed' stage?",
+          ].map((prompt, idx) => (
+            <button
+              key={idx}
+              onClick={() => setUserInput(prompt)}
+              className="text-xs sm:text-sm px-3 py-1 bg-white dark:bg-[#3c4658] hover:bg-gray-200 dark:hover:bg-[#485267] text-gray-900 dark:text-white rounded-full shadow-sm transition-all"
+            >
+              {prompt}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Input Field */}
+      <form
+        onSubmit={async (e) => {
+          e.preventDefault();
+          if (!userInput.trim()) return;
+          const question = userInput.trim();
+          setChatMessages(prev => [...prev, { sender: "user", text: question }]);
+          setUserInput("");
+          setIsTyping(true);
+
+          try {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/ai-hint`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                token: localStorage.getItem("userToken") || "",
+              },
+              body: JSON.stringify({ gameId: user?.gameId, promptFromUser: question }),
+            });
+
+            const data = await res.json();
+            setUser(data);
+            setChatMessages(prev => [
+              ...prev,
+              {
+                sender: "elon",
+                text: res.ok && data?.hint
+                  ? data?.hint
+                  : "Hmm... I'm not sure about that one right now.",
+              },
+            ]);
+          } catch {
+            setChatMessages(prev => [
+              ...prev,
+              { sender: "elon", text: "Something went wrong. Try again later." },
+            ]);
+          } finally {
+            setIsTyping(false);
+          }
+        }}
+        className="mt-2 flex items-end gap-2"
+      >
+        <textarea
+          rows={1}
+          value={userInput}
+          onChange={(e) => setUserInput(e.target.value)}
+          placeholder="Ask your startup question..."
+          className="flex-grow resize-none overflow-hidden px-4 py-2 text-sm sm:text-base rounded-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-[#2c3440]/80 text-gray-900 dark:text-white shadow-sm placeholder:text-gray-500 dark:placeholder:text-gray-400"
+          onInput={(e) => {
+            e.currentTarget.style.height = "auto";
+            e.currentTarget.style.height = `${e.currentTarget.scrollHeight}px`;
+          }}
+        />
+        <button
+          type="submit"
+          className="bg-blue-600 hover:bg-blue-700 text-white text-sm sm:text-base px-4 py-2 rounded-full"
+        >
+          Send
+        </button>
+      </form>
+    </motion.div>
+  </div>
+)}
+
 {showBoostModal && (
   <div className="fixed inset-0 z-[99999] bg-black bg-opacity-50 flex items-center justify-center">
     <div className="bg-white dark:bg-boxdark rounded-xl w-full max-w-md p-6 shadow-lg">
