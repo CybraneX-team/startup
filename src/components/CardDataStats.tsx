@@ -648,7 +648,7 @@ const makeBrainstrom = async (turnAmount: string) => {
     }
 
     const makeReq = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/brainstrom`,
+      `${process.env.NEXT_PUBLIC_API_URL}/brainstrom`,
       {
         method: "POST",
         credentials: "include",

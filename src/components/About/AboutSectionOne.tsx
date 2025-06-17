@@ -9,7 +9,7 @@ const checkIcon = (
 
 const AboutSectionOne = () => {
   const List = ({ text }: { text: string }) => (
-    <p className="text-body-color mb-5 flex items-center  text-lg font-medium">
+    <p className="text-body-color mb-5 flex items-center text-lg font-medium">
       <span className="mr-4 flex h-[30px] w-[30px] items-center justify-center rounded-md bg-primary bg-opacity-10 text-primary">
         {checkIcon}
       </span>
@@ -17,57 +17,68 @@ const AboutSectionOne = () => {
     </p>
   );
 
+  const startupStages = [
+    "FFF",
+    "Pre-Seed",
+    "Angel Investors",
+    "Seed",
+    "Series A",
+    "Series B",
+    "Series C",
+    "Series D ",
+    "Pre-IPO",
+    "IPO",
+    "Post-IPO ",
+  ];
+
   return (
     <section
       id="about"
-      className=" w-full bg-slate-100 px-20 pb-20 pt-16 dark:bg-[#0f1523] md:px-28 lg:px-32 2xl:px-48"
+      className="2xl:px-38 w-full bg-slate-100 px-3 pb-20 pt-16 dark:bg-[#0f1523] md:px-28 lg:px-32"
     >
       <div className="container">
         <div className="border-body-color/[.15] border-b pb-16 dark:border-white/[.15] md:pb-20 lg:pb-28">
           <div className="-mx-4 flex flex-wrap items-center">
             <div className="w-full px-4 lg:w-1/2">
               <SectionTitle
-                title="Crafted for Startup, SaaS and Business Sites."
-                paragraph="The main ‘thrust’ is to focus on educating attendees on how to best protect highly vulnerable business applications with interactive panel discussions and roundtables."
+                title="Make Impactful Decisions, Backed by Real Metrics"
+                paragraph="Track your progress through every startup stage — from initial idea to IPO and beyond — with actionable metrics guiding each decision."
                 mb="44px"
               />
 
               <div
-                className="wow fadeInUp mb-12 max-w-[570px] lg:mb-0"
+                className="wow fadeInUp mb-0 max-w-[570px] md:mb-12 lg:mb-0"
                 data-wow-delay=".15s"
               >
                 <div className="mx-[-12px] flex flex-wrap">
-                  <div className="w-full px-3 sm:w-1/2 lg:w-full xl:w-1/2">
-                    <List text="Premium quality" />
-                    <List text="Tailwind CSS" />
-                    <List text="Use for lifetime" />
-                  </div>
-
-                  <div className="w-full px-3 sm:w-1/2 lg:w-full xl:w-1/2">
-                    <List text="Next.js" />
-                    <List text="Rich documentation" />
-                    <List text="Developer friendly" />
-                  </div>
+                  {startupStages.map((stage, index) => (
+                    <div
+                      key={index}
+                      className="w-1/2 px-3 sm:w-1/2 md:w-1/2 lg:w-full xl:w-1/2"
+                    >
+                      <List text={stage} />
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
 
             <div className="w-full px-4 lg:w-1/2">
               <div
-                className="wow fadeInUp relative mx-auto aspect-[25/24] max-w-[500px] lg:mr-0"
+                className="wow fadeInUp relative h-[500px] w-full lg:h-[600px]"
                 data-wow-delay=".2s"
               >
                 <Image
-                  src="/images/cards/cards-01.png"
+                  src="/images/metrics.png"
                   alt="about-image"
                   fill
-                  className="drop-shadow-three mx-auto max-w-full dark:hidden dark:drop-shadow-none lg:mr-0"
+                  className="object-cover object-center dark:hidden"
                 />
                 <Image
-                  src="/images/cards/cards-01.png"
+                  src="/images/metrics.png"
                   alt="about-image"
                   fill
-                  className="drop-shadow-three mx-auto hidden max-w-full dark:block dark:drop-shadow-none lg:mr-0"
+                  className="hidden object-cover object-center dark:block"
                 />
               </div>
             </div>

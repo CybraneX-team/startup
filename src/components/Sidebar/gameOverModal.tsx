@@ -20,7 +20,7 @@ const GameOverModal = () => {
   const resetTheGame = async () => {
     setloader(true);
     const makeReq = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/resetGame`,
+      `${process.env.NEXT_PUBLIC_API_URL}/resetGame`,
       {
         method: 'POST',
         credentials: 'include',
@@ -44,7 +44,7 @@ const GameOverModal = () => {
     setloader(true);
     setShowConfirm(false);
     const makeReq = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/resumeGame`,
+      `${process.env.NEXT_PUBLIC_API_URL}/resumeGame`,
       {
         method: 'POST',
         credentials: 'include',
@@ -71,7 +71,7 @@ const GameOverModal = () => {
    async function handleStartOver() {
       const token = localStorage.getItem("userToken");
     
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/credits/startover`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/credits/startover`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

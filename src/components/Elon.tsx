@@ -134,7 +134,7 @@ const ElonAssistant = ({ onStepChange }: ElonAssistantProps) => {
   useEffect(() => {
     if (waitingForClick || hasSkippedRef.current) return;
 
-    playAudio(step + 1);
+    playAudio(step +1 );
 
     if (step === tutorialSteps.length - 1) {
       const timer = setTimeout(() => {

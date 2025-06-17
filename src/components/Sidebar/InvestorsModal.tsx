@@ -31,7 +31,7 @@ const InvestorsModal: React.FC<InvestorsModalProps> = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
   const signInvestment = async (e: any) => {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/makeInvestment`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/makeInvestment`, {
       method: "POST",
       credentials: "include",
       headers: {
@@ -53,7 +53,7 @@ const InvestorsModal: React.FC<InvestorsModalProps> = ({ isOpen, onClose }) => {
   };
 
   const buyoutInvestment = async (e: any) => {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/buyoutInvestor`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/buyoutInvestor`, {
       method: "POST",
       credentials: "include",
       headers: {

@@ -69,7 +69,7 @@ const SubscriptionPlansPage = () => {
           subscription_id: subscriptionId,
           customerId : customerId, 
           handler: async (response: any) => {
-            const verifyRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/razorpay/verify-subscription`, {
+            const verifyRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/razorpay/verify-subscription`, {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
@@ -98,7 +98,7 @@ const SubscriptionPlansPage = () => {
     const handleSubscribe = async (planId: string) => {
         const token = localStorage.getItem("userToken");
       
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/razorpay/create-subscription`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/razorpay/create-subscription`, {
           method: "POST",
           credentials: "include",
           headers: {

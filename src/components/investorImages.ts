@@ -13,16 +13,16 @@
 
 export const getInvestorImage = (name: string)  => {
   const images: { [key: string]: string } = {
-    "Accel Partners": "/images/accelPartners.png",
-    "Benjamin Horowitz": "/images/benjaminHorowitz.png",
-    "Elon Musk": "/images/elonMusk.png",
-    "Erlich Bachman": "/images/erlichBachman.png",
-    "GGV Capital": "/images/ggvCAPITAL.png",
-    "Index Ventures": "/images/indexVentures.png",
-    "Marc Andreessen": "/images/marcAndreessen.png",
-    "Peter Andreas Thiel": "/images/PeterAndreas.png",
-    "Softbank": "/images/softbank.png",
-    "Y combinator": "/images/YCombinator.png",
+    "Accel Partners": "/investorsimages/accelPartners.png",
+    "Benjamin Horowitz": "/investorsimages/benjaminHorowitz.png",
+    "Elon Musk": "/investorsimages/elonMusk.png",
+    "Erlich Bachman": "/investorsimages/erlichBachman.png",
+    "GGV Capital": "/investorsimages/ggvCAPITAL.png",
+    "Index Ventures": "/investorsimages/indexVentures.png",
+    "Marc Andreessen": "/investorsimages/marcAndreessen.png",
+    "Peter Andreas Thiel": "/investorsimages/PeterAndreas.png",
+    "Softbank": "/investorsimages/softbank.png",
+    "Y combinator": "/investorsimages/YCombinator.png",
   };
 
   return images[name] || null;

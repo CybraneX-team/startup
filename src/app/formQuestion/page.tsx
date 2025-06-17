@@ -84,7 +84,7 @@ export default function StartupBasicsForm() {
   
     try {
       const token = localStorage.getItem("userToken");
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/taskCustomization`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/taskCustomization`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -159,7 +159,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
     setloader(true)
     
     const makeReq = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/resetGame`,
+      `${process.env.NEXT_PUBLIC_API_URL}/resetGame`,
       {
         method : "POST",
         credentials: "include",
@@ -183,7 +183,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
   
   async function startNewSimulation(){
     try {
-      const makeReq = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/create-new-game`, {
+      const makeReq = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/create-new-game`, {
         method: "POST",
         credentials: "include",
         headers: {

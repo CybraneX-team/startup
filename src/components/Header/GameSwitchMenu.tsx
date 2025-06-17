@@ -27,7 +27,7 @@ const GameSwitchMenu = () => {
   async function getGameFromId(gameId: string) {
     try {
       setloader(true);
-      const makeReq = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/switch-game/${gameId}`, {
+      const makeReq = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/switch-game/${gameId}`, {
         credentials: "include",
         headers: {
           "Content-Type": "application/json",
@@ -66,7 +66,7 @@ const GameSwitchMenu = () => {
     }
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/update-game-name`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/update-game-name`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

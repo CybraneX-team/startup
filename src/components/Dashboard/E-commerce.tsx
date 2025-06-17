@@ -506,7 +506,7 @@ useEffect(() => {
   async function handleBugPrevention() {
     const token = localStorage.getItem("userToken");
   
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/credits/bugPrevention`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/credits/bugPrevention`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -529,7 +529,7 @@ useEffect(() => {
   async function handleBuyoutBug() {
     const token = localStorage.getItem("userToken");
   
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/credits/buyoutBug`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/credits/buyoutBug`, {
       method: "POST",
       credentials : "include",
       headers: {
@@ -623,7 +623,7 @@ useEffect(() => {
       preventBug : user?.preventBug
     }
 
-    const makeReq = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/turn`, {
+    const makeReq = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/turn`, {
       method: "POST",
       credentials: "include",
       headers: {
@@ -1326,7 +1326,7 @@ useEffect(() => {
           setIsTyping(true);
 
           try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/ai-hint`, {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/ai-hint`, {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",

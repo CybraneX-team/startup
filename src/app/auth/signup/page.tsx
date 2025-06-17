@@ -20,45 +20,45 @@ const SignUp: React.FC = () => {
   const router = useRouter();
   const { setUser } = useUser();
   const { data: session, status } = useSession();
-  useEffect(() => {
-      const syncUser = async () => {
-        try {
-          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/google-login`, {
-            method: "POST",
-            credentials: "include",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              email: session?.user?.email,
-              username: session?.user?.name,
-            }),
-          });
+  // useEffect(() => {
+  //     const syncUser = async () => {
+  //       try {
+  //         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/google-login`, {
+  //           method: "POST",
+  //           credentials: "include",
+  //           headers: {
+  //             "Content-Type": "application/json",
+  //           },
+  //           body: JSON.stringify({
+  //             email: session?.user?.email,
+  //             username: session?.user?.name,
+  //           }),
+  //         });
     
-          if (!response.ok) {
-            const error = await response.json();
-            console.error("Google login failed:", error.message);
-            return;
-          }
+  //         if (!response.ok) {
+  //           const error = await response.json();
+  //           console.error("Google login failed:", error.message);
+  //           return;
+  //         }
     
-          const data = await response.json();
-          localStorage.setItem("userToken", data.token);
-          localStorage.setItem("userData", JSON.stringify(data));        
-          setUser(data);
-          router.push("/formQuestion");
-        } catch (err) {
-          console.error("Sync error:", err);
-        }
-      };
+  //         const data = await response.json();
+  //         localStorage.setItem("userToken", data.token);
+  //         localStorage.setItem("userData", JSON.stringify(data));        
+  //         setUser(data);
+  //         router.push("/formQuestion");
+  //       } catch (err) {
+  //         console.error("Sync error:", err);
+  //       }
+  //     };
     
-      if (
-        status === "authenticated" &&
-        session?.user?.email &&
-        !localStorage.getItem("userToken") // ✅ avoid repeated sync
-      ) {
-        syncUser();
-      }
-    }, [session, status, router, setUser]);
+  //     if (
+  //       status === "authenticated" &&
+  //       session?.user?.email &&
+  //       !localStorage.getItem("userToken") // ✅ avoid repeated sync
+  //     ) {
+  //       syncUser();
+  //     }
+  //   }, [session, status, router, setUser]);
   const [usercreds, setusercreds] = useState({
     username: "",
     email: "",
@@ -115,7 +115,7 @@ const SignUp: React.FC = () => {
     if (!validateInputs()) return;
 
     const makeReq = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/auth/register`,
+      `${process.env.NEXT_PUBLIC_API_URL}/auth/register`,
       {
         method: "POST",
         credentials: "include",
