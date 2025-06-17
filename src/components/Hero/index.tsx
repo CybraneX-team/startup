@@ -15,26 +15,31 @@ const Hero = () => {
                 data-wow-delay=".2s"
               >
                 <h1 className="mb-5 text-3xl font-bold leading-tight text-black dark:text-white sm:text-4xl sm:leading-tight md:text-5xl md:leading-tight">
-                  Free and Open-Source Next.js Template for Startup & SaaS
+                  Hands on Experience with your Business Before ever launching
+                  your company!
                 </h1>
                 <p className="dark:text-body-color-dark text-body-color mb-12 text-base !leading-relaxed sm:text-lg md:text-xl">
-                  Startup is free Next.js template for startups and SaaS
-                  business websites comes with all the essential pages,
-                  components, and sections you need to launch a complete
-                  business website, built-with Next 13.x and Tailwind CSS.
+                  Strategise, Raise Capital, Hire and Progress your business
+                  with Startup Simulator. A hands-on, interactive platform where
+                  you don’t just learn how startups grow — you build one through
+                  smart decisions, real challenges, and strategic choices. It's
+                  not just a game. It’s your first startup experience —
+                  simulated, safe, and intensely real. <br />
+                  Turn Ambition into Strategy. Strategy into
+                  Simulation.Simulation into Reality
                 </p>
                 <div className="flex flex-col items-center justify-center space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
                   <Link
-                    href="https://nextjstemplates.com/templates/saas-starter-startup"
+                    href="/auth/signup"
                     className="rounded-sm bg-primary px-8 py-4 text-base font-semibold text-white duration-300 ease-in-out hover:bg-primary/80"
                   >
-                    🔥 Get Pro
+                    🔥 Start Your Journey
                   </Link>
                   <Link
-                    href="https://github.com/NextJSTemplates/startup-nextjs"
+                    href="#"
                     className="inline-block rounded-sm bg-black px-8 py-4 text-base font-semibold text-white duration-300 ease-in-out hover:bg-black/90 dark:bg-white/10 dark:text-white dark:hover:bg-white/5"
                   >
-                    Star on GitHub
+                    Play a Demo
                   </Link>
                 </div>
               </div>

@@ -11,8 +11,8 @@ const Features = () => {
       >
         <div className="min-w-screen container flex flex-col items-center justify-center">
           <SectionTitle
-            title="Main Features"
-            paragraph="There are many variations of passages of Lorem Ipsum available but the majority have suffered alteration in some form."
+            title="Train to be a Founder"
+            paragraph="The founder’s playbook brought to life"
             center
           />
 
