@@ -20,10 +20,10 @@ const Hero = () => {
                 </h1>
                 <p className="dark:text-body-color-dark text-body-color mb-12 text-base !leading-relaxed sm:text-lg md:text-xl">
                   Strategise, Raise Capital, Hire and Progress your business
-                  with Startup Simulator. A hands-on, interactive platform where
-                  you don’t just learn how startups grow — you build one through
-                  smart decisions, real challenges, and strategic choices. It's
-                  not just a game. It’s your first startup experience —
+                  with Unicorn Simulator. A hands-on, interactive platform where
+                  you don&lsquo;t just learn how startups grow — you build one through
+                  smart decisions, real challenges, and strategic choices. It&lsquo;s
+                  not just a game. It&lsquo;s your first startup experience —
                   simulated, safe, and intensely real. <br />
                   Turn Ambition into Strategy. Strategy into
                   Simulation.Simulation into Reality
@@ -35,12 +35,7 @@ const Hero = () => {
                   >
                     🔥 Start Your Journey
                   </Link>
-                  <Link
-                    href="#"
-                    className="inline-block rounded-sm bg-black px-8 py-4 text-base font-semibold text-white duration-300 ease-in-out hover:bg-black/90 dark:bg-white/10 dark:text-white dark:hover:bg-white/5"
-                  >
-                    Play a Demo
-                  </Link>
+                  
                 </div>
               </div>
             </div>

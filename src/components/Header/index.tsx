@@ -81,7 +81,7 @@ const Header = (props: {
   >
     <Coins className="w-4 h-4 text-white animate-bounce-slow group-hover:animate-none" />
     <span className="px-3 py-1 rounded-full text-sm font-semibold tracking-wide">
-      Credits: {user?.credits}
+      Venture Coins: {user?.credits}
     </span>
   </div>
 )}

@@ -1,11 +1,57 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import SectionTitle from "../common/Common/SectionTitle";
 import OfferList from "./OfferList";
 import PricingBox from "./PricingBox";
+import { toast } from "react-toastify";
+import { useRouter } from 'next/navigation';
+
 
 const Pricing = () => {
   const [isMonthly, setIsMonthly] = useState(true);
+  const router = useRouter();
+  
+   useEffect(() => {
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.async = true;
+    document.body.appendChild(script);
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []);
+
+      const openRazorpayCheckout = (subscriptionId: string, customerId: string) => {
+          const options = {
+            key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID!,
+            name: "Unicorn Simulator",
+            description: "Subscription for game access",
+            subscription_id: subscriptionId,
+            customerId : customerId, 
+            handler: async (response: any) => {
+              const verifyRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/razorpay/verify-subscription`, {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ razorpay_subscription_id: subscriptionId }),
+              });
+        
+              if (verifyRes.ok) {
+                toast.success("Subscription activated 🚀");
+                router.push("/");
+              } else {
+                toast.error("Verification failed");
+              }
+            },
+            theme: {
+              color: "#4fc387",
+            },
+          };
+        
+          const rzp = new (window as any).Razorpay(options);
+          rzp.open();
+        };
 
   return (
     <section id="pricing" className="relative z-10 py-16 md:py-20 lg:py-28">
@@ -17,88 +63,45 @@ const Pricing = () => {
           width="665px"
         />
 
-        <div className="w-full">
-          <div
-            className="wow fadeInUp mb-8 flex justify-center md:mb-12 lg:mb-16"
-            data-wow-delay=".1s"
-          >
-            <span
-              onClick={() => setIsMonthly(true)}
-              className={`${
-                isMonthly
-                  ? "pointer-events-none text-primary"
-                  : "text-dark dark:text-white"
-              } mr-4 cursor-pointer text-base font-semibold`}
-            >
-              Monthly
-            </span>
-            <div
-              onClick={() => setIsMonthly(!isMonthly)}
-              className="flex cursor-pointer items-center"
-            >
-              <div className="relative">
-                <div className="h-5 w-14 rounded-full bg-[#1D2144] shadow-inner"></div>
-                <div
-                  className={`${
-                    isMonthly ? "" : "translate-x-full"
-                  } absolute left-0 top-[-4px] flex h-7 w-7 items-center justify-center rounded-full bg-primary shadow-switch-1 transition`}
-                >
-                  <span className="active h-4 w-4 rounded-full bg-white"></span>
-                </div>
-              </div>
-            </div>
-            <span
-              onClick={() => setIsMonthly(false)}
-              className={`${
-                isMonthly
-                  ? "text-dark dark:text-white"
-                  : "pointer-events-none text-primary"
-              } ml-4 cursor-pointer text-base font-semibold`}
-            >
-              Yearly
-            </span>
-          </div>
-        </div>
+      
 
         <div className="grid grid-cols-1 gap-x-8 gap-y-10 md:grid-cols-2 lg:grid-cols-3">
           <PricingBox
-            packageName="Lite"
-            price={isMonthly ? "40" : "120"}
+            packageName="Starter Plan"
+            price={isMonthly ? "₹5,000" : "120"}
             duration={isMonthly ? "mo" : "yr"}
-            subtitle="Lorem ipsum dolor sit amet adiscing elit Mauris egestas enim."
+            subtitle="Billed Monthly"
+            razorpayFunction={openRazorpayCheckout}
+            planId="1_month"
           >
-            <OfferList text="All UI Components" status="active" />
-            <OfferList text="Use with Unlimited Projects" status="active" />
-            <OfferList text="Commercial Use" status="active" />
-            <OfferList text="Email Support" status="active" />
-            <OfferList text="Lifetime Access" status="inactive" />
-            <OfferList text="Free Lifetime Updates" status="inactive" />
+            <OfferList text="Access to all simulator features" status="active" />
+            <OfferList text="1 Month runway" status="active" />
+            <OfferList text="Monthly renewal flexibility" status="active" />
+          </PricingBox>
+
+          <PricingBox
+            packageName="Growth Plan"
+            price={isMonthly ? "₹10,000" : "789"}
+            duration={isMonthly ? "mo" : "yr"}
+            subtitle="Billed Every 6 Months"
+            razorpayFunction={openRazorpayCheckout}
+            planId="6_months"
+          >
+            <OfferList text="Access to all simulator features" status="active" />
+            <OfferList text="6 Months runway" status="active" />
+            <OfferList text="Better value vs monthly" status="active" />
           </PricingBox>
           <PricingBox
-            packageName="Basic"
-            price={isMonthly ? "399" : "789"}
+            packageName="Founder Pro"
+            price={isMonthly ? "₹15,000" : "999"}
             duration={isMonthly ? "mo" : "yr"}
-            subtitle="Lorem ipsum dolor sit amet adiscing elit Mauris egestas enim."
+            subtitle="Billed Annually"
+            razorpayFunction={openRazorpayCheckout}
+            planId="12_months"
           >
-            <OfferList text="All UI Components" status="active" />
-            <OfferList text="Use with Unlimited Projects" status="active" />
-            <OfferList text="Commercial Use" status="active" />
-            <OfferList text="Email Support" status="active" />
-            <OfferList text="Lifetime Access" status="active" />
-            <OfferList text="Free Lifetime Updates" status="inactive" />
-          </PricingBox>
-          <PricingBox
-            packageName="Plus"
-            price={isMonthly ? "589" : "999"}
-            duration={isMonthly ? "mo" : "yr"}
-            subtitle="Lorem ipsum dolor sit amet adiscing elit Mauris egestas enim."
-          >
-            <OfferList text="All UI Components" status="active" />
-            <OfferList text="Use with Unlimited Projects" status="active" />
-            <OfferList text="Commercial Use" status="active" />
-            <OfferList text="Email Support" status="active" />
-            <OfferList text="Lifetime Access" status="active" />
-            <OfferList text="Free Lifetime Updates" status="active" />
+            <OfferList text="Access to all simulator features" status="active" />
+            <OfferList text="12 Months runway" status="active" />
+            <OfferList text="Best value for serious founders" status="active" />
           </PricingBox>
         </div>
       </div>

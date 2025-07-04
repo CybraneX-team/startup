@@ -75,6 +75,8 @@ export interface UserData {
   credits : number;
   preventBug  : boolean;
   hint? : string;
+  notEnoughCredits : boolean;
+  isPurchaseDone : boolean;
 }
 interface notificationMessagesType{
   message: string;

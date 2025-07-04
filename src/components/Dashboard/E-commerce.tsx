@@ -5,6 +5,7 @@ import TaskGrid from "../CardDataStats";
 import { InfoIcon, ArrowRight  } from "lucide-react";
 import TooltipModal from "@/components/TooltipModal";
 import { Bell } from "lucide-react";
+import { Tooltip } from 'react-tooltip'
 import SpotlightModal from "@/components/SpotlightModal";
 
 // import { Dice1, InfoIcon } from "lucide-react";
@@ -13,12 +14,17 @@ import { useRouter } from "next/navigation";
 import { Bounce, toast, ToastContainer } from "react-toastify";
 import "@/components/Dashboard/index.css";
 import GameOverModal from "../Sidebar/gameOverModal";
+// import NotEnoughVenture coins from "../Sidebar/notEnoughVenture coins";
+
 import ElonAssistant from "@/components/Elon";
 
 import TypewriterText from "@/components/TypewriterText/TypewriterText";
 // import elonMusk from "@/app/elon.png";
 import Image from "next/image";
 import { motion } from "framer-motion";
+import { Lock } from "lucide-react";
+import NotEnoughCredits from "../Sidebar/notEnoughCredits";
+// import notEnoughVenture coins from "../Sidebar/notEnoughVenture coins";
 
 const MapOne = dynamic(() => import("@/components/Maps/MapOne"), {
   ssr: false,
@@ -411,23 +417,33 @@ const ECommerce: React.FC = () => {
     forceRender((prev) => prev + 1);
   }, [user]);
 
-  useEffect(() => {
-    if (userLoaded) {
-      const token = typeof window !== "undefined" ? localStorage.getItem("userToken") : null;
-      
+useEffect(() => {
+  if (!userLoaded) return; // Wait until user context is ready
 
-  
-      if (!user || !user.username || !token) {
+  if (!user) {
+    router.push("/home"); // Not logged in
+  } else if (!user.isAiCustomizationDone) {
+    router.push("/formQuestion"); // Logged in but setup not complete
+  }
+}, [user, router, userLoaded]);
 
-        router.push("/auth/signup");
-      } else {
-      }
-    }
-  }, [userLoaded, user, router]);
   
   useEffect(() => {
     setGameOverModal( user && user?.finances < 0  ? true : false )
   }, [user]);
+
+  useEffect(() => {
+    if (!user || !user.startupStage) return;
+
+    const isEarlyStage = user.startupStage === "FFF" || user.startupStage === "Angels";
+
+    if (isEarlyStage) {
+      setnotEnoughCredits(false);
+    } else {
+      setnotEnoughCredits(!user.isPurchaseDone);
+    }
+  }, [user]);
+
 
   useEffect(() => {
     // Function to check the screen size
@@ -585,6 +601,8 @@ useEffect(() => {
   const [gameOverModal, setGameOverModal] = useState(() => {
     return user?.finances !== undefined && user.finances < 0;
   });
+ const [notEnoughCredits, setnotEnoughCredits] = useState(false);
+
   const [hintModalOpen, setHintModalOpen] = useState(false);
   const [hintContent, setHintContent] = useState("");
 
@@ -761,6 +779,7 @@ useEffect(() => {
 
   return (
     <>
+    <Tooltip id="my-tooltip" />
     <ElonAssistant  onStepChange={setElonStep} />
       {loader && (
       <div className="fixed inset-0 z-[99999] flex flex-col items-center justify-center bg-black bg-opacity-50">
@@ -777,6 +796,10 @@ useEffect(() => {
         gameOverModal ? <GameOverModal  /> : null
       }
       
+      
+      {
+        notEnoughCredits  ? <NotEnoughCredits  /> : null
+      }
       <h3 className="text-sm text-gray-500 dark:text-gray-400">
         Startup Stages
       </h3>
@@ -802,7 +825,9 @@ useEffect(() => {
     ${elonStep === 1 ? 'ring-1 ring-[#3C50E0] animate-pulse py-4  bg-yellow-100 dark:bg-yellow-900' : ''} 
     lg:w-auto lg:overflow-hidden 
     dark:bg-[#101d28] bg-white border border-gray-200 
-    lg:dark:bg-transparent lg:border-0 dark:border-gray-700 p-5 lg:bg-transparent lg:p-0`}>
+    lg:dark:bg-transparent lg:border-0 dark:border-gray-700 p-5 lg:bg-transparent lg:p-0`}
+    
+    >
   {stages.map((stage, index) => (
     <div
       key={index}
@@ -816,8 +841,17 @@ useEffect(() => {
             ? "bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
             : "bg-gray-200 dark:bg-[#1C2E5B] border-transparent hover:bg-gray-200 dark:hover:bg-[#223a5f]"
         }`}
+      data-tooltip-id="my-tooltip"
+      data-tooltip-content={ index === 0  ||  index === 1   
+         ? "" : "You need to purchase a plan to play through this stage"}
     >
       <div className="flex items-center justify-center gap-1">
+        { index !== 0  &&  index !== 1 ? (
+        <div className="flex justify-center mx-1">
+          <Lock size={14} className="text-gray-400 dark:text-white" />
+        </div>
+        ) : null}
+         
         <span className={`text-sm font-medium whitespace-nowrap 
           ${
             user?.startupStage === stage
@@ -1117,10 +1151,10 @@ useEffect(() => {
       <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">Confirm Action</h2>
       <p className="text-sm text-gray-600 dark:text-gray-300 mb-6">
         Are you sure you want to {confirmationAction === 'skip'
-          ? 'skip the bug fix duration (60 credits)?'
+          ? 'skip the bug fix duration (60 Venture coins)?'
           : confirmationAction === 'buyout'
-          ? 'buy out this bug (60 credits)?'
-          : 'use Bug Prevention Insurance (25 credits)?'}
+          ? 'buy out this bug (60 Venture coins)?'
+          : 'use Bug Prevention Insurance (25 Venture coins)?'}
       </p>
 
       <div className="flex justify-center gap-4">
@@ -1158,7 +1192,7 @@ useEffect(() => {
           ⚡ Skip Bug Fix Duration
         </button>
         <p className="text-xs text-gray-500 dark:text-gray-400 -mt-2 mb-2">
-          Instantly solves a bug without using any funds. Cost: 60 credits.
+          Instantly solves a bug without using any funds. Cost: 60 Venture coins.
         </p> */}
 
         {/* <div className="relative border-t pt-2 border-gray-300 dark:border-gray-600">
@@ -1172,7 +1206,7 @@ useEffect(() => {
           🛠 Buyout Bug
         </button>
         <p className="text-xs text-gray-500 dark:text-gray-400 -mt-2 mb-2">
-          Permanently removes one active bug without a turn. Best for critical issues. Cost: 600 credits.
+          Permanently removes one active bug without a turn. Best for critical issues. Cost: 6000 Venture coins.
         </p>
 
         <div className="relative border-t pt-2 border-gray-300 dark:border-gray-600">
@@ -1186,7 +1220,7 @@ useEffect(() => {
           🛡️ Bug Prevention Insurance
         </button>
         <p className="text-xs text-gray-500 dark:text-gray-400 -mt-2">
-          Prevents bugs from triggering this turn. Usable once every 3 turns. Cost: 250 credits.
+          Prevents bugs from triggering this turn. Usable once every 3 turns. Cost: 2500 Venture coins.
         </p>
 
         <button
@@ -1394,19 +1428,19 @@ useEffect(() => {
 
       <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
         Auto-complete any 1-turn task instantly. Saves time and opens up bandwidth for higher-value tasks. <br />
-        <span className="text-indigo-500 font-medium">Cost: 50 credits</span>
+        <span className="text-indigo-500 font-medium">Cost: 50 Venture coins</span>
       </p>
 
       <div className="space-y-3 max-h-60 overflow-y-auto">
         {[
-          { id: 1, name: "Fix Signup Flow", credits: 50 },
+          { id: 1, name: "Fix Signup Flow", credits : 50 },
           { id: 2, name: "Optimize CTA", credits: 50 },
           { id: 3, name: "Polish UI Spacing", credits: 50 },
         ].map((task) => (
           <div key={task.id} className="flex justify-between items-center p-3 rounded-lg border border-gray-200 dark:border-gray-700">
             <div>
               <h3 className="text-sm font-semibold text-gray-800 dark:text-white">{task.name}</h3>
-              <p className="text-xs text-gray-500 dark:text-gray-400">1-turn task — Cost: 50 credits</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">1-turn task — Cost: 50 Venture coins</p>
             </div>
             <button
               onClick={() => {

@@ -65,7 +65,7 @@ export default function ModuleLayout({ children }: ModuleLayoutProps) {
             <div className="course-title mx-6 my-4 rounded-lg border border-gray-200">
               <div className="flex items-center">
                 <span className="mr-2">🚀</span>
-                <span className="text-xl font-semibold">Startup simulator</span>
+                <span className="text-xl font-semibold">Unicorn simulator</span>
               </div>
             </div>
 

@@ -13,46 +13,46 @@ const SignIn: React.FC = () => {
   const { data: session, status } = useSession();
   const router = useRouter();
   const { setUser, user } = useUser();
-  // useEffect(() => {
-  //   const syncUser = async () => {
-  //     try {
-  //       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/google-login`, {
-  //         method: "POST",
-  //         credentials: "include",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //         },
-  //         body: JSON.stringify({
-  //           email: session?.user?.email,
-  //           username: session?.user?.name,
-  //         }),
-  //       });
+  useEffect(() => {
+    const syncUser = async () => {
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/google-login`, {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: session?.user?.email,
+            username: session?.user?.name,
+          }),
+        });
   
-  //       if (!response.ok) {
-  //         const error = await response.json();
-  //         console.error("Google login failed:", error.message);
-  //         return;
-  //       }
+        if (!response.ok) {
+          const error = await response.json();
+          console.error("Google login failed:", error.message);
+          return;
+        }
   
-  //       const data = await response.json();
+        const data = await response.json();
 
-  //       localStorage.setItem("userToken", data.token);
-  //       localStorage.setItem("userData", JSON.stringify(data));        
-  //       setUser(data);
-  //       router.push(data?.isAiCustomizationDone ? "/" : "/formQuestion");
-  //     } catch (err) {
-  //       console.error("Sync error:", err);
-  //     }
-  //   };
+        localStorage.setItem("userToken", data.token);
+        localStorage.setItem("userData", JSON.stringify(data));        
+        setUser(data);
+        router.replace(data?.isAiCustomizationDone ? "/" : "/formQuestion");
+      } catch (err) {
+        console.error("Sync error:", err);
+      }
+    };
   
-  //   if (
-  //     status === "authenticated" &&
-  //     session?.user?.email &&
-  //     !localStorage.getItem("userToken") // ✅ avoid repeated sync
-  //   ) {
-  //     syncUser();
-  //   }
-  // }, [session, status, router, setUser]);
+    if (
+      status === "authenticated" &&
+      session?.user?.email &&
+      !localStorage.getItem("userToken") // ✅ avoid repeated sync
+    ) {
+      syncUser();
+    }
+  }, [session, status, router, setUser]);
   
   const [usercreds, setusercreds] = useState({
     email: "",
@@ -113,7 +113,7 @@ const SignIn: React.FC = () => {
         <div className="flex justify-center w-full">
           <div className="w-full max-w-lg border border-stroke bg-white p-6 sm:p-10 shadow-default dark:border-strokedark dark:bg-boxdark rounded-xl">
             <h2 className="mb-8 text-2xl sm:text-3xl font-bold text-center text-black dark:text-white leading-tight">
-              Sign In to <br /> Startup Simulator
+              Sign In to <br /> Unicorn Simulator
             </h2>
 
             <form onSubmit={handleUserLogin}>

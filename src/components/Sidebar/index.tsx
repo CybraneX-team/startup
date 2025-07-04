@@ -86,7 +86,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
     }else{
       setSidebarOpen(false)
     }
-  }, [elonStep])
+  }, [elonStep, setSidebarOpen])
   useEffect(() => {
     if (user?.financesBreakdown) {
       const breakdown = user.financesBreakdown as financesBreakdown;
@@ -229,7 +229,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
             />
             <h1 
             className="mx-2 text-xl font-semibold text-black dark:text-white">
-              Startup Simulator  
+              Unicorn Simulator  
             </h1>
           </Link>
            <div onClick={()=>{setSidebarOpen(false)}} className="lg:hidden text-red-500"> <X /> </div>

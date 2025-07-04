@@ -129,7 +129,7 @@ const ElonAssistant = ({ onStepChange }: ElonAssistantProps) => {
         window.scrollTo({ top: y, behavior: "smooth" });
       }
     }
-  }, [step]);
+  }, [step, onStepChange]);
 
   useEffect(() => {
     if (waitingForClick || hasSkippedRef.current) return;

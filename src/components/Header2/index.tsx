@@ -50,29 +50,27 @@ const Header = () => {
         <div className="container">
           <div className="relative -mx-4 flex items-center justify-between">
             <div className="w-60 max-w-full px-4 xl:mr-12">
-              <Link
-                href="/"
-                className={`header-logo block w-full ${
-                  sticky ? "py-5 lg:py-2" : "py-8"
-                } `}
-              >
-                <Image
-                  src="/images/logo/logo.svg"
-                  alt="logo"
-                  width={140}
-                  height={30}
-                  className="w-full dark:hidden"
-                />
-                <Image
-                  src="/images/logo/logo.svg"
-                  alt="logo"
-                  width={140}
-                  height={30}
-                  className="hidden w-full dark:block"
-                />
-              </Link>
+            <Link
+            href="/"
+            className={`header-logo block w-full ${
+              sticky ? "py-5 lg:py-2" : "py-8"
+            }`}
+          >
+            <div className="flex items-center space-x-3">
+              <Image
+                src="/images/logo/logo-icon.svg"
+                alt="logo"
+                width={50}
+                height={50}
+                className="block"
+              />
+              <h1 className="text-[#495CE2] dark:text-white text-2xl lg:text-3xl font-bold leading-tight whitespace-nowrap">
+                Unicorn Simulator
+              </h1>
             </div>
-            <div className="flex w-full items-center justify-between px-4">
+          </Link>
+            </div>
+            <div className="flex w-auto items-center justify-between px-4">
               <div>
                 <button
                   onClick={navbarToggleHandler}

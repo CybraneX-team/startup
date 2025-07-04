@@ -4,8 +4,10 @@ const PricingBox = (props: {
   packageName: string;
   subtitle: string;
   children: React.ReactNode;
+  razorpayFunction : any
+  planId : string
 }) => {
-  const { price, duration, packageName, subtitle, children } = props;
+  const { price, duration, packageName, subtitle, children, razorpayFunction , planId } = props;
 
   return (
     <div className="w-full">
@@ -15,8 +17,8 @@ const PricingBox = (props: {
       >
         <div className="flex items-center justify-between">
           <h3 className="price mb-2 text-3xl font-bold text-black dark:text-white">
-            $<span className="amount">{price}</span>
-            <span className="time text-body-color">/{duration}</span>
+            <span className="amount">{price}</span>
+            {/* <span className="time text-body-color">/{duration}</span> */}
           </h3>
           <h4 className="text-dark mb-2 text-xl font-bold dark:text-white">
             {packageName}
@@ -24,8 +26,10 @@ const PricingBox = (props: {
         </div>
         <p className="text-body-color mb-7 text-base">{subtitle}</p>
         <div className="border-body-color mb-8 border-b border-opacity-10 pb-8 dark:border-white dark:border-opacity-10">
-          <button className="hover:shadow-signUp flex w-full items-center justify-center rounded-sm bg-primary p-3 text-base font-semibold text-white transition duration-300 ease-in-out hover:bg-opacity-80">
-            Start Free Trial
+          <button 
+          onClick={()=>{razorpayFunction(planId)}}
+          className="hover:shadow-signUp flex w-full items-center justify-center rounded-sm bg-primary p-3 text-base font-semibold text-white transition duration-300 ease-in-out hover:bg-opacity-80">
+           Get Started 
           </button>
         </div>
         <div>{children}</div>

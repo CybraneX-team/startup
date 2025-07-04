@@ -64,7 +64,7 @@ const SubscriptionPlansPage = () => {
     const openRazorpayCheckout = (subscriptionId: string, customerId: string) => {
         const options = {
           key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID!,
-          name: "Startup Simulator",
+          name: "Unicorn Simulator",
           description: "Subscription for game access",
           subscription_id: subscriptionId,
           customerId : customerId, 
@@ -117,7 +117,7 @@ const SubscriptionPlansPage = () => {
         }
       };
       function setSideBarOpen() {
-        console.log("sidebar")
+        // console.log("sidebar")
       }
   return (
     // <DefaultLayout>

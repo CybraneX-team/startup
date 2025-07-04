@@ -83,7 +83,7 @@ const GameOptionsModal = ({
     <AlertCircle size={16} className="text-yellow-600 dark:text-yellow-300" />
     <span className="break-words text-sm">Starting a new simulation will cost</span>
   </div>
-  <span className="text-violet-700 dark:text-violet-400 font-semibold">2000 credits</span>
+  <span className="text-violet-700 dark:text-violet-400 font-semibold">2000 Venture coins</span>
           </div>
 
           </div>
@@ -99,7 +99,7 @@ const GameOptionsModal = ({
             </h3>
             <p className="text-sm text-gray-600 dark:text-gray-300 mb-5">
               Starting a new simulation will cost 
-              <span className="font-bold text-violet-600 dark:text-violet-400">200 credits</span>
+              <span className="font-bold text-violet-600 dark:text-violet-400">200 venture coins</span>
             </p>
             <div className="flex justify-center gap-4">
               <button

@@ -52,15 +52,18 @@ export default function StartupBasicsForm() {
     setFormData({ ...formData, [key]: value });
   };
 
-  useEffect(() => {
-    if (!user?.isAiCustomizationDone || !user) {
-      router.push("/auth/signin");
-      return
-    }else{
-      router.push("/");
-      return
-    }
-  }, [user, router, userLoaded]);
+useEffect(() => {
+  if (!userLoaded) return;
+
+  if (!user) {
+    router.push("/auth/signin");
+  } else if (user.isAiCustomizationDone) {
+    router.push("/");
+  }
+}, [user, router, userLoaded]);
+
+
+
   
   const handleSubmit = async () => {
     if (!user || !user.gameId) return;

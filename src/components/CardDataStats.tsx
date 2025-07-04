@@ -441,7 +441,7 @@ const BrainstormModal = ({
           <div className="z-10 flex items-center gap-2 text-sm">
             <Sparkles className="h-4 w-4 text-emerald-500" />
             <span className="text-gray-700 dark:text-gray-300">
-              Power Boost: +5 tasks for 600 credits
+              Power Boost: +5 tasks for 6000 Venture coins
             </span>
           </div>
 

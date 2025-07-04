@@ -13,22 +13,25 @@ const Footer = () => {
           <div className="-mx-4 flex flex-wrap">
             <div className="w-full px-4 md:w-1/2 lg:w-4/12 xl:w-5/12">
               <div className="mb-12 max-w-[360px] lg:mb-16">
-                <Link href="/" className="mb-8 inline-block">
-                  <Image
-                    src="/images/logo/logo-2.svg"
-                    alt="logo"
-                    className="w-full dark:hidden"
-                    width={140}
-                    height={30}
-                  />
-                  <Image
-                    src="/images/logo/logo.svg"
-                    alt="logo"
-                    className="hidden w-full dark:block"
-                    width={140}
-                    height={30}
-                  />
-                </Link>
+                      <Link
+                      href="/"
+                      className={`header-logo block w-full 
+                          py-5 lg:py-2 
+                      `}
+                    >
+                      <div className="flex items-center space-x-3">
+                        <Image
+                          src="/images/logo/logo-icon.svg"
+                          alt="logo"
+                          width={50}
+                          height={50}
+                          className="hidden dark:block"
+                        />
+                        <h1 className="text-white text-2xl lg:text-3xl font-bold leading-tight whitespace-nowrap">
+                          Unicorn Simulator
+                        </h1>
+                      </div>
+                    </Link>
                 <p className="dark:text-body-color-dark text-body-color mb-9 text-base leading-relaxed">
                   Lorem ipsum dolor sit amet, consectetur adipiscing elit.
                   Integer lobortis.

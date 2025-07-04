@@ -53,7 +53,7 @@ const AboutSectionTwo = () => {
                   Stage 3: Pre-IPO & IPO
                 </h3>
                 <p className="text-body-color text-base font-medium leading-relaxed sm:text-lg sm:leading-relaxed">
-                  With a full team and matured systems, it's time to scale
+                  With a full team and matured systems, it&lsquo;s time to scale
                   efficiently and go public—while staying profitable and
                   dominating the market.
                 </p>

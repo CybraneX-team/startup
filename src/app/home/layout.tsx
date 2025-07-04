@@ -27,8 +27,13 @@ export default function RootLayout({
           <ScrollToTop />
         </Providers>
       </div>
+      <Script
+            src="https://checkout.razorpay.com/v1/checkout.js"
+            strategy="beforeInteractive"
+          />
     </div>
   );
 }
 
-import { Providers } from "./providers";
+import { Providers } from "./providers";import Script from "next/script";
+

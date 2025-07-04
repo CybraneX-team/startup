@@ -17,7 +17,7 @@ const DropdownUser = () => {
   useEffect(() => {
     const isAuthPage = pathname?.startsWith("/auth");
     if (userLoaded && user === null && !isAuthPage) {
-      router.push("/auth/signup");
+      router.push("/home");
     }
   }, [user, userLoaded, pathname, router]);
 
@@ -25,7 +25,7 @@ const DropdownUser = () => {
     localStorage.removeItem("userToken");
     localStorage.removeItem("userData");
     setUserState(null);
-    signOut({ callbackUrl: `/auth/signin` }); 
+    signOut({ callbackUrl: `/home` }); 
   }
 
   return (

@@ -139,7 +139,7 @@ const GameOverModal = () => {
               className="w-full flex flex-wrap items-center justify-center gap-2 py-3 px-2 bg-violet-600 hover:bg-violet-700 text-white font-bold rounded-xl text-sm sm:text-base text-center"
             >
               <span className="whitespace-nowrap">Resume From Where You Left</span>
-              <span className="whitespace-nowrap">(2000 Credits)</span>
+              <span className="whitespace-nowrap">(2000 venture coins)</span>
               <CreditCard size={18} />
             </button>
           </div>
