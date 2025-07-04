@@ -1185,19 +1185,6 @@ useEffect(() => {
       </p>
 
       <div className="flex flex-col space-y-3">
-        {/* <button
-          onClick={() => setConfirmationAction('skip')}
-          className="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-lg"
-        >
-          ⚡ Skip Bug Fix Duration
-        </button>
-        <p className="text-xs text-gray-500 dark:text-gray-400 -mt-2 mb-2">
-          Instantly solves a bug without using any funds. Cost: 60 Venture coins.
-        </p> */}
-
-        {/* <div className="relative border-t pt-2 border-gray-300 dark:border-gray-600">
-          <p className="text-xs uppercase text-gray-400 dark:text-gray-500">OR</p>
-        </div> */}
 
         <button
           onClick={() => setConfirmationAction('buyout')}
@@ -1206,7 +1193,7 @@ useEffect(() => {
           🛠 Buyout Bug
         </button>
         <p className="text-xs text-gray-500 dark:text-gray-400 -mt-2 mb-2">
-          Permanently removes one active bug without a turn. Best for critical issues. Cost: 6000 Venture coins.
+          Permanently removes one active bug without a turn. Best for critical issues. Cost:  3500 Venture coins.
         </p>
 
         <div className="relative border-t pt-2 border-gray-300 dark:border-gray-600">
