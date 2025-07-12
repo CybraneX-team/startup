@@ -219,7 +219,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
       >
         {/* Header - With gray background to match app header */}
         <div className="flex items-center  justify-between gap-2 px-6 py-5.5 bg-gray-100 dark:bg-gray-800">
-          <Link href="/" className="flex items-center">
+          <Link href="/home" className="flex items-center">
             <Image
               width={24}
               height={24}

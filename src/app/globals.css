@@ -7,6 +7,9 @@
 /* This replaces the layout.css file */
 
 /* Module page specific styles */
+html{
+  scroll-behavior: smooth;
+}
 .module-content {
   width: 100%;
   transition: width 0.3s ease, margin-left 0.3s ease;

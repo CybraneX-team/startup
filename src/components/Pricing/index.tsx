@@ -53,12 +53,33 @@ const Pricing = () => {
           rzp.open();
         };
 
+            const handleSubscribe = async (planId: string) => {
+                const token = localStorage.getItem("userToken");
+              
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/razorpay/create-subscription`, {
+                  method: "POST",
+                  credentials: "include",
+                  headers: {
+                    "Content-Type": "application/json",
+                    token: token || "",
+                  },
+                  body: JSON.stringify({ selectedPlan: planId }),
+                });
+              
+                const data = await response.json();
+              
+                if (data.subscriptionId) {
+                  openRazorpayCheckout(data.subscriptionId, data.customerId);
+                } else {
+                  toast.error("Subscription failed. Please try again.");
+                }
+              };
   return (
     <section id="pricing" className="relative z-10 py-16 md:py-20 lg:py-28">
       <div className="container">
         <SectionTitle
           title="Simple and Affordable Pricing"
-          paragraph="There are many variations of passages of Lorem Ipsum available but the majority have suffered alteration in some form."
+          paragraph="Flexible plans for every founder. Whether you're just starting or scaling your virtual startup empire, we&apos;ve got a plan that fits your ambition."
           center
           width="665px"
         />
@@ -72,6 +93,7 @@ const Pricing = () => {
             duration={isMonthly ? "mo" : "yr"}
             subtitle="Billed Monthly"
             razorpayFunction={openRazorpayCheckout}
+            handleSubscribe={handleSubscribe}
             planId="1_month"
           >
             <OfferList text="Access to all simulator features" status="active" />
@@ -85,6 +107,7 @@ const Pricing = () => {
             duration={isMonthly ? "mo" : "yr"}
             subtitle="Billed Every 6 Months"
             razorpayFunction={openRazorpayCheckout}
+            handleSubscribe={handleSubscribe}
             planId="6_months"
           >
             <OfferList text="Access to all simulator features" status="active" />
@@ -97,6 +120,7 @@ const Pricing = () => {
             duration={isMonthly ? "mo" : "yr"}
             subtitle="Billed Annually"
             razorpayFunction={openRazorpayCheckout}
+            handleSubscribe={handleSubscribe}
             planId="12_months"
           >
             <OfferList text="Access to all simulator features" status="active" />

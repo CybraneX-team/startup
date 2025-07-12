@@ -1,3 +1,8 @@
+"use client"
+
+import { useUser } from "@/context/UserContext";
+import { toast } from "react-toastify";
+
 const PricingBox = (props: {
   price: string;
   duration: string;
@@ -6,9 +11,11 @@ const PricingBox = (props: {
   children: React.ReactNode;
   razorpayFunction : any
   planId : string
+  handleSubscribe: any
 }) => {
-  const { price, duration, packageName, subtitle, children, razorpayFunction , planId } = props;
-
+  const { price, duration, packageName, subtitle, children, razorpayFunction , planId, handleSubscribe } = props;
+  const {user} = useUser()
+  // console.log("user", user)
   return (
     <div className="w-full">
       <div
@@ -27,7 +34,13 @@ const PricingBox = (props: {
         <p className="text-body-color mb-7 text-base">{subtitle}</p>
         <div className="border-body-color mb-8 border-b border-opacity-10 pb-8 dark:border-white dark:border-opacity-10">
           <button 
-          onClick={()=>{razorpayFunction(planId)}}
+          onClick={()=>{
+            if(!user){
+              toast.info("Please log in first to purchase a plan.")
+              return 
+            }
+            handleSubscribe(planId)
+          }}
           className="hover:shadow-signUp flex w-full items-center justify-center rounded-sm bg-primary p-3 text-base font-semibold text-white transition duration-300 ease-in-out hover:bg-opacity-80">
            Get Started 
           </button>

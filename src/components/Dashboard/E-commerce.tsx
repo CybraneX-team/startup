@@ -532,7 +532,7 @@ useEffect(() => {
     });
   
     const data = await response.json();
-    console.log("data", data)
+    // console.log("data", data)
     if (response.ok) {
       setUser(data);
       setUserState(data);
@@ -1431,7 +1431,7 @@ useEffect(() => {
             </div>
             <button
               onClick={() => {
-                console.log(`Boosted task: ${task.name}`);
+                // console.log(`Boosted task: ${task.name}`);
                 setShowBoostModal(false);
               }}
               className="bg-indigo-600 hover:bg-indigo-700 text-white text-sm px-3 py-1.5 rounded-lg"

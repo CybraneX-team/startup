@@ -25,7 +25,7 @@ const NotEnoughCredits = () => {
     {/* Modal Text */}
     <h3 className="text-lg font-medium text-gray-800 dark:text-gray-100">Alert</h3>
     <div className="px-6 pt-2 pb-6">
-      <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">You can't play anymore</h2>
+      <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">You can&apos;t play anymore</h2>
       <p className="text-gray-600 dark:text-gray-300">
         You need more venture coins  to continue
       </p>

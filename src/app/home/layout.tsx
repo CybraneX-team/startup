@@ -20,6 +20,22 @@ export default function RootLayout({
         // suppressHydrationWarning={true}
         className={`flex w-screen flex-col bg-[#FCFCFC]  dark:bg-black ${inter.className}`}
       >
+        <div className="z-99999">
+        <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick={false}
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+        transition={Bounce}
+      />
+        </div>
+
         <Providers>
           <Header />
           {children}
@@ -36,4 +52,5 @@ export default function RootLayout({
 }
 
 import { Providers } from "./providers";import Script from "next/script";
+import { Bounce, ToastContainer } from "react-toastify";
 
