@@ -187,7 +187,7 @@ const ElonAssistant = ({ onStepChange }: ElonAssistantProps) => {
           onClick={handleUserClick}
         >
           <div className="bg-black/80 px-6 py-4 rounded-xl text-sm font-medium shadow-lg">
-            👋 Click anywhere to start Elon’s voice guide
+            👋 Click anywhere to start Elon&apos;s voice guide
           </div>
         </div>
       ) : (

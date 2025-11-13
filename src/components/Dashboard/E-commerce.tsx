@@ -491,11 +491,38 @@ useEffect(() => {
      setShowMore(false)
    }
   }, [elonStep])
-  
+    const [showElon, setShowElon] = useState<boolean>(false);
 
-  const [confirmationAction, setConfirmationAction] = useState<null | 'skip' | 'buyout' | 'prevent'>(null);
+  // inside ECommerce component (after user & userLoaded are available)
+useEffect(() => {
+  if (!userLoaded || !user) return;
 
-  //  const { setIsOpen, setCurrentStep } = useTour();
+  const seenKey = `elon_seen_v1_${user?.gameId ?? user?.username ?? "guest"}`;
+  const hasSeen = typeof window !== "undefined" && localStorage.getItem(seenKey);
+
+  if (!hasSeen) {
+    // mark as seen so subsequent refreshes won't re-show
+    try {
+      localStorage.setItem(seenKey, "1");
+    } catch (err) {
+      console.warn("Could not write elon seen flag", err);
+    }
+
+    // show assistant this session, and set the context step
+    setShowElon(true);
+    setElonStep(1);
+  } else {
+    // do not mount the assistant
+    setShowElon(false);
+    // keep the context step cleared
+    setElonStep(null);
+  }
+  // only run when userLoaded/user changes
+}, [userLoaded, user, setElonStep]);
+
+
+    const [confirmationAction, setConfirmationAction] = useState<null | 'skip' | 'buyout' | 'prevent'>(null);
+
 
     const [chatModalOpen, setChatModalOpen] = useState(false);
     const [isTyping, setIsTyping] = useState(false);
@@ -664,6 +691,19 @@ useEffect(() => {
     setloader(false);
   }
   // 67e0705d89fe231396228b83
+  const handleShowTutorial = () => {
+  if (typeof window === "undefined" || !user) return;
+  const seenKey = `elon_seen_v1_${user?.gameId ?? user?.username ?? "guest"}`;
+  // allow re-showing by removing the seen flag
+  try {
+    localStorage.removeItem(seenKey);
+  } catch (err) {
+    console.warn("Couldn't clear seen flag", err);
+  }
+  // show the assistant and set starting step
+  setShowElon(true);
+  setElonStep(1);
+};
   function getShortName(metricName: string): string {
     const metricMap: Record<string, string> = {
       userAcquisition: "UA",
@@ -780,7 +820,7 @@ useEffect(() => {
   return (
     <>
     <Tooltip id="my-tooltip" />
-    <ElonAssistant  onStepChange={setElonStep} />
+    {showElon && <ElonAssistant onStepChange={setElonStep} />}
       {loader && (
       <div className="fixed inset-0 z-[99999] flex flex-col items-center justify-center bg-black bg-opacity-50">
         <div className="flex gap-2 mb-4">
@@ -927,7 +967,13 @@ useEffect(() => {
 >
   💡 Ask AI Advisor
 </button>
-
+  <button
+    onClick={handleShowTutorial}
+    className="flex items-center gap-2 text-sm font-medium bg-transparent text-blue-400 dark:text-blue-300 border border-transparent hover:underline px-3 py-2 rounded-xl transition duration-150"
+    title="Start the Elon tutorial"
+  >
+    💫 Show Tutorial
+  </button>
 
 
 </div>

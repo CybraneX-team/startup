@@ -24,7 +24,7 @@ const Terms: React.FC = () => {
             <h2 className="text-xl font-semibold mt-6 mb-2">2. Platform Usage</h2>
             <p>
               Unicorn Simulator is intended for educational and simulation purposes only. Reproduction, redistribution,
-              or commercial use of the platform's content without explicit written permission is strictly prohibited.
+              or commercial use of the platform&apos;s content without explicit written permission is strictly prohibited.
             </p>
 
             <h2 className="text-xl font-semibold mt-6 mb-2">3. User Responsibilities</h2>

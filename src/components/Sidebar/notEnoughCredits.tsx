@@ -1,4 +1,5 @@
 import { useUser } from '@/context/UserContext';
+import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react'
 
@@ -19,7 +20,7 @@ const NotEnoughCredits = () => {
 
     {/* Custom SVG */}
     <div className="flex justify-center">
-      <img src="images/cantplay.svg" alt="Cannot Play Icon" className="h-25 w-60 mb-4" />
+      <Image src="images/cantplay.svg" alt="Cannot Play Icon" width={25}  height={25} className="h-25 w-60 mb-4" />
     </div>
 
     {/* Modal Text */}

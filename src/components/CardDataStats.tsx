@@ -523,6 +523,40 @@ const TaskGrid: React.FC = () => {
       return;
     }
   }, [user, router, userLoaded]);
+  // inside TaskGrid component, after other useEffects that depend on `user`
+useEffect(() => {
+  if (!user?.tasks) return;
+
+  // Build sets for quick existence checks:
+  const existingObjectIdSet = new Set(user.tasks.map((t: any) => t._id)); // _id (bugs + tasks)
+  const existingTaskIdSet = new Set(
+    user.tasks
+      .filter((t: any) => !t.isBug && t.taskId)
+      .map((t: any) => t.taskId)
+  );
+
+  // Clean selectedTasks (a Set of task._id)
+  setSelectedTasks((prev) => {
+    const newSet = new Set<string>();
+    for (const id of Array.from(prev)) {
+      if (existingObjectIdSet.has(id)) newSet.add(id);
+    }
+    return newSet;
+  });
+
+  // Clean selectedTaskIds (array of { taskId } or { bugId })
+  setSelectedTaskIds((prevArr: any[]) => {
+    return prevArr.filter((idObj) => {
+      if (idObj.bugId) {
+        return existingObjectIdSet.has(idObj.bugId);
+      }
+      if (idObj.taskId) {
+        return existingTaskIdSet.has(idObj.taskId);
+      }
+      return false;
+    });
+  });
+}, [user?.tasks, setSelectedTaskIds]);
 
   const handleTaskToggle = (task: any) => {
     const newSelected = new Set(selectedTasks);
