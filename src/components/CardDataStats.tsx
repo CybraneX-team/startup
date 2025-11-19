@@ -1,6 +1,6 @@
 "use client";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { Users, CheckSquare,ChevronDown } from "lucide-react";
+import { Users, CheckSquare, Square, ChevronDown, Info, X } from "lucide-react";
 import { useUser } from "@/context/UserContext";
 import { useRouter } from "next/navigation";
 import { toast, ToastContainer, Bounce } from "react-toastify";
@@ -31,31 +31,22 @@ const brainstromTaskAmountMap: Record<Stage, BrainstormStats> = {
   c: { turnsRequired: 1, taskToGenerate: 25 },
   d: { turnsRequired: 1, taskToGenerate: 25 },
 };
-interface TaskCardProps {
+interface TaskData {
+  _id: string;
+  taskId?: string;
   name: string;
-  description : string;
+  description: string;
   turnsRequired: number;
-  metricsImpact: {
-    conversionFirstPurchase: number;
-    averageOrderValue: number;
-    userAcquisition: number;
-    buyerCount: number;
-    costOfGoodsSold: number;
-    averagePaymentCount: number;
-    customerLifetimeValue: number;
-    averageRevenuePerUser: number;
-    costPerAcquisition: number;
-    contributionMargin: number;
-  };
-  requiredTeamMembers: {
-    ceo: number;
-    developer: number;
-    sales: number;
-  };
+  metricsImpact: Record<string, number>;
+  requiredTeamMembers: Record<string, number>;
   requiredTeam: string[];
-  isSelected: boolean;
   isBug?: boolean;
+}
+
+interface TaskCardProps extends TaskData {
+  isSelected: boolean;
   onToggle: () => void;
+  onShowDetails?: (task: TaskData) => void;
 }
 
 interface CancelTaskModalProps {
@@ -65,6 +56,14 @@ interface CancelTaskModalProps {
   metrics: { name: string; value: number }[];
   onConfirm: () => void;
   onCancel: () => void;
+}
+
+interface TaskDetailModalProps {
+  isOpen: boolean;
+  task: TaskData | null;
+  onClose: () => void;
+  onAdd: () => void;
+  onMakeTurn: () => void;
 }
 
 const CancelTaskModal: React.FC<CancelTaskModalProps> = ({
@@ -85,7 +84,7 @@ const CancelTaskModal: React.FC<CancelTaskModalProps> = ({
 
   return (
     <div
-      className={`fixed inset-0 z-50  flex items-center justify-center bg-black bg-opacity-50`}
+      className="fixed inset-0 z-[3001] flex items-center justify-center bg-black/50 backdrop-blur-sm"
     >
       <div className="w-full max-w-md rounded-2xl bg-white p-6 dark:bg-[#1A232F] dark:text-white">
         <h2 className="mb-4 text-xl font-semibold text-gray-900 dark:text-white">
@@ -151,6 +150,126 @@ const CancelTaskModal: React.FC<CancelTaskModalProps> = ({
   );
 };
 
+const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
+  isOpen,
+  task,
+  onClose,
+  onAdd,
+  onMakeTurn,
+}) => {
+  const { setHeaderDark } = useUser();
+
+  useEffect(() => {
+    setHeaderDark(isOpen);
+    return () => setHeaderDark(false);
+  }, [isOpen, setHeaderDark]);
+
+  if (!isOpen || !task) return null;
+
+  return (
+    <div className="fixed inset-0 z-[3002] flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
+      <div className="w-full max-w-2xl rounded-[32px] bg-white/95 p-8 shadow-[0_25px_70px_rgba(15,23,42,0.15)] backdrop-blur-md dark:bg-gray-900/90 dark:text-white">
+        <div className="mb-6 flex items-start justify-between gap-4">
+          <div>
+            <p className="text-[11px] uppercase tracking-[0.4em] text-gray-500 dark:text-gray-400">
+              Task details
+            </p>
+            <h2 className="mt-1 text-3xl font-semibold text-gray-900 dark:text-white leading-tight">
+              {task.name}
+            </h2>
+            <p className="mt-3 text-sm text-gray-600 dark:text-gray-300">
+              {task.description}
+            </p>
+          </div>
+          <button
+            onClick={onClose}
+            className="rounded-full border border-gray-200/80 p-2 text-gray-500 hover:border-gray-400 hover:text-gray-900 dark:border-gray-700 dark:text-gray-300"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+
+        <div className="mb-6 grid gap-4 sm:grid-cols-2">
+          <div className="rounded-3xl border border-gray-100 bg-gray-50/80 p-4 dark:border-gray-800 dark:bg-gray-900/40">
+            <p className="text-xs uppercase tracking-[0.35em] text-gray-500 dark:text-gray-400">
+              Turns required
+            </p>
+            <p className="mt-3 text-4xl font-semibold text-gray-900 dark:text-white">
+              {task.turnsRequired}
+            </p>
+          </div>
+          <div className="rounded-3xl border border-gray-100 bg-gray-50/80 p-4 dark:border-gray-800 dark:bg-gray-900/40">
+            <p className="text-xs uppercase tracking-[0.35em] text-gray-500 dark:text-gray-400">
+              Type
+            </p>
+            <p className="mt-3 text-lg font-semibold text-gray-900 dark:text-white">
+              {task.isBug ? "Bug" : "Task"}
+            </p>
+          </div>
+        </div>
+
+        <div className="mb-6 rounded-3xl border border-gray-100 bg-gray-50/80 p-5 dark:border-gray-800 dark:bg-gray-900/40">
+          <p className="text-xs uppercase tracking-[0.35em] text-gray-500 dark:text-gray-400 mb-3">
+            Effects
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {task.metricsImpact &&
+              Object.entries(task.metricsImpact)
+                .filter(([, value]) => value !== undefined && value !== 0)
+                .map(([key, value]) => (
+                  <span
+                    key={key}
+                    className="inline-flex items-center rounded-full border border-gray-200 bg-white px-3 py-1 text-xs font-semibold text-gray-700 dark:border-gray-700 dark:bg-gray-900/60 dark:text-gray-200"
+                  >
+                    {getShortName(key)}: {signTeller(key)}
+                    {showDollarSign(key)}
+                    {value}
+                    {symbolToShow(key) ? "%" : ""}
+                  </span>
+                ))}
+          </div>
+        </div>
+
+        <div className="mb-8 rounded-3xl border border-gray-100 bg-gray-50/80 p-5 dark:border-gray-800 dark:bg-gray-900/40">
+          <p className="text-xs uppercase tracking-[0.35em] text-gray-500 dark:text-gray-400 mb-3">
+            Required team
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {task.requiredTeamMembers &&
+              Object.entries(task.requiredTeamMembers).map(([member, count]) =>
+                count > 0 ? (
+                  <div
+                    key={member}
+                    className="inline-flex items-center gap-1 rounded-full border border-gray-200 bg-white px-3 py-1 text-xs font-semibold text-gray-700 dark:border-gray-700 dark:bg-gray-900/60 dark:text-gray-200"
+                  >
+                    <Users className="h-3.5 w-3.5" />
+                    <span className="capitalize">{member}</span>
+                    <span>{count}</span>
+                  </div>
+                ) : null,
+              )}
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+          <button
+            onClick={onAdd}
+            className="flex-1 rounded-xl border border-gray-200 px-4 py-3 text-sm font-semibold text-gray-700 transition-all hover:border-gray-300 hover:bg-gray-50 dark:border-gray-700 dark:text-white dark:hover:bg-gray-800"
+          >
+            Add to selection
+          </button>
+          <button
+            onClick={onMakeTurn}
+            className="flex-1 rounded-xl bg-gray-900 px-4 py-3 text-sm font-semibold text-white transition-all hover:bg-gray-800 dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-gray-200"
+          >
+            Make turn now
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const FilterButton: React.FC<FilterButtonProps> = ({
   label,
   count,
@@ -159,23 +278,71 @@ const FilterButton: React.FC<FilterButtonProps> = ({
 }) => (
   <button
     onClick={onClick}
-    className={` flex items-center rounded-full px-4 py-1.5 text-sm capitalize transition-colors
+    className={`flex items-center rounded-lg px-4 py-2 text-sm font-medium capitalize transition-all duration-200
       ${
         isActive
-          ? "bg-blue-50 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400"
-          : "bg-white text-gray-600 hover:bg-gray-50 dark:bg-boxdark dark:text-gray-400 dark:hover:bg-gray-800"
+          ? "bg-gray-900 text-white dark:bg-gray-700 dark:text-white shadow-sm"
+          : "bg-white text-gray-700 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-750 border border-gray-200 dark:border-gray-700"
       }`}
   >
     <span>{label}</span>
     {count !== undefined && (
-      <span className="ml-2 rounded-full bg-white px-2 text-xs font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-400">
+      <span className={`ml-2 rounded px-2 py-0.5 text-xs font-semibold ${
+        isActive
+          ? "bg-white/20 text-white"
+          : "bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300"
+      }`}>
         {count}
       </span>
     )}
   </button>
 );
 
+const metricMap: Record<string, string> = {
+  userAcquisition: "UA",
+  conversionFirstPurchase: "C1",
+  averageOrderValue: "AOV",
+  costOfGoodsSold: "COGS",
+  averagePaymentCount: "APC",
+  customerLifetimeValue: "CLTV",
+  averageRevenuePerUser: "ARPU",
+  costPerAcquisition: "CPA",
+  contributionMargin: "CM",
+  buyerCount: "B",
+};
+
+const getShortName = (metricName: string): string => {
+  return metricMap[metricName] || metricName;
+};
+
+const signTeller = (metricName: string): string => {
+  const nameOfMetric = getShortName(metricName);
+  if (
+    nameOfMetric === "UA" ||
+    nameOfMetric === "C1" ||
+    nameOfMetric === "AOV" ||
+    nameOfMetric === "APC"
+  ) {
+    return "+";
+  }
+  return "";
+};
+
+const symbolToShow = (metricName: string): boolean =>
+  getShortName(metricName) === "C1";
+
+const showDollarSign = (metricName: string): string => {
+  const nameOfMetric = getShortName(metricName);
+
+  if (nameOfMetric === "AOV" || nameOfMetric === "COGS" || nameOfMetric === "CPA") {
+    return "$";
+  }
+  return "";
+};
+
 const TaskCard: React.FC<TaskCardProps> = ({
+  _id,
+  taskId,
   name,
   turnsRequired,
   requiredTeamMembers,
@@ -185,170 +352,101 @@ const TaskCard: React.FC<TaskCardProps> = ({
   isSelected,
   description,
   onToggle,
+  onShowDetails,
 }) => {
   const [showDescription, setShowDescription] = useState(false);
-
-  function getShortName(metricName: string): string {
-    const metricMap: Record<string, string> = {
-      userAcquisition: "UA",
-      conversionFirstPurchase: "C1",
-      averageOrderValue: "AOV",
-      costOfGoodsSold: "COGS",
-      averagePaymentCount: "APC",
-      customerLifetimeValue: "CLTV",
-      averageRevenuePerUser: "ARPU",
-      costPerAcquisition: "CPA",
-      contributionMargin: "CM",
-      buyerCount: "B",
-    };
-    return metricMap[metricName] || metricName;
-  }
-  function signTeller(metricName: string): string {
-    const nameOfMetric = getShortName(metricName);
-    if (
-      nameOfMetric === "UA" ||
-      nameOfMetric === "C1" ||
-      nameOfMetric === "AOV" ||
-      nameOfMetric === "APC"
-    ) {
-      return "+";
-    } else {
-      return "";
-    }
-  }
-  function symbolToShow(metricName: string): boolean {
-    const nameOfMetric = getShortName(metricName);
-    if (nameOfMetric === "C1") {
-      return true;
-    }
-    return false;
-  }
-  function showDollarSign(metricName: string): string {
-    const nameOfMetric = getShortName(metricName);
-    if (
-      nameOfMetric === "AOV" ||
-      nameOfMetric === "COGS" ||
-      nameOfMetric === "CPA"
-    ) {
-      return "$";
-    } else {
-      return "";
-    }
-  }
 return (
- <div
-  onClick={onToggle}
-  className={`
-    self-start w-full rounded-xl hover:cursor-pointer border p-4 shadow-sm transition-all duration-200 hover:shadow-md
-    ${isSelected
-      ? "border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-900/20"
-      : "border-stroke bg-white dark:border-strokedark dark:bg-boxdark"
+  <div
+    onClick={onToggle}
+    className={`relative w-full cursor-pointer overflow-hidden rounded-2xl border border-gray-200 bg-white px-5 py-4 shadow-[0_10px_30px_rgba(15,23,42,0.06)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_40px_rgba(15,23,42,0.09)] dark:border-gray-800 dark:bg-gray-900 ${
+      isSelected ? "ring-2 ring-gray-900/50 dark:ring-gray-100/50" : ""
     }`}
->
-
-    <div className="flex items-start justify-between gap-4">
-      <div className="min-w-0 flex-1">
-        <div className="flex items-center justify-between">
-          <h3
-            className={`text-md mb-2 truncate font-semibold ${
-              isSelected
-                ? "text-green-700 dark:text-green-400"
-                : "text-black dark:text-white"
-            }`}
-          >
-            {isBug ? `🐛 Bug: ${name}` : name}
-          </h3>
-       
-          {/* Toggle Description Arrow */}
+  >
+    <div className="flex items-start justify-between gap-3">
+      <div className="flex flex-col gap-2">
+        <div className="inline-flex items-center gap-2">
+          <span className="inline-flex w-fit items-center rounded-full bg-gray-100 px-3 py-1 text-[11px] font-semibold tracking-[0.3em] text-gray-500 dark:bg-gray-800 dark:text-gray-300">
+            {isBug ? "BUG" : "TASK"}
+          </span>
           <button
             type="button"
             onClick={(e) => {
               e.stopPropagation();
-              setShowDescription((prev) => !prev);
+              onShowDetails?.({
+                _id,
+                taskId,
+                name,
+                description,
+                turnsRequired,
+                requiredTeamMembers,
+                metricsImpact,
+                requiredTeam,
+                isBug,
+              });
             }}
-            className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 transition"
+            className="flex h-6 w-6 items-center justify-center rounded-full border border-gray-200 text-gray-500 hover:border-gray-400 hover:text-gray-700 dark:border-gray-700 dark:text-gray-300"
           >
-            <ChevronDown
-              className={`h-4 w-4 text-gray-600 dark:text-gray-300 transition-transform duration-200 ${
-                showDescription ? "rotate-180" : ""
-              }`}
-            />
+            <Info className="h-3.5 w-3.5" />
           </button>
         </div>
-
-                
-
-        <div className="space-y-3">
-          <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
-            <span>Turns required</span>
-            <span>{turnsRequired}</span>
-          </div>
-
-          <div className="flex items-center justify-between text-sm">
-            <span className="text-gray-600 dark:text-gray-400">
-              Effect on Metrics
-            </span>
-            <span className="text-emerald-600 dark:text-emerald-400 text-right">
-              {metricsImpact &&
-                Object.entries(metricsImpact)
-                  .filter(([, value]) => value !== undefined && value !== 0)
-                  .map(
-                    ([key, value]) =>
-                      `${getShortName(key)}: ${signTeller(key)} ${showDollarSign(
-                        key
-                      )}${value}${symbolToShow(key) ? "%" : ""}`
-                  )
-                  .join(" , ")}
-            </span>
-          </div>
-
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-            <span className="whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
-              Required team members
-            </span>
-            <div className="flex flex-wrap gap-2">
-              {requiredTeamMembers &&
-                Object.entries(requiredTeamMembers).map(([member, count], index) =>
-                  count > 0 ? (
-                    <div
-                      key={index}
-                      className="flex items-center gap-1 rounded bg-gray-100 px-2 py-1 text-xs dark:bg-gray-700"
-                    >
-                      <Users className="h-3 w-3" />
-                      <span>{member}</span> <span>{count}</span>
-                    </div>
-                  ) : null
-                )}
-            </div>
-          </div>
-        </div>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white leading-snug">
+          {name}
+        </h3>
       </div>
-
-      {/* Toggle Selection Button */}
-      <div
-        className="flex-shrink-0"
+      <button
+        type="button"
         onClick={(e) => {
           e.stopPropagation();
           onToggle();
         }}
+        className={`flex h-6 w-10 items-center justify-center rounded-full transition-all ${
+          isSelected
+            ? "border-gray-900 bg-gray-900 text-white dark:border-gray-100 dark:bg-gray-100 dark:text-gray-900"
+            : "border-gray-300 text-gray-400 hover:border-gray-500 dark:border-gray-700 dark:text-gray-400"
+        }`}
       >
-        {isSelected ? (
-          <CheckSquare className="h-6 w-6 text-green-500 cursor-pointer" />
-        ) : (
-          <div className="h-6 w-6 rounded-full border-2 border-gray-300 dark:border-gray-600 cursor-pointer" />
-        )}
-        
-      </div>
+        {isSelected ? <CheckSquare className="h-3.5 w-3.5" /> : <Square className="h-3.5 w-3.5" />}
+      </button>
     </div>
+
+    <div className="mt-4 flex flex-wrap items-center gap-2 text-sm">
+      <span className="inline-flex items-center rounded-full border border-gray-200 px-3 py-1 font-semibold text-gray-700 dark:border-gray-700 dark:text-gray-200">
+        Turns {turnsRequired}
+      </span>
+      {metricsImpact &&
+        Object.entries(metricsImpact)
+          .filter(([, value]) => value !== undefined && value !== 0)
+          .map(([key, value], idx) => (
+            <span
+              key={idx}
+              className="inline-flex items-center rounded-full border border-gray-200 px-3 py-1 text-xs font-semibold text-gray-600 dark:border-gray-700 dark:text-gray-200"
+            >
+              {getShortName(key)}: {signTeller(key)}
+              {showDollarSign(key)}
+              {value}
+              {symbolToShow(key) ? "%" : ""}
+            </span>
+          ))}
+      {requiredTeamMembers &&
+        Object.entries(requiredTeamMembers).map(([member, count], index) =>
+          count > 0 ? (
+            <span
+              key={index}
+              className="inline-flex items-center gap-1 rounded-full border border-gray-200 px-3 py-1 text-xs font-semibold text-gray-600 dark:border-gray-700 dark:text-gray-200"
+            >
+              <Users className="h-3.5 w-3.5" />
+              <span className="capitalize">{member}</span>
+              <span>{count}</span>
+            </span>
+          ) : null,
+        )}
+    </div>
+
     {showDescription && (
-  <div className="mt-3 text-sm text-gray-700 dark:text-gray-300">
-    {description}
-  </div>
-)}
+      <p className="mt-4 text-sm text-gray-600 dark:text-gray-300">{description}</p>
+    )}
   </div>
 );
-
-;
 };
 interface BrainstormModalProps {
   isOpen: boolean;
@@ -389,7 +487,7 @@ const BrainstormModal = ({
   const extraTasks = powerBoost ? 5 : 0;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 px-4 sm:px-0">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-4 sm:px-0">
       <div className="relative w-full max-w-md rounded-2xl bg-white p-6 dark:bg-[#1A232F] dark:text-white">
         <h2 className="mb-4 text-xl font-semibold text-gray-900 dark:text-white">
           Would you like to start a brainstorm session?
@@ -480,6 +578,7 @@ const TaskGrid: React.FC = () => {
   const [selectedTasks, setSelectedTasks] = useState<Set<string>>(new Set());
   const [brainstormModalOpen, setBrainstormModalOpen] = useState(false);
   const [powerBoost, setPowerBoost] = useState(false);
+  const [detailModalTask, setDetailModalTask] = useState<TaskData | null>(null);
 
   const [activeFilters, setActiveFilters] = useState<Set<string>>(
     new Set(["all"]),
@@ -610,6 +709,76 @@ useEffect(() => {
 
   const handleCancelDismiss = () => {
     setCancelModal({ isOpen: false, taskId: null, task: null });
+  };
+
+  const handleShowDetails = (task: TaskData) => {
+    setDetailModalTask(task);
+  };
+
+  const handleAddFromDetails = () => {
+    if (!detailModalTask) return;
+
+    if (selectedTasks.has(detailModalTask._id)) {
+      toast.info("Task already selected");
+    } else {
+      handleTaskToggle(detailModalTask);
+      toast.success("Task added to selection");
+    }
+
+    setDetailModalTask(null);
+  };
+
+  const handleImmediateTurn = async (task: TaskData) => {
+    if (!user) {
+      toast.error("User not found");
+      return;
+    }
+
+    const token = localStorage.getItem("userToken");
+    if (!token) {
+      toast.error("Please sign in to make a turn");
+      return;
+    }
+
+    setloader(true);
+    try {
+      const bugIds = task.isBug ? [task._id] : [];
+      const taskIds = !task.isBug && task.taskId ? [task.taskId] : [];
+
+      const requestBody = {
+        gameId: user.gameId,
+        employees: user.teamMembers,
+        turnAmount,
+        bugIds,
+        taskIds,
+        preventBug: user.preventBug,
+      };
+
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/turn`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+          token,
+        },
+        body: JSON.stringify(requestBody),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setUser(data);
+        setnotificationMessages([...notificationMessages, ...(data.message || [])]);
+        toast.success("Turn completed");
+        setDetailModalTask(null);
+      } else {
+        toast.error(data.message || "Unable to make turn");
+      }
+    } catch (error) {
+      toast.error("Something went wrong while making the turn");
+    } finally {
+      setloader(false);
+    }
   };
 
   const toggleFilter = (filter: string) => {
@@ -749,6 +918,13 @@ const makeBrainstrom = async (turnAmount: string) => {
         onConfirm={handleCancelConfirm}
         onCancel={handleCancelDismiss}
       />
+      <TaskDetailModal
+        isOpen={!!detailModalTask}
+        task={detailModalTask}
+        onClose={() => setDetailModalTask(null)}
+        onAdd={handleAddFromDetails}
+        onMakeTurn={() => detailModalTask && handleImmediateTurn(detailModalTask)}
+      />
       <BrainstormModal
         isOpen={brainstormModalOpen}
         turnsRequired={1}
@@ -768,7 +944,7 @@ const makeBrainstrom = async (turnAmount: string) => {
         setPowerBoost={setPowerBoost}
       />
 
-      <div className="flex flex-col space-y-4 px-4">
+    <div className="flex flex-col space-y-4 px-4 pb-40 lg:pb-48">
         <div className="flex flex-wrap justify-between gap-2">
           <div className="flex flex-wrap gap-2">
             <FilterButton
@@ -793,30 +969,30 @@ const makeBrainstrom = async (turnAmount: string) => {
             ))}
             <button
               onClick={() => setActiveFilters(new Set(["all"]))}
-              className="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+              className="text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
             >
               Reset filters
             </button>
           </div>
           <button
-            className="flex self-end rounded-lg bg-white px-3 py-2 text-xs font-medium text-black shadow-xl dark:bg-blue-900/50 dark:text-blue-400"
+            className="flex self-end rounded-lg bg-gray-900 dark:bg-gray-700 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 dark:hover:bg-gray-600 transition-colors shadow-sm"
             onClick={() => setBrainstormModalOpen(true)}
           >
             Brainstorm
           </button>
         </div>
-<div className="flex flex-wrap gap-4">
-  {filteredTasks.map((task: any, index: number) => (
-    <div key={index} className="w-full md:w-[48%]">
-      <TaskCard
-        key={index }
-        {...task}
-        isSelected={selectedTasks.has(task._id)}
-        onToggle={() => handleTaskToggle(task)}
-      />
-    </div>
-  ))}
-</div>
+        <div className="columns-1 gap-4 space-y-4 sm:columns-2 xl:columns-3 pb-10">
+          {filteredTasks.map((task: any, index: number) => (
+            <div key={index} className="mb-4 break-inside-avoid">
+              <TaskCard
+                {...task}
+                isSelected={selectedTasks.has(task._id)}
+                onToggle={() => handleTaskToggle(task)}
+                onShowDetails={handleShowDetails}
+              />
+            </div>
+          ))}
+        </div>
 
       </div>
     </>

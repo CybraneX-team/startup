@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Info, Edit, X } from "lucide-react";
+import { Info, Edit, X, ChevronLeft, ChevronRight, DollarSign, Users, Lightbulb, TrendingUp, Building2 } from "lucide-react";
 import dynamic from 'next/dynamic';
 import { ApexOptions } from "apexcharts";
 import { useUser } from "@/context/UserContext";
@@ -19,13 +19,15 @@ const ReactApexChart = dynamic(() => import('react-apexcharts'), { ssr: false })
 interface SidebarProps {
   sidebarOpen: boolean;
   setSidebarOpen: (arg: boolean) => void;
+  sidebarCollapsed?: boolean;
+  setSidebarCollapsed?: (arg: boolean) => void;
 }
 interface financesBreakdown {
-  Founder: number;  // Uppercase matches API response
+  Founder: number;
   Investors: number;
   Mentor: number;
 }
-const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
+const Sidebar = ({ sidebarOpen, setSidebarOpen, sidebarCollapsed = false, setSidebarCollapsed }: SidebarProps) => {
   const [makevisible, setmakevisible] = useState(false);
   const [marketModalOpen, setMarketModalOpen] = useState(false);
   const [mentorsModalOpen, setMentorsModalOpen] = useState(false);
@@ -40,6 +42,10 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
     chart: {
       fontFamily: "Satoshi, sans-serif",
       type: "donut",
+      animations: {
+        enabled: true,
+        speed: 800,
+      },
     },
     colors: ["#6577F3", "#A5D6A7", "#8FD0EF"],
     labels: ["Founder", "Investors", "Mentors"],
@@ -91,8 +97,6 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
     if (user?.financesBreakdown) {
       const breakdown = user.financesBreakdown as financesBreakdown;
   
-      // console.log("breakdown is ", breakdown); // Debugging: Ensure correct structure
-  
       setChartData({
         series: [breakdown.Founder, breakdown.Investors, breakdown.Mentor],
         options: {
@@ -115,10 +119,6 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
   const breakdown: financesBreakdown = user?.financesBreakdown ?? { Founder: 0, Investors: 0, Mentor: 0 };
   const series = [breakdown.Founder, breakdown.Investors, breakdown.Mentor];
 
-  
-  const makeVisible = () => {
-    setmakevisible((prev) => !prev);
-  };
   
   const openMarketModal = () => {
     setMarketModalOpen(true);
@@ -168,7 +168,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
         }),
         headers: {
           "Content-Type": "application/json",
-          token: `${localStorage.getItem("userToken")}` // or however you're passing the token
+          token: `${localStorage.getItem("userToken")}`
         }
       }
     )
@@ -212,186 +212,260 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
   return (
     <>
       <aside
-        className={`fixed left-0  ${elonStep === 3 ? 'z-9999' : 'z-999999'} top-0 lg:z-50 flex h-screen w-[300px]  flex-col overflow-y-hidden bg-white duration-300 ease-linear dark:bg-boxdark lg:translate-x-0 ${
+        className={`fixed left-0 ${elonStep === 3 ? 'z-9999' : 'z-999999'} top-0 lg:z-50 flex h-screen flex-col overflow-y-hidden bg-white dark:bg-boxdark border-r border-stroke dark:border-strokedark duration-300 ease-linear lg:translate-x-0 ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
+        } ${sidebarCollapsed ? "w-20" : "w-[300px]"}`}
         style={{ height: '100dvh' }} 
       >
-        {/* Header - With gray background to match app header */}
-        <div className="flex items-center  justify-between gap-2 px-6 py-5.5 bg-gray-100 dark:bg-gray-800">
-          <Link href="/home" className="flex items-center">
-            <Image
-              width={24}
-              height={24}
-              src={"/favicon.ico"}
-              alt="Logo"
-              priority
-            />
-            <h1 
-            className="mx-2 text-xl font-semibold text-black dark:text-white">
-              Unicorn Simulator  
-            </h1>
-          </Link>
-           <div onClick={()=>{setSidebarOpen(false)}} className="lg:hidden text-red-500"> <X /> </div>
+        {/* Header */}
+        <div className={`flex items-center justify-between gap-2 px-4 py-4 border-b border-stroke dark:border-strokedark ${sidebarCollapsed ? "px-3" : "px-4"}`}>
+          {!sidebarCollapsed && (
+            <Link href="/home" className="flex items-center gap-2">
+              <Image
+                width={24}
+                height={24}
+                src={"/favicon.ico"}
+                alt="Logo"
+                priority
+              />
+              <h1 className="text-lg font-bold text-black dark:text-white">
+                Unicorn Simulator  
+              </h1>
+            </Link>
+          )}
+          {sidebarCollapsed && (
+            <div className="flex justify-center w-full">
+              <Image
+                width={32}
+                height={32}
+                src={"/favicon.ico"}
+                alt="Logo"
+                priority
+              />
+            </div>
+          )}
+          <div className="flex items-center gap-2">
+            {setSidebarCollapsed && (
+              <button
+                onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+                className="hidden lg:flex items-center justify-center w-8 h-8 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                title={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+              >
+                {sidebarCollapsed ? (
+                  <ChevronRight className="h-4 w-4 text-bodydark dark:text-bodydark1" />
+                ) : (
+                  <ChevronLeft className="h-4 w-4 text-bodydark dark:text-bodydark1" />
+                )}
+              </button>
+            )}
+            <button
+              onClick={() => setSidebarOpen(false)}
+              className="lg:hidden text-bodydark dark:text-bodydark1 hover:text-black dark:hover:text-white"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </div>
         </div>
 
         {/* Main Content */}
-        <div className="flex flex-col overflow-y-auto overflow-x-hidden px-6 py-4 custom-scrollbar">
-
-          {/* Business Idea Section */}
-          <div className="mb-6">
-            <h2 className="mb-3 text-sm font-semibold text-black dark:text-white">
-              Business Idea
-              <span
-                 onClick={() =>{ setOptionsModalOpen(true); setHeaderDark(true) }}
-                className="ml-20 cursor-pointer text-xl"
+        <div className={`flex flex-col overflow-y-auto overflow-x-hidden custom-scrollbar flex-1 ${sidebarCollapsed ? "px-2 py-4" : "px-4 py-4"}`}>
+          {sidebarCollapsed ? (
+            /* Collapsed View - Show only icons */
+            <div className="flex flex-col items-center gap-3 mt-4">
+              <button
+                onClick={() => { setOptionsModalOpen(true); setHeaderDark(true); }}
+                className="w-12 h-12 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors border border-stroke dark:border-strokedark"
+                title="Business Idea"
               >
-                {" "}
-                ...{" "}
-              </span>
-            </h2>
+                <Lightbulb className="h-5 w-5 text-bodydark dark:text-bodydark1" />
+              </button>
+              <div className="w-12 h-12 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center border border-stroke dark:border-strokedark" title="Financials">
+                <DollarSign className="h-5 w-5 text-bodydark dark:text-bodydark1" />
+              </div>
+              <div className="w-12 h-12 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center border border-stroke dark:border-strokedark" title="Team">
+                <Users className="h-5 w-5 text-bodydark dark:text-bodydark1" />
+              </div>
+            </div>
+          ) : (
+            <>
+          {/* Business Idea Section - Restructured at top */}
+          <div className="mb-5">
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-sm font-semibold text-black dark:text-white">
+                Business Idea
+              </h2>
+              <button
+                onClick={() => { setOptionsModalOpen(true); setHeaderDark(true); }}
+                className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                title="Game Options"
+              >
+                <Info className="h-4 w-4 text-bodydark dark:text-bodydark1" />
+              </button>
+            </div>
 
-            {/* <h2
-              className={`text-sm font-semibold my-2 cursor-pointer text-black dark:text-white ${
-                makevisible ? "block" : "hidden"
-              }`}
-              onClick={resetTheGame}
-            >
-              {" "}
-              reset game{" "}
-            </h2> */}
-       <p className="relative rounded-lg bg-gray-100 text-gray-800 border  dark:bg-[#1A1F2E] dark:text-gray-300 dark:border-gray-700 bg-opacity-80 px-3 py-2 text-sm leading-relaxed">
-          {user.businessDescription
-            ? showFullDesc
-              ? user.businessDescription
-              : `${user.businessDescription.slice(0, 80)}...`
-            : "Subscription service that delivers a monthly package of pet care items."}
+            <div className="rounded-lg bg-gray-50 dark:bg-boxdark-2 border border-stroke dark:border-strokedark p-3">
+              <p className="text-sm leading-relaxed text-bodydark dark:text-bodydark1">
+                {user.businessDescription
+                  ? showFullDesc
+                    ? user.businessDescription
+                    : `${user.businessDescription.slice(0, 80)}...`
+                  : "Subscription service that delivers a monthly package of pet care items."}
 
-          {user.businessDescription && user.businessDescription.length > 120 && (
-            <button
-              onClick={() => setShowFullDesc(!showFullDesc)}
-              className="ml-2 text-xs text-blue-600 hover:text-blue-500 underline dark:text-blue-400 dark:hover:text-blue-300"
-            >
-              {showFullDesc ? "See less" : "See more"}
-            </button>
-          )}
-        </p>
-
+                {user.businessDescription && user.businessDescription.length > 120 && (
+                  <button
+                    onClick={() => setShowFullDesc(!showFullDesc)}
+                    className="ml-2 text-xs font-medium text-primary hover:underline"
+                  >
+                    {showFullDesc ? "See less" : "See more"}
+                  </button>
+                )}
+              </p>
+            </div>
           </div>
 
-          {/* Financials Section */}
-          <div className="mb-6">
-            <h2 className="mb-4 text-base font-medium text-black dark:text-white">
+          {/* Financials Section - Restructured layout */}
+          <div className="mb-5">
+            <h2 className="mb-3 text-sm font-semibold text-black dark:text-white">
               Financials
             </h2>
 
-            {/* Donut Chart with Static Center Label */}
-            <div className="flex items-center">
-              {/* Legend Column */}
-              <div className=" flex flex-col">
-             <div className="flex  text-sm">
-              <span className="inline-block h-3 w-3 rounded-full cursor-pointer
-               my-2 mx-1 bg-[#6577F3]"></span>
-              <span className="text-gray-600 mt-1  dark:text-white">Founder</span>
-              <span className="font-medium mx-1 my-1 text-[#6577F3]">{renderValue(breakdown["Founder"])}%</span>
-          </div>
-          <div className={`flex text-sm ${elonStep ===3 ? `animate-pulse ring-1 dark:ring-blue-600 rounded-lg my-1` : ""}`} 
-          onClick={openInvestorsModal} >
-          <span className="inline-block h-3 w-3 mx-1 my-2 rounded-full cursor-pointer
-           bg-[#A5D6A7] investment-step-1"></span>
-            <span className="text-gray-600 mt-1 dark:text-white ">Investors</span>
-            <span className="font-medium mx-1 my-1 text-[#A5D6A7]">{renderValue(breakdown.Investors)}%</span> </div>
-          <div className={`flex text-sm ${elonStep ===3 ? `animate-pulse ring-1 dark:ring-blue-600 rounded-lg my-1` : ""}`}  
-          onClick={openMentorsModal}>
-            <span className="inline-block h-3 w-3 mx-1  my-2 rounded-full cursor-pointer
-             bg-[#8FD0EF] mentor-step-1"></span>
-            <span className="text-gray-600 mt-1 dark:text-white">Mentors</span>
-            <span className="font-medium my-1 text-[#8FD0EF]">{renderValue(breakdown.Mentor)}%</span> </div>
+            {/* Funds Chart - New compact layout */}
+            <div className="mb-4 rounded-lg bg-gray-50 dark:bg-boxdark-2 border border-stroke dark:border-strokedark p-4">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-xs font-medium text-bodydark dark:text-bodydark1">Fund Distribution</span>
+                <span className="text-sm font-bold text-black dark:text-white">${user.finances.toLocaleString() || "0"}</span>
               </div>
               
-              {/* Donut Chart */}
-              <div className="lg:-ml-17 md:-ml-12 -ml-5 relative">
-              <ReactApexChart
-                  options={options}
-                  series={series}
-                  type="donut"
-                  height={150}
-                />
-             <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
-              <span className="text-gray-500 text-sm font-medium dark:text-white">Funds</span>
-              <span className="text-sm font-bold text-gray-700 dark:text-white">${user.finances.toLocaleString() || "Not Logged in"}</span>
-            </div>
+              <div className="flex items-center gap-4">
+                {/* Legend */}
+                <div className="flex flex-col gap-2 flex-1">
+                  <div className="flex items-center gap-2 text-xs">
+                    <span className="inline-block h-3 w-3 rounded-full bg-[#6577F3]"></span>
+                    <span className="text-bodydark dark:text-bodydark1 flex-1">Founder</span>
+                    <span className="font-semibold text-black dark:text-white">{renderValue(breakdown["Founder"])}%</span>
+                  </div>
+                  <div 
+                    className={`flex items-center gap-2 text-xs cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 rounded px-2 py-1 -mx-2 transition-colors ${elonStep === 3 ? `animate-pulse ring-1 ring-primary rounded` : ""}`} 
+                    onClick={openInvestorsModal}
+                  >
+                    <span className="inline-block h-3 w-3 rounded-full bg-[#A5D6A7] investment-step-1"></span>
+                    <span className="text-bodydark dark:text-bodydark1 flex-1">Investors</span>
+                    <span className="font-semibold text-black dark:text-white">{renderValue(breakdown.Investors)}%</span>
+                  </div>
+                  <div 
+                    className={`flex items-center gap-2 text-xs cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 rounded px-2 py-1 -mx-2 transition-colors ${elonStep === 3 ? `animate-pulse ring-1 ring-primary rounded` : ""}`}  
+                    onClick={openMentorsModal}
+                  >
+                    <span className="inline-block h-3 w-3 rounded-full bg-[#8FD0EF] mentor-step-1"></span>
+                    <span className="text-bodydark dark:text-bodydark1 flex-1">Mentors</span>
+                    <span className="font-semibold text-black dark:text-white">{renderValue(breakdown.Mentor)}%</span>
+                  </div>
+                </div>
+                
+                {/* Donut Chart */}
+                <div className="relative -ml-18">
+                  <ReactApexChart 
+                    options={options}
+                    series={series}
+                    type="donut"
+                    height={120}
+                    width={120}
+                  />
+                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
+                    <span className="text-[10px] font-medium text-bodydark dark:text-bodydark1 uppercase">Funds</span>
+                    <span className="text-xs font-bold text-black dark:text-white">${user.finances.toLocaleString() || "0"}</span>
+                  </div>
+                </div>
               </div>
             </div>
 
-            <div className="space-y-2">
-              <div className="flex justify-between">
-                <span className="text-sm text-gray-600 dark:text-white">Revenue</span>
-                <span className="text-sm font-medium  tabular-nums text-emerald-500">$ {user.revenue ?
-                user.revenue : "$40" }</span>
+            {/* Revenue & Expenses - Restructured as compact list */}
+            <div className="mb-4 space-y-2 rounded-lg bg-gray-50 dark:bg-boxdark-2 border border-stroke dark:border-strokedark p-3">
+              <div className="flex justify-between items-center py-1.5 border-b border-stroke dark:border-strokedark">
+                <span className="text-xs font-medium text-bodydark dark:text-bodydark1">Revenue</span>
+                <span className="text-sm font-semibold tabular-nums text-meta-3">${user.revenue || 40}</span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-gray-600 dark:text-white">Salaries</span>
-                <span className="text-sm font-medium  tabular-nums text-red-500">-${user.salaries ?
-                user.salaries : "3400" }</span>
+              <div className="flex justify-between items-center py-1.5 border-b border-stroke dark:border-strokedark">
+                <span className="text-xs font-medium text-bodydark dark:text-bodydark1">Salaries</span>
+                <span className="text-sm font-semibold tabular-nums text-meta-1">-${user.salaries || 3400}</span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-gray-600 dark:text-white">Rent</span>
-                <span className="text-sm font-medium  tabular-nums text-red-500">-${user.rent
-                  ? user.rent  : "600"}</span>
+              <div className="flex justify-between items-center py-1.5 border-b border-stroke dark:border-strokedark">
+                <span className="text-xs font-medium text-bodydark dark:text-bodydark1">Rent</span>
+                <span className="text-sm font-semibold tabular-nums text-meta-1">-${user.rent || 600}</span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-gray-600 dark:text-white">Marketing</span>
-                <span className="text-sm font-medium  tabular-nums text-red-500">${user.marketing
-                  ? user.marketing : "3600"}</span>
+              <div className="flex justify-between items-center py-1.5 border-b border-stroke dark:border-strokedark">
+                <span className="text-xs font-medium text-bodydark dark:text-bodydark1">Marketing</span>
+                <span className="text-sm font-semibold tabular-nums text-meta-5">${user.marketing || 3600}</span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-gray-600 dark:text-white">Cost of Sales</span>
-                <span className="text-sm font-medium  tabular-nums text-red-500">-${user.costOfSales
-                  ? user.costOfSales : "44"}</span>
+              <div className="flex justify-between items-center py-1.5">
+                <span className="text-xs font-medium text-bodydark dark:text-bodydark1">Cost of Sales</span>
+                <span className="text-sm font-semibold tabular-nums text-meta-1">-${user.costOfSales || 44}</span>
               </div>
             </div>
 
-            {/* Available Market */}
-            <div className="mt-4 flex items-center justify-between">
-              <span className="text-sm text-gray-600 dark:text-white">Available Market</span>
-              <div className="flex items-center">
-                <span className="text-sm font-medium text-blue-500">
+            {/* Available Market - Compact design */}
+            <div className="flex items-center justify-between rounded-lg bg-gray-50 dark:bg-boxdark-2 border border-stroke dark:border-strokedark px-3 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors" onClick={openMarketModal}>
+              <span className="text-xs font-medium text-bodydark dark:text-bodydark1">Available Market</span>
+              <div className="flex items-center gap-1.5">
+                <span className="text-xs font-semibold text-black dark:text-white">
                   USD 999B
                 </span>
                 <Info 
-                  className="ml-1 h-4 w-4 text-gray-400 cursor-pointer hover:text-gray-600" 
-                  onClick={openMarketModal}
+                  className="h-3.5 w-3.5 text-bodydark dark:text-bodydark1 cursor-pointer hover:text-primary transition-colors" 
                 />
               </div>
             </div>
           </div>
 
-          {/* Team Section */}
+          {/* Team Section - Restructured layout */}
           <div>
-            <div className="mb-4 flex items-center justify-between">
+            <div className="mb-3 flex items-center justify-between">
               <h2 className="text-sm font-semibold text-black dark:text-white">
                 Team
               </h2>
-              {/* Edit button for Team */}
-              <Edit 
-                className="h-4 w-4 cursor-pointer text-blue-500  hover:text-blue-700" 
+              <button
                 onClick={openTeamModal}
-              />
+                className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                title="Edit Team"
+              >
+                <Edit className="h-4 w-4 text-bodydark dark:text-bodydark1" />
+              </button>
             </div>
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-3 gap-2.5">
               {user.teamMembers?.map((item) => (
-                <div key={item._id} className="flex flex-col items-center">
-                  <div className="mb-2 rounded-full bg-gray-100 dark:bg-[#1C2E5B] p-3">
+                <div 
+                  key={item._id} 
+                  className="flex flex-col items-center rounded-lg bg-gray-50 dark:bg-boxdark-2 border border-stroke dark:border-strokedark p-3 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors cursor-pointer"
+                >
+                  <div className="mb-2 rounded-lg bg-white dark:bg-boxdark p-2">
                     {roleIcons[item.roleName.toLowerCase()] || <span>No Icon</span>}
                   </div>
-                  <span className="text-sm text-gray-600 dark:text-white">{item.roleName}</span>
-                  <span className="text-sm font-medium">{item.quantity}</span>
+                  <span className="text-xs font-medium text-bodydark dark:text-bodydark1 capitalize mb-0.5">{item.roleName}</span>
+                  <span className="text-sm font-bold text-black dark:text-white tabular-nums">{item.quantity}</span>
                 </div>
               ))}
             </div>
           </div>
+            </>
+          )}
         </div>
+
+        {/* Collapse/Expand Button at Bottom */}
+        {setSidebarCollapsed && (
+          <div className="border-t border-stroke dark:border-strokedark p-3 bg-gray-50 dark:bg-boxdark-2">
+            <button
+              onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+              className={`w-full flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors py-2.5`}
+              title={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+            >
+              {sidebarCollapsed ? (
+                <ChevronRight className="h-5 w-5 text-bodydark dark:text-bodydark1" />
+              ) : (
+                <ChevronLeft className="h-5 w-5 text-bodydark dark:text-bodydark1" />
+              )}
+            </button>
+          </div>
+        )}
       </aside>
 
 

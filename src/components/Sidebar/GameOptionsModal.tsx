@@ -30,7 +30,7 @@ const GameOptionsModal = ({
   return (
     <>
       {/* Main Modal */}
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+      <div className="fixed inset-0 z-[3000] flex items-center justify-center bg-black/40 backdrop-blur-sm">
         <div className="relative w-[90%] max-w-md rounded-2xl bg-white dark:bg-[#1F2937] p-6 shadow-2xl">
 
           {/* Close Icon */}
@@ -92,7 +92,7 @@ const GameOptionsModal = ({
 
       {/* Confirmation Modal */}
       {showConfirm && (
-        <div className="fixed inset-0 z-[999999] flex items-center justify-center bg-black bg-opacity-40">
+        <div className="fixed inset-0 z-[3001] flex items-center justify-center bg-black/40 backdrop-blur-sm">
           <div className="w-[90%] max-w-sm bg-white dark:bg-[#1F2937] rounded-2xl p-6 shadow-2xl text-center">
             <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-3">
               Are you sure?

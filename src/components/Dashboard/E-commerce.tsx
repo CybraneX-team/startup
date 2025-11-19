@@ -2,7 +2,7 @@
 import dynamic from "next/dynamic";
 import React, { useEffect, useRef, useState } from "react";
 import TaskGrid from "../CardDataStats";
-import { InfoIcon, ArrowRight  } from "lucide-react";
+import { InfoIcon, ArrowRight, X } from "lucide-react";
 import TooltipModal from "@/components/TooltipModal";
 import { Bell } from "lucide-react";
 import { Tooltip } from 'react-tooltip'
@@ -113,7 +113,7 @@ const InfoModal: React.FC<ModalProps> = ({
     <>
       <div className="fixed inset-0 z-[99999] flex items-center justify-center">
         <div
-          className="absolute inset-0 bg-black bg-opacity-50"
+          className="absolute inset-0 bg-black/50 backdrop-blur-sm"
           onClick={onClose}
         ></div>
         <div
@@ -390,14 +390,14 @@ const orderedMetrics: MetricKey[] = [
 // };
 
 const ECommerce: React.FC = () => {
-  const { 
-    user, 
-    setUser, 
-    setUserState, 
-    loader, 
-    setloader, 
-    notificationMessages, 
-    setnotificationMessages ,
+  const {
+    user,
+    setUser,
+    setUserState,
+    loader,
+    setloader,
+    notificationMessages,
+    setnotificationMessages,
     turnAmount,
     selectedTaskIds,
     setSelectedTaskIds,
@@ -408,7 +408,7 @@ const ECommerce: React.FC = () => {
     setElonStep,
     setLoaderMessage
   } = useUser();
-  
+
   const router = useRouter();
 
   const [, forceRender] = useState(0);
@@ -417,19 +417,19 @@ const ECommerce: React.FC = () => {
     forceRender((prev) => prev + 1);
   }, [user]);
 
-useEffect(() => {
-  if (!userLoaded) return; // Wait until user context is ready
-
-  if (!user) {
-    router.push("/home"); // Not logged in
-  } else if (!user.isAiCustomizationDone) {
-    router.push("/formQuestion"); // Logged in but setup not complete
-  }
-}, [user, router, userLoaded]);
-
-  
   useEffect(() => {
-    setGameOverModal( user && user?.finances < 0  ? true : false )
+    if (!userLoaded) return; // Wait until user context is ready
+
+    if (!user) {
+      router.push("/home"); // Not logged in
+    } else if (!user.isAiCustomizationDone) {
+      router.push("/formQuestion"); // Logged in but setup not complete
+    }
+  }, [user, router, userLoaded]);
+
+
+  useEffect(() => {
+    setGameOverModal(user && user?.finances < 0 ? true : false)
   }, [user]);
 
   useEffect(() => {
@@ -463,92 +463,92 @@ useEffect(() => {
   }, []);
 
 
-// useEffect(() => {
-//   const timer = setTimeout(() => {
-//     setIsOpen(true);
-//     setCurrentStep(0);
-//   }, 1000); // Wait 1 second after mount
+  // useEffect(() => {
+  //   const timer = setTimeout(() => {
+  //     setIsOpen(true);
+  //     setCurrentStep(0);
+  //   }, 1000); // Wait 1 second after mount
 
-//   return () => clearTimeout(timer);
-// }, [setCurrentStep, setIsOpen]);
+  //   return () => clearTimeout(timer);
+  // }, [setCurrentStep, setIsOpen]);
   useEffect(() => {
     setSelectedTaskIds(
-      (prev)=>{
-        return prev.filter((elem: any)=>{
-          return user?.tasks.some((e)=>{
+      (prev) => {
+        return prev.filter((elem: any) => {
+          return user?.tasks.some((e) => {
             return e.taskId === elem.taskId && e.isBug === elem.isBug
           })
         })
       }
     )
-  }, [user,  setSelectedTaskIds])
-  
+  }, [user, setSelectedTaskIds])
+
 
   useEffect(() => {
-   if (elonStep === 5) {
-     setShowMore(true)
-   }else{
-     setShowMore(false)
-   }
+    if (elonStep === 5) {
+      setShowMore(true)
+    } else {
+      setShowMore(false)
+    }
   }, [elonStep])
-    const [showElon, setShowElon] = useState<boolean>(false);
+  const [showElon, setShowElon] = useState<boolean>(false);
 
   // inside ECommerce component (after user & userLoaded are available)
-useEffect(() => {
-  if (!userLoaded || !user) return;
+  useEffect(() => {
+    if (!userLoaded || !user) return;
 
-  const seenKey = `elon_seen_v1_${user?.gameId ?? user?.username ?? "guest"}`;
-  const hasSeen = typeof window !== "undefined" && localStorage.getItem(seenKey);
+    const seenKey = `elon_seen_v1_${user?.gameId ?? user?.username ?? "guest"}`;
+    const hasSeen = typeof window !== "undefined" && localStorage.getItem(seenKey);
 
-  if (!hasSeen) {
-    // mark as seen so subsequent refreshes won't re-show
-    try {
-      localStorage.setItem(seenKey, "1");
-    } catch (err) {
-      console.warn("Could not write elon seen flag", err);
+    if (!hasSeen) {
+      // mark as seen so subsequent refreshes won't re-show
+      try {
+        localStorage.setItem(seenKey, "1");
+      } catch (err) {
+        console.warn("Could not write elon seen flag", err);
+      }
+
+      // show assistant this session, and set the context step
+      setShowElon(true);
+      setElonStep(1);
+    } else {
+      // do not mount the assistant
+      setShowElon(false);
+      // keep the context step cleared
+      setElonStep(null);
     }
-
-    // show assistant this session, and set the context step
-    setShowElon(true);
-    setElonStep(1);
-  } else {
-    // do not mount the assistant
-    setShowElon(false);
-    // keep the context step cleared
-    setElonStep(null);
-  }
-  // only run when userLoaded/user changes
-}, [userLoaded, user, setElonStep]);
+    // only run when userLoaded/user changes
+  }, [userLoaded, user, setElonStep]);
 
 
-    const [confirmationAction, setConfirmationAction] = useState<null | 'skip' | 'buyout' | 'prevent'>(null);
+  const [confirmationAction, setConfirmationAction] = useState<null | 'skip' | 'buyout' | 'prevent'>(null);
 
 
-    const [chatModalOpen, setChatModalOpen] = useState(false);
-    const [isTyping, setIsTyping] = useState(false);
+  const [chatModalOpen, setChatModalOpen] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
 
-    const [chatMessages, setChatMessages] = useState([
-      { sender: 'elon', text: "Hey there! I'm Elon, your AI Advisor 🤖. Ask me anything about your startup — metrics, hiring, bugs, you name it." }
-    ]);
-    const [userInput, setUserInput] = useState("");
+  const [chatMessages, setChatMessages] = useState([
+    { sender: 'elon', text: "Hey there! I'm Elon, your AI Advisor 🤖. Ask me anything about your startup — metrics, hiring, bugs, you name it." }
+  ]);
+  const [userInput, setUserInput] = useState("");
 
- useEffect(() => {
-  const scrollTarget = messagesEndRef.current;
-  if (scrollTarget) {
-    scrollTarget.scrollIntoView({ behavior: "smooth", block: "start" });
-  }
-}, [chatMessages, isTyping]);
-useEffect(() => {
-  const el = document.querySelector("textarea");
-  if (el) {
-    el.style.height = "auto";
-    el.style.height = `${el.scrollHeight}px`;
-  }
-}, [userInput]);
+  useEffect(() => {
+    const scrollTarget = messagesEndRef.current;
+    if (scrollTarget) {
+      scrollTarget.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [chatMessages, isTyping]);
+  useEffect(() => {
+    const el = document.querySelector("textarea");
+    if (el) {
+      el.style.height = "auto";
+      el.style.height = `${el.scrollHeight}px`;
+    }
+  }, [userInput]);
 
   async function handleBugPrevention() {
     const token = localStorage.getItem("userToken");
-  
+
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/credits/bugPrevention`, {
       method: "POST",
       headers: {
@@ -557,7 +557,7 @@ useEffect(() => {
       },
       body: JSON.stringify({ gameId: user?.gameId }),
     });
-  
+
     const data = await response.json();
     // console.log("data", data)
     if (response.ok) {
@@ -571,19 +571,19 @@ useEffect(() => {
 
   async function handleBuyoutBug() {
     const token = localStorage.getItem("userToken");
-  
+
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/credits/buyoutBug`, {
       method: "POST",
-      credentials : "include",
+      credentials: "include",
       headers: {
         "Content-Type": "application/json",
         token: token || "",
       },
       body: JSON.stringify({ gameId: user?.gameId }),
     });
-  
+
     const data = await response.json();
-  
+
     if (response.ok) {
       setUser(data);
       setUserState(data);
@@ -593,10 +593,10 @@ useEffect(() => {
       toast.error(data.message || "Could not buyout bug");
     }
   }
-  
+
   const handleConfirmBugAction = () => {
     if (!user) return;
-  
+
     switch (confirmationAction) {
       case 'skip':
       case 'buyout':
@@ -606,11 +606,11 @@ useEffect(() => {
         handleBugPrevention();
         break;
     }
-  
+
     setConfirmationAction(null);
     setShowSkipBugModal(false);
   };
-  
+
 
   const [modalInfo, setModalInfo] = useState<ModalInfo>({
     isOpen: false,
@@ -623,12 +623,12 @@ useEffect(() => {
   const [showMore, setShowMore] = useState<boolean | null>(false);
   const [selectedStage, setSelectedStage] = useState<string | null>(null);
   const [showBoostModal, setShowBoostModal] = useState(false);
-  const [showNotifications, setShowNotifications] = useState(false);
+  const [showNotificationModal, setShowNotificationModal] = useState(false);
   const [showSkipBugModal, setShowSkipBugModal] = useState(false);
   const [gameOverModal, setGameOverModal] = useState(() => {
     return user?.finances !== undefined && user.finances < 0;
   });
- const [notEnoughCredits, setnotEnoughCredits] = useState(false);
+  const [notEnoughCredits, setnotEnoughCredits] = useState(false);
 
   const [hintModalOpen, setHintModalOpen] = useState(false);
   const [hintContent, setHintContent] = useState("");
@@ -641,31 +641,31 @@ useEffect(() => {
     setloader(true);
     const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
     const token = localStorage.getItem("userToken");
-  
+
     if (!token) {
       alert("User is not authenticated. Please log in.");
       setloader(false);
       return;
     }
-  
-    let bugId  : string[] = []
-    let taskId : string[] = []
-    
+
+    let bugId: string[] = []
+    let taskId: string[] = []
+
     selectedTaskIds.forEach(element => {
       if (element.bugId) {
         bugId.push(element.bugId)
-      }else if(element.taskId) { 
+      } else if (element.taskId) {
         taskId.push(element.taskId)
       }
     });
 
     let requestBody = {
-      gameId : user?.gameId,
+      gameId: user?.gameId,
       employees: user?.teamMembers,
       turnAmount,
-      bugIds : bugId,
-      taskIds : taskId,
-      preventBug : user?.preventBug
+      bugIds: bugId,
+      taskIds: taskId,
+      preventBug: user?.preventBug
     }
 
     const makeReq = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/turn`, {
@@ -677,33 +677,33 @@ useEffect(() => {
       },
       body: JSON.stringify(requestBody),
     });
-  
+
     if (makeReq.ok) {
       const response = await makeReq.json();
-    
+
       setUser(response);
       setUserState(response);
       setnotificationMessages([...notificationMessages, ...response.message]);
-      
+
     }
-    
+
     // await delay(1000);
     setloader(false);
   }
   // 67e0705d89fe231396228b83
   const handleShowTutorial = () => {
-  if (typeof window === "undefined" || !user) return;
-  const seenKey = `elon_seen_v1_${user?.gameId ?? user?.username ?? "guest"}`;
-  // allow re-showing by removing the seen flag
-  try {
-    localStorage.removeItem(seenKey);
-  } catch (err) {
-    console.warn("Couldn't clear seen flag", err);
-  }
-  // show the assistant and set starting step
-  setShowElon(true);
-  setElonStep(1);
-};
+    if (typeof window === "undefined" || !user) return;
+    const seenKey = `elon_seen_v1_${user?.gameId ?? user?.username ?? "guest"}`;
+    // allow re-showing by removing the seen flag
+    try {
+      localStorage.removeItem(seenKey);
+    } catch (err) {
+      console.warn("Couldn't clear seen flag", err);
+    }
+    // show the assistant and set starting step
+    setShowElon(true);
+    setElonStep(1);
+  };
   function getShortName(metricName: string): string {
     const metricMap: Record<string, string> = {
       userAcquisition: "UA",
@@ -716,7 +716,7 @@ useEffect(() => {
       costPerAcquisition: "CPA",
       contributionMargin: "CM",
       buyerCount: "B",
-      bugPercentage : "bugPercentage"
+      bugPercentage: "bugPercentage"
     };
 
     return metricMap[metricName] || metricName;
@@ -735,7 +735,7 @@ useEffect(() => {
   ];
   const handleMetricClick = (
     metricKey: string,
-    event: React.MouseEvent<HTMLDivElement>,
+    event: React.MouseEvent<HTMLElement>,
   ) => {
     const info = metricsInfo[metricKey];
     if (info) {
@@ -748,7 +748,7 @@ useEffect(() => {
       });
     }
   };
-  const handleStageClick = (stage: string, event: React.MouseEvent<HTMLDivElement>) => {
+  const handleStageClick = (stage: string, event: React.MouseEvent<HTMLElement>) => {
     const stageKey = stage.toUpperCase();
     const info = stagesInfo[stageKey];
     if (info) {
@@ -815,168 +815,173 @@ useEffect(() => {
     if (Math.floor(value) === value) return 0; // integer
     return value.toString().split(".")[1]?.length || 0;
   }
-  
+
 
   return (
     <>
-    <Tooltip id="my-tooltip" />
-    {showElon && <ElonAssistant onStepChange={setElonStep} />}
+      <Tooltip id="my-tooltip" />
+      {showElon && <ElonAssistant onStepChange={setElonStep} />}
       {loader && (
-      <div className="fixed inset-0 z-[99999] flex flex-col items-center justify-center bg-black bg-opacity-50">
-        <div className="flex gap-2 mb-4">
-          <div className="h-4 w-4 animate-bounce rounded-full bg-blue-700 [animation-delay:.1s]"></div>
-          <div className="h-4 w-4 animate-bounce rounded-full bg-blue-700 [animation-delay:.3s]"></div>
-          <div className="h-4 w-4 animate-bounce rounded-full bg-blue-700 [animation-delay:.5s]"></div>
+        <div className="fixed inset-0 z-[99999] flex flex-col items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className="flex gap-2 mb-4">
+            <div className="h-4 w-4 animate-bounce rounded-full bg-blue-700 [animation-delay:.1s]"></div>
+            <div className="h-4 w-4 animate-bounce rounded-full bg-blue-700 [animation-delay:.3s]"></div>
+            <div className="h-4 w-4 animate-bounce rounded-full bg-blue-700 [animation-delay:.5s]"></div>
+          </div>
+          <p className="text-white text-sm font-medium mt-2">{loaderMessage}</p>
         </div>
-        <p className="text-white text-sm font-medium mt-2">{loaderMessage}</p>
-      </div>
-    )}
-
-      {
-        gameOverModal ? <GameOverModal  /> : null
-      }
-      
-      
-      {
-        notEnoughCredits  ? <NotEnoughCredits  /> : null
-      }
-      <h3 className="text-sm text-gray-500 dark:text-gray-400">
-        Startup Stages
-      </h3>
-      {user?.startupStage === "FFF" ? (
-        <p >Your goal is to reach 10 buyers</p>
-      ) : user?.startupStage === "Angels" ? (
-        <p >Your goal is to reach 100 buyers</p>
-      ) : user?.startupStage === "pre_seed" ? (
-        <p>Your goal is to reach 500 buyers</p>
-      ) : user?.startupStage === "Seed" ? (
-        <p>Your goal is to reach 2500 buyers and a positive contribution margin</p>
-      ) : user?.startupStage === "a" ? (
-        <p>Your goal is to reach 10,000 buyers and a contribution margin of $100,000</p>
-      ) : user?.startupStage === "b" ? (
-        <p>Your goal is to reach 50,000 buyers, a contribution margin of $500,000, and $100,000 in revenue</p>
-      ) : user?.startupStage === "c" ? (
-        <p>Your goal is to reach 100,000 buyers, a contribution margin of $1,000,000, and $500,000 in revenue</p>
-      ) : (
-        <p>Congratulations! You &apos; ve reached the highest stage 🚀</p>
       )}
 
-<div className={`my-2 flex gap-3 overflow-x-auto  transition-all duration-300 rounded-xl
-    ${elonStep === 1 ? 'ring-1 ring-[#3C50E0] animate-pulse py-4  bg-yellow-100 dark:bg-yellow-900' : ''} 
-    lg:w-auto lg:overflow-hidden 
-    dark:bg-[#101d28] bg-white border border-gray-200 
-    lg:dark:bg-transparent lg:border-0 dark:border-gray-700 p-5 lg:bg-transparent lg:p-0`}
-    
-    >
-  {stages.map((stage, index) => (
-    <div
-      key={index}
-      onClick={(e) => handleStageClick(stage, e)}
-      onMouseEnter={() => setHoveredStage(stage)}
-      onMouseLeave={() => setHoveredStage(null)}
-      className={`min-w-[100px] max-w-[120px] cursor-pointer px-4 py-2 text-center rounded-lg border transition-all duration-200
-        ${elonStep ===1 ? "my-2 mx-0.2"  :  ""}
-        ${
-          user?.startupStage === stage
-            ? "bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
-            : "bg-gray-200 dark:bg-[#1C2E5B] border-transparent hover:bg-gray-200 dark:hover:bg-[#223a5f]"
+      {
+        gameOverModal ? <GameOverModal /> : null
+      }
+
+
+      {
+        notEnoughCredits ? <NotEnoughCredits /> : null
+      }
+      <div
+        className={`mb-8 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900/40 p-5 shadow-sm transition-all duration-300 ${
+          elonStep === 1 ? "ring-2 ring-blue-500 animate-pulse" : ""
         }`}
-      data-tooltip-id="my-tooltip"
-      data-tooltip-content={ index === 0  ||  index === 1   
-         ? "" : "You need to purchase a plan to play through this stage"}
-    >
-      <div className="flex items-center justify-center gap-1">
-        { index !== 0  &&  index !== 1 ? (
-        <div className="flex justify-center mx-1">
-          <Lock size={14} className="text-gray-400 dark:text-white" />
+      >
+        <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between mb-4">
+          <div>
+            <p className="text-xs uppercase tracking-[0.2em] text-gray-500 dark:text-gray-400">
+              Startup Stages
+            </p>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+              Choose the stage to unlock new goals
+            </h3>
+          </div>
+          <div className="text-sm text-gray-500 dark:text-gray-400">
+            {user?.startupStage === "FFF"
+              ? "Goal: reach 10 buyers"
+              : user?.startupStage === "Angels"
+                ? "Goal: reach 100 buyers"
+                : user?.startupStage === "pre_seed"
+                  ? "Goal: reach 500 buyers"
+                  : user?.startupStage === "Seed"
+                    ? "Goal: reach 2,500 buyers + positive CM"
+                    : user?.startupStage === "a"
+                      ? "Goal: 10,000 buyers + $100k CM"
+                      : user?.startupStage === "b"
+                        ? "Goal: 50,000 buyers + $500k CM + $100k revenue"
+                        : user?.startupStage === "c"
+                          ? "Goal: 100,000 buyers + $1M CM + $500k revenue"
+                          : "Highest stage unlocked"}
+          </div>
         </div>
-        ) : null}
-         
-        <span className={`text-sm font-medium whitespace-nowrap 
-          ${
-            user?.startupStage === stage
-              ? "text-black dark:text-white font-semibold py-1 lg:py-0 text-center"
-              : "text-gray-600 dark:text-gray-400 py-1 text-center lg:py-0"
-          }`}
-        >
-          {stage}
-        </span>
-        {hoveredStage === stage && (
-          <InfoIcon size={12} className="text-gray-400 dark:text-gray-400" />
-        )}
+
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+          {stages.map((stage, index) => {
+            const isLocked = index > 1;
+            const isActive = user?.startupStage === stage;
+            return (
+              <button
+                key={stage}
+                onClick={(e) => handleStageClick(stage, e)}
+                onMouseEnter={() => setHoveredStage(stage)}
+                onMouseLeave={() => setHoveredStage(null)}
+                className={`flex items-center justify-between rounded-xl border px-4 py-3 text-left transition-all ${
+                  isActive
+                    ? "border-gray-900 bg-gray-900 text-white shadow-md dark:border-gray-100 dark:bg-gray-100 dark:text-gray-900"
+                    : "border-gray-200 bg-gray-50 text-gray-700 hover:border-gray-400 dark:border-gray-800 dark:bg-gray-800/40 dark:text-gray-200 dark:hover:border-gray-600"
+                }`}
+                data-tooltip-id="my-tooltip"
+                data-tooltip-content={
+                  isLocked ? "Purchase a plan to play this stage" : ""
+                }
+              >
+                <span className="text-sm font-semibold">{stage}</span>
+                <span className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                  {isLocked && <Lock size={12} />}
+                  {hoveredStage === stage && <InfoIcon size={12} />}
+                </span>
+              </button>
+            );
+          })}
+        </div>
       </div>
-    </div>
-  ))}
-</div>
 
 
-      <h3 className="text-sm text-gray-500 dark:text-gray-400">Metrics</h3>
-      <div 
-      className={`my-2 grid grid-cols-3 lg:flex 
-    gap-5 lg:gap-3 overflow-x-scroll lg:overflow-x-hidden
-    p-4 lg:p-0 
-    h-auto
-    ${elonStep === 2 
-      ? '  ring-1 ring-[#3C50E0] animate-pulse rounded-xl' 
-      : ''}
-  `}>
-      {user && user.metrics && orderedMetrics.map((metric, index) => (
-    <div
-      key={index}
-      onClick={(e) => handleMetricClick(getShortName(metric), e)}
-      className={`flex min-w-max lg:min-w-[9%]  lg:mx-0  items-center justify-around rounded-xl border 
-      border-stroke bg-white px-2 py-3 dark:border-strokedark dark:bg-boxdark
-       ${elonStep === 2 ? "my-2 mx-0.2"  :  ""}
-       `}
-    >
-      <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
-        {getShortName(metric)}
-      </span>
-      <span className="text-xs font-medium text-[#6577F3] dark:text-secondary">
-  {(() => {
-    const shortName = getShortName(metric);
-    const value = user.metrics[metric];
+      <div
+        className={`mb-8 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900/40 p-5 shadow-sm transition-all duration-300 ${
+          elonStep === 2 ? "ring-2 ring-blue-500 animate-pulse" : ""
+        }`}
+      >
+        <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between mb-4">
+          <div>
+            <p className="text-xs uppercase tracking-[0.2em] text-gray-500 dark:text-gray-400">
+              Core metrics
+            </p>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+              Track the numbers powering your turn
+            </h3>
+          </div>
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            Tap a metric to see context in the stage guide.
+          </p>
+        </div>
 
-    let displayValue;
-    if (shortName === 'UA' || shortName === 'B') {
-      displayValue = Math.floor(value);
-    } else if (Number.isInteger(value) || countDecimalPlaces(value) <= 2) {
-      displayValue = value;
-    } else {
-      displayValue = value.toFixed(2);
-    }
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+          {user &&
+            user.metrics &&
+            orderedMetrics.map((metric, index) => (
+              <button
+                key={index}
+                onClick={(e) => handleMetricClick(getShortName(metric), e)}
+                className="rounded-xl border border-gray-200 bg-gray-50 p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-gray-400 hover:bg-white dark:border-gray-800 dark:bg-gray-800/60 dark:hover:border-gray-600"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                    {getShortName(metric)}
+                  </span>
+                </div>
+                <p className="mt-2 text-xl font-semibold text-gray-900 dark:text-white">
+                  {(() => {
+                    const shortName = getShortName(metric);
+                    const value = user.metrics[metric];
 
-    return (
-      <>
-        {displayValue}
-        {shortName === 'C1' ? '%' : ''}
-        {dollarMetrics.includes(shortName) ? '$' : ''}
-      </>
-    );
-  })()}
-      </span>
-    </div>
-  ))}
+                    let displayValue;
+                    if (shortName === "UA" || shortName === "B") {
+                      displayValue = Math.floor(value);
+                    } else if (Number.isInteger(value) || countDecimalPlaces(value) <= 2) {
+                      displayValue = value;
+                    } else {
+                      displayValue = value.toFixed(2);
+                    }
 
-
-</div>
-<div className="mt-4 mb-6 flex justify-end w-full">
-<button
-  onClick={() => setChatModalOpen(true)}
-  className="flex items-center gap-2 text-sm font-medium bg-yellow-300 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300 px-4 py-2 rounded-xl shadow-sm hover:bg-yellow-200 dark:hover:bg-yellow-800 transition duration-200 ease-in-out w-full sm:w-auto sm:min-w-[180px] justify-center"
->
-  💡 Ask AI Advisor
-</button>
-  <button
-    onClick={handleShowTutorial}
-    className="flex items-center gap-2 text-sm font-medium bg-transparent text-blue-400 dark:text-blue-300 border border-transparent hover:underline px-3 py-2 rounded-xl transition duration-150"
-    title="Start the Elon tutorial"
-  >
-    💫 Show Tutorial
-  </button>
-
-
-</div>
+                    return (
+                      <>
+                        {displayValue}
+                        {shortName === "C1" ? "%" : ""}
+                        {dollarMetrics.includes(shortName) ? "$" : ""}
+                      </>
+                    );
+                  })()}
+                </p>
+              </button>
+            ))}
+        </div>
+      </div>
+      <div className="mt-6 mb-6 flex flex-col sm:flex-row gap-3 justify-end w-full">
+        <button
+          onClick={() => setChatModalOpen(true)}
+          className="flex items-center justify-center gap-2 text-sm font-medium bg-gray-900 dark:bg-gray-700 text-white dark:text-white px-5 py-2.5 rounded-lg shadow-sm hover:bg-gray-800 dark:hover:bg-gray-600 transition duration-200 w-full sm:w-auto sm:min-w-[160px]"
+        >
+          <InfoIcon className="w-4 h-4" />
+          Ask AI Advisor
+        </button>
+        <button
+          onClick={handleShowTutorial}
+          className="flex items-center justify-center gap-2 text-sm font-medium bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-750 px-5 py-2.5 rounded-lg transition duration-150 w-full sm:w-auto"
+          title="Start the Elon tutorial"
+        >
+          <ArrowRight className="w-4 h-4" />
+          Show Tutorial
+        </button>
+      </div>
 
       <SpotlightModal
         isOpen={modalInfo.isOpen}
@@ -986,517 +991,522 @@ useEffect(() => {
         anchorEl={modalInfo.anchorEl}
         selectedMetric={selectedMetric}
       />
-     <div className={`mt-4 w-full relative items-center 
+      <div className={`mt-4 w-full relative items-center 
      ${elonStep === 4 ? "ring-1 ring-blue-600 p-4 rounded-2xl animate-pulse" : ''}
-      lg:static pb-[120px] md:mt-4 2xl:mt-7.5`}>
-      <TaskGrid />
-    </div>
-    <div
-  className={`fixed bottom-0 right-0 z-[999] w-full lg:w-[calc(100%-300px)] lg:ml-[250px] 
-    px-4 py-3 bg-white dark:bg-boxdark border-t border-gray-200 dark:border-gray-700`}
->
-  {/* MOBILE & TABLET: Up to md screens */}
-  <div className="flex flex-col gap-3 md:hidden">
-    {/* Show More Toggle */}
-    <div
-      onClick={() => setShowMore(!showMore)}
-      className="flex justify-center mb-1 cursor-pointer"
-    >
-      <p className="text-sm font-medium text-blue-600 dark:text-blue-300">
-        {showMore ? "Show Less" : "Show More"}
-      </p>
-    </div>
-
-    {/* Conditionally Shown Extra Info */}
-    {showMore && (
-      <>
-        {/* Notifications */}
-        <div className="rounded-xl bg-gray-100 dark:bg-[#1A222C] p-3 mb-2">
-          <div className="flex justify-between items-center">
-            <h3
-              className={`text-sm ${
-                notificationMessages[notificationMessages.length - 1]?.isPositive
-                  ? "text-emerald-600 dark:text-emerald-400"
-                  : "text-red-600 dark:text-red-400"
-              }`}
-            >
-              {notificationMessages[notificationMessages.length - 1]?.message || "No notifications"}
-            </h3>
-            <button
-              onClick={() => setShowNotifications(!showNotifications)}
-              className="text-gray-600 dark:text-gray-400"
-            >
-              {showNotifications ? (
-                <span className="flex items-center">Hide <Bell className="ml-1" size={16} /></span>
-              ) : (
-                <span className="flex items-center">Show <Bell className="ml-1 text-red-500" size={16} /></span>
-              )}
-            </button>
-          </div>
-          {showNotifications && (
-            <div className="max-h-24 overflow-y-scroll mt-1 space-y-1 pr-1">
-              {notificationMessages
-                .slice(0, notificationMessages.length - 1)
-                .reverse()
-                .map((msg, idx) => (
-                  <p
-                    key={idx}
-                    className={`text-xs ${msg.isPositive ? "text-green-500" : "text-red-500"}`}
-                  >
-                    {msg.message}
-                  </p>
-                ))}
-            </div>
-          )}
-        </div>
-
-        {/* Bugs and Funds */}
-        <div className="flex justify-between text-sm">
-          <div>
-            <p>Bugs</p>
-            <div className={`flex items-center 
-               ${elonStep === 6 ? "ring-1 ring-blue-600 p-4 rounded-2xl animate-pulse" : ''}
-              gap-2`}>
-              <span className="font-semibold">{user?.bugPercentage}%</span>
-          <button
-            onClick={() => setShowSkipBugModal(true)}
-            className={`
-              text-xs px-3 py-1 rounded-full 
-              bg-blue-100 text-blue-800 hover:bg-blue-200 
-              dark:bg-blue-900 dark:text-blue-300 dark:hover:bg-blue-800
-
-              ${elonStep === 5 ? "ring-2 ring-yellow-400 animate-pulse bg-yellow-100 dark:bg-yellow-800" : ""}
-            `}
-          >
-            ⚙️ Manage Bug
-          </button>
-
-            </div>
-          </div>
-          <div>
-            <p>Funds</p>
-            <p className="font-semibold">${user?.finances}</p>
-          </div>
-        </div>
-      </>
-    )}
-
-    {/* Always Visible Turn Button */}
-    <button
-      onClick={() => makeTurn(turnAmount)}
-      className={`w-full flex flex-col items-center rounded-xl bg-[#4fc387] px-4 py-3
-         ${elonStep === 7 ? 'ring-2 ring-yellow-400 animate-pulse dark:ring-yellow-500' : ''}
-        `}
-    >
-      <span className="font-semibold text-white">Make turn</span>
-      <div className="flex justify-between w-full">
-        <span className="text-white text-sm">Income</span>
-        <span className="font-bold text-white ml-2">${turnAmount}</span>
+      lg:static md:mt-4 2xl:mt-7.5`}>
+        <TaskGrid />
       </div>
-    </button>
-  </div>
-
-  {/* TABLET & DESKTOP: md and above */}
-  <div className="hidden md:flex flex-col xl:flex-row xl:items-center items-start justify-between w-full gap-4">
-    {/* Notifications */}
-    <div className="flex flex-col gap-2 dark:bg-[#1A222C] bg-gray-100 rounded-xl px-4 py-2 w-full max-w-full xl:max-w-[500px] shadow-sm">
-      <div className="flex justify-between items-start gap-2">
-        <p
-          className={`text-sm ${
-            notificationMessages[notificationMessages.length - 1]?.isPositive
-              ? "text-emerald-600 dark:text-emerald-400"
-              : "text-red-600 dark:text-red-400"
-          }`}
-        >
-          {notificationMessages[notificationMessages.length - 1]?.message || "Welcome to the game"}
-        </p>
-        <button
-          onClick={() => setShowNotifications(!showNotifications)}
-          className="text-gray-500 hover:text-gray-700"
-        >
-          {showNotifications ? (
-            <span className="flex items-center">Hide <Bell className="ml-1 text-green-500" size={16} /></span>
-          ) : (
-            <span className="flex items-center">Show <Bell className="ml-1 text-red-500" size={16} /></span>
-          )}
-        </button>
-      </div>
-      {showNotifications && (
-        <div className="max-h-24 overflow-y-scroll mt-1 space-y-1 pr-1">
-          {notificationMessages
-            .slice(0, notificationMessages.length - 1)
-            .reverse()
-            .map((msg, idx) => (
-              <p
-                key={idx}
-                className={`text-xs ${msg.isPositive ? "text-green-500" : "text-red-500"}`}
-              >
-                {msg.message}
-              </p>
-            ))}
-        </div>
-      )}
-    </div>
-
-    {/* Bugs + Funds + Turn */}
-    <div className="flex flex-col ml-20 sm:flex-row xl:items-end gap-4 w-full  justify-between">
-      {/* Bugs and Funds */}
-      <div className="flex gap-6 w-full sm:w-auto justify-between">
-        <div className="text-sm">
-          <p>Bugs</p>
-          <div className="flex items-center gap-2">
-            <span className="font-semibold joyride-step-4">{user?.bugPercentage}%</span>
-            <button
-  onClick={() => setShowSkipBugModal(true)}
-  className={`
-    text-xs px-3 py-1 rounded-full 
-    bg-blue-100 text-blue-800 hover:bg-blue-200 
-    dark:bg-blue-900 dark:text-blue-300 dark:hover:bg-blue-800
-
-    ${elonStep === 5 ? "ring-2 ring-yellow-400 animate-pulse bg-yellow-100 dark:bg-yellow-800" : ""}
-  `}
->
-  ⚙️ Manage Bug
-</button>
-
-          </div>
-        </div>
-
-        <div className="text-sm">
-          <p>Funds</p>
-          <p className="font-semibold">${user?.finances}</p>
-        </div>
-      </div>
-
-      {/* Make Turn Button */}
-   <button
-  onClick={() => makeTurn(turnAmount)}
-  className={`w-full sm:w-72 rounded-xl bg-[#4fc387] px-6 py-3 flex flex-col items-center justify-center space-y-1
-    ${elonStep === 7 ? 'ring-2 ring-yellow-400 animate-pulse dark:ring-yellow-500' : ''}
-  `}
->
-  <span className="font-semibold text-white text-lg">Make turn</span>
-  <div className="flex justify-between w-full px-2">
-    <span className="font-medium text-white">Income</span>
-    <span className="font-bold text-white">${turnAmount}</span>
-  </div>
-</button>
-
-    </div>
-  </div>
-</div>
-
-
-
-
-
-
-{confirmationAction && (
-  <div className="fixed inset-0 z-[999999] flex items-center m-5 justify-center bg-black bg-opacity-50">
-    <div className="bg-white dark:bg-boxdark p-6 rounded-xl w-full max-w-sm shadow-lg text-center">
-      <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">Confirm Action</h2>
-      <p className="text-sm text-gray-600 dark:text-gray-300 mb-6">
-        Are you sure you want to {confirmationAction === 'skip'
-          ? 'skip the bug fix duration (60 Venture coins)?'
-          : confirmationAction === 'buyout'
-          ? 'buy out this bug (60 Venture coins)?'
-          : 'use Bug Prevention Insurance (25 Venture coins)?'}
-      </p>
-
-      <div className="flex justify-center gap-4">
-        <button
-          onClick={handleConfirmBugAction}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg"
-        >
-          Confirm
-        </button>
-        <button
-          onClick={() => setConfirmationAction(null)}
-          className="border border-gray-300 hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-800 text-gray-700 dark:text-white px-4 py-2 rounded-lg"
-        >
-          Cancel
-        </button>
-      </div>
-    </div>
-  </div>
-)}
-
-
-{showSkipBugModal && (
-  <div className="fixed inset-0 z-[99999] flex items-center m-5 lg:m-0 justify-center bg-black bg-opacity-50">
-    <div className="bg-white dark:bg-boxdark p-6 rounded-xl w-full max-w-sm shadow-lg text-center">
-      <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-2">Manage Bug</h2>
-      <p className="text-sm text-gray-500 dark:text-gray-300 mb-4">
-        Choose how you want to resolve or prevent bugs. Options vary in cost and effect.
-      </p>
-
-      <div className="flex flex-col space-y-3">
-
-        <button
-          onClick={() => setConfirmationAction('buyout')}
-          className="bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-lg"
-        >
-          🛠 Buyout Bug
-        </button>
-        <p className="text-xs text-gray-500 dark:text-gray-400 -mt-2 mb-2">
-          Permanently removes one active bug without a turn. Best for critical issues. Cost:  3500 Venture coins.
-        </p>
-
-        <div className="relative border-t pt-2 border-gray-300 dark:border-gray-600">
-          <p className="text-xs uppercase text-gray-400 dark:text-gray-500">OR</p>
-        </div>
-
-        <button
-          onClick={() => setConfirmationAction('prevent')}
-          className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg"
-        >
-          🛡️ Bug Prevention Insurance
-        </button>
-        <p className="text-xs text-gray-500 dark:text-gray-400 -mt-2">
-          Prevents bugs from triggering this turn. Usable once every 3 turns. Cost: 2500 Venture coins.
-        </p>
-
-        <button
-          onClick={() => setShowSkipBugModal(false)}
-          className="border border-gray-300 hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-800 text-gray-700 dark:text-white px-4 py-2 rounded-lg"
-        >
-          Cancel
-        </button>
-      </div>
-    </div>
-  </div>
-)}
-
-
-{chatModalOpen && (
-  <div className="fixed m-5 lg:m-0 inset-0 z-[99999] flex items-center justify-center bg-black/40 backdrop-blur-sm">
-    <motion.div
-      initial={{ opacity: 0, scale: 0.95, y: 30 }}
-      animate={{ opacity: 1, scale: 1, y: 0 }}
-      exit={{ opacity: 0, scale: 0.95, y: 30 }}
-      transition={{ duration: 0.3 }}
-      className="w-full max-w-lg h-[90vh] max-h-[650px] flex flex-col p-5 rounded-3xl shadow-2xl bg-white dark:bg-[#1b1f23]/70 dark:backdrop-blur-xl border border-gray-300 dark:border-gray-700"
-    >
-      {/* Header */}
-      <div className="flex justify-between items-center mb-3">
-        <h2 className="text-xl font-bold text-gray-900 dark:text-white">AI Advisor</h2>
-        <button
-          onClick={() => {
-            setChatModalOpen(false);
-            setChatMessages([
-              {
-                sender: 'elon',
-                text: "Hey there! I'm Elon, your AI Advisor 🤖. Ask me anything about your startup — metrics, hiring, bugs, you name it.",
-              },
-            ]);
-          }}
-          className="text-gray-600 hover:text-red-500 dark:text-gray-400 dark:hover:text-red-400 text-lg"
-        >
-          ✕
-        </button>
-      </div>
-
-      {/* Chat Scrollable Area */}
       <div
-        className="flex-1 overflow-y-auto space-y-4 pr-1 custom-scrollbar"
-        ref={(el) => {
-          if (el && !isTyping) {
-            const lastMessage = el.lastElementChild;
-            if (lastMessage) {
-              lastMessage.scrollIntoView({ behavior: "smooth", block: "start" });
-            }
-          }
-        }}
+        className={`fixed bottom-0 right-0 z-[1000] w-full lg:w-[calc(100%-var(--sidebar-width,0px))] lg:ml-[var(--sidebar-width,0px)]
+    px-6 py-5 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 shadow-2xl backdrop-blur-sm transition-all duration-300`}
       >
-        {chatMessages.map((msg, idx) => {
-          const isUser = msg.sender === 'user';
-          return (
-            <motion.div
-              key={idx}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: idx * 0.04 }}
-              className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}
-            >
-              <div className={`flex items-start gap-3 max-w-[85%] ${isUser ? 'flex-row-reverse' : ''}`}>
-                {isUser ? (
-                  <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-sm">
-                    {user?.username?.[0]?.toUpperCase() || "U"}
-                  </div>
-                ) : (
-                  <Image
-                    src="/elon.png"
-                    alt="AI"
-                    width={32}
-                    height={32}
-                    className="rounded-full object-cover flex-shrink-0"
-                  />
-                )}
-                <div className={`whitespace-pre-wrap break-words px-4 py-3 rounded-2xl text-sm shadow-md ${
-                  isUser
-                    ? "bg-blue-600 text-white"
-                    : "bg-gray-100 dark:bg-[#2d3746]/70 text-gray-900 dark:text-white"
-                }`}>
-                  {idx === 0 && !isUser
-                    ? <TypewriterText text={msg.text} speed={20} />
-                    : <p>{msg.text}</p>}
+        {/* MOBILE & TABLET: Up to md screens */}
+        <div className="flex flex-col gap-3 md:hidden">
+          {/* Show More Toggle */}
+          <div
+            onClick={() => setShowMore(!showMore)}
+            className="flex justify-center mb-1 cursor-pointer"
+          >
+            <p className="text-sm font-medium text-blue-600 dark:text-blue-300">
+              {showMore ? "Show Less" : "Show More"}
+            </p>
+          </div>
+
+          {/* Conditionally Shown Extra Info */}
+          {showMore && (
+            <>
+              {/* Notifications */}
+              <div className="rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-4 mb-3">
+                <div className="flex justify-between items-center">
+                  <h3
+                    className={`text-sm font-semibold ${notificationMessages[notificationMessages.length - 1]?.isPositive
+                        ? "text-green-600 dark:text-green-400"
+                        : "text-red-600 dark:text-red-400"
+                      }`}
+                  >
+                    {notificationMessages[notificationMessages.length - 1]?.message || "No notifications"}
+                  </h3>
+                  <button
+                    onClick={() => setShowNotificationModal(true)}
+                    className="flex items-center gap-1.5 text-xs font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 transition-colors"
+                  >
+                    <span>Show</span>
+                    <Bell className="h-4 w-4" />
+                  </button>
                 </div>
               </div>
-            </motion.div>
-          );
-        })}
+              
+              {/* Bugs and Funds */}
+              <div className="flex justify-between gap-4">
+                <div className="flex-1 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-3">
+                  <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">Bugs</p>
+                  <div className={`flex items-center gap-2 
+               ${elonStep === 6 ? "ring-2 ring-blue-500 p-2 rounded-lg animate-pulse" : ''}`}>
+                    <span className="text-lg font-bold text-gray-900 dark:text-white">{user?.bugPercentage}%</span>
+                    <button
+                      onClick={() => setShowSkipBugModal(true)}
+                      className={`
+                  text-xs px-3 py-1.5 rounded-lg font-medium
+                  bg-gray-900 text-white hover:bg-gray-800 
+                  dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600 transition-colors
 
-        {isTyping && (
-          <div className="flex items-start gap-2">
-            <Image src="/elon.png" alt="AI" width={32} height={32} className="rounded-full" />
-            <div className="bg-gray-100 dark:bg-[#2c3440]/80 px-4 py-2 rounded-2xl text-sm shadow-md">
-              <div className="flex space-x-1 animate-pulse">
-                <span className="w-2 h-2 bg-gray-500 dark:bg-gray-300 rounded-full" />
-                <span className="w-2 h-2 bg-gray-500 dark:bg-gray-300 rounded-full" />
-                <span className="w-2 h-2 bg-gray-500 dark:bg-gray-300 rounded-full" />
+                  ${elonStep === 5 ? "ring-2 ring-blue-500 animate-pulse" : ""}
+                `}
+                    >
+                      Manage Bug
+                    </button>
+                  </div>
+                </div>
+                <div className="flex-1 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-3">
+                  <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">Funds</p>
+                  <p className="text-lg font-bold text-gray-900 dark:text-white">${user?.finances}</p>
+                </div>
               </div>
+            </>
+          )}
+
+          {/* Always Visible Turn Button */}
+          <button
+            onClick={() => makeTurn(turnAmount)}
+            className={`w-full flex flex-col items-center rounded-lg bg-gray-900 dark:bg-gray-700 px-5 py-4 hover:bg-gray-800 dark:hover:bg-gray-600 transition-all duration-200 shadow-lg hover:shadow-xl
+         ${elonStep === 7 ? 'ring-2 ring-blue-500 animate-pulse' : ''}
+        `}
+          >
+            <span className="font-bold text-white text-lg mb-2">Make turn</span>
+            <div className="flex justify-between items-center w-full px-2 pt-2 border-t border-white/10">
+              <span className="text-white text-sm font-medium">Income</span>
+              <span className={`text-lg font-bold ${Number(turnAmount) >= 0 ? 'text-green-300' : 'text-red-300'}`}>${turnAmount}</span>
+            </div>
+          </button>
+        </div>
+
+        {/* TABLET & DESKTOP: md and above */}
+        <div className="hidden md:flex flex-col xl:flex-row xl:items-center items-start justify-between w-full gap-4">
+          {/* Notifications */}
+          <div className="flex flex-col gap-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-5 py-4 w-full max-w-full xl:max-w-[500px]">
+            <div className="flex justify-between items-start gap-3">
+              <p
+                className={`text-sm font-semibold leading-relaxed ${notificationMessages[notificationMessages.length - 1]?.isPositive
+                    ? "text-green-600 dark:text-green-400"
+                    : "text-red-600 dark:text-red-400"
+                  }`}
+              >
+                {notificationMessages[notificationMessages.length - 1]?.message || "Welcome to the game"}
+              </p>
+              <button
+                onClick={() => setShowNotificationModal(true)}
+                className="flex items-center gap-1.5 text-xs font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 transition-colors flex-shrink-0"
+              >
+                <span>Show</span>
+                <Bell className="h-4 w-4" />
+              </button>
             </div>
           </div>
-        )}
-      </div>
 
-      {/* Suggestions */}
-      <div className="mt-2 mb-2 bg-gray-100 dark:bg-[#1e2630]/60 p-2 rounded-xl shadow-inner max-h-[72px] overflow-y-auto">
-        <p className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Need help? Try one of these:</p>
-        <div className="flex flex-wrap gap-2">
-          {[
-            "How can I increase my user acquisition quickly?",
-            "What metrics should I prioritize at the FFF stage?",
-            "How do I reduce the bug percentage in my startup?",
-            "Should I hire a developer or a salesperson right now?",
-            "What tasks give the best ROI in the 'pre-seed' stage?",
-          ].map((prompt, idx) => (
+          {/* Bugs + Funds + Turn */}
+          <div className="flex flex-col xl:flex-row xl:items-center gap-4 w-full justify-end">
+            {/* Bugs and Funds */}
+            <div className="flex gap-4">
+              <div className="rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-4 py-3 min-w-[140px]">
+                <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">Bugs</p>
+                <div className="flex items-center gap-2">
+                  <span className="text-xl font-bold text-gray-900 dark:text-white joyride-step-4">{user?.bugPercentage}%</span>
+                  <button
+                    onClick={() => setShowSkipBugModal(true)}
+                    className={`
+                text-xs px-3 py-1.5 rounded-lg font-medium
+                bg-gray-900 text-white hover:bg-gray-800 
+                dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600 transition-colors
+
+                ${elonStep === 5 ? "ring-2 ring-blue-500 animate-pulse" : ""}
+              `}
+                  >
+                    Manage Bug
+                  </button>
+                </div>
+              </div>
+
+              <div className="rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-4 py-3 min-w-[140px]">
+                <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">Funds</p>
+                <p className="text-xl font-bold text-gray-900 dark:text-white">${user?.finances}</p>
+              </div>
+            </div>
+
+            {/* Make Turn Button */}
             <button
-              key={idx}
-              onClick={() => setUserInput(prompt)}
-              className="text-xs sm:text-sm px-3 py-1 bg-white dark:bg-[#3c4658] hover:bg-gray-200 dark:hover:bg-[#485267] text-gray-900 dark:text-white rounded-full shadow-sm transition-all"
+              onClick={() => makeTurn(turnAmount)}
+              className={`w-full xl:w-80 rounded-lg bg-gray-900 dark:bg-gray-700 px-6 py-4 flex flex-col items-center justify-center hover:bg-gray-800 dark:hover:bg-gray-600 transition-all duration-200 shadow-lg hover:shadow-xl
+          ${elonStep === 7 ? 'ring-2 ring-blue-500 animate-pulse' : ''}
+        `}
             >
-              {prompt}
+              <span className="font-bold text-white text-lg mb-2">Make turn</span>
+              <div className="flex justify-between items-center w-full px-2 pt-2 border-t border-white/10">
+                <span className="font-medium text-white text-sm">Income</span>
+                <span className={`text-lg font-bold ${Number(turnAmount) >= 0 ? 'text-green-300' : 'text-red-300'}`}>${turnAmount}</span>
+              </div>
             </button>
-          ))}
+          </div>
         </div>
       </div>
 
-      {/* Input Field */}
-      <form
-        onSubmit={async (e) => {
-          e.preventDefault();
-          if (!userInput.trim()) return;
-          const question = userInput.trim();
-          setChatMessages(prev => [...prev, { sender: "user", text: question }]);
-          setUserInput("");
-          setIsTyping(true);
 
-          try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/ai-hint`, {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                token: localStorage.getItem("userToken") || "",
-              },
-              body: JSON.stringify({ gameId: user?.gameId, promptFromUser: question }),
-            });
 
-            const data = await res.json();
-            setUser(data);
-            setChatMessages(prev => [
-              ...prev,
-              {
-                sender: "elon",
-                text: res.ok && data?.hint
-                  ? data?.hint
-                  : "Hmm... I'm not sure about that one right now.",
-              },
-            ]);
-          } catch {
-            setChatMessages(prev => [
-              ...prev,
-              { sender: "elon", text: "Something went wrong. Try again later." },
-            ]);
-          } finally {
-            setIsTyping(false);
-          }
-        }}
-        className="mt-2 flex items-end gap-2"
-      >
-        <textarea
-          rows={1}
-          value={userInput}
-          onChange={(e) => setUserInput(e.target.value)}
-          placeholder="Ask your startup question..."
-          className="flex-grow resize-none overflow-hidden px-4 py-2 text-sm sm:text-base rounded-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-[#2c3440]/80 text-gray-900 dark:text-white shadow-sm placeholder:text-gray-500 dark:placeholder:text-gray-400"
-          onInput={(e) => {
-            e.currentTarget.style.height = "auto";
-            e.currentTarget.style.height = `${e.currentTarget.scrollHeight}px`;
-          }}
-        />
-        <button
-          type="submit"
-          className="bg-blue-600 hover:bg-blue-700 text-white text-sm sm:text-base px-4 py-2 rounded-full"
-        >
-          Send
-        </button>
-      </form>
-    </motion.div>
-  </div>
-)}
 
-{showBoostModal && (
-  <div className="fixed inset-0 z-[99999] bg-black bg-opacity-50 flex items-center justify-center">
-    <div className="bg-white dark:bg-boxdark rounded-xl w-full max-w-md p-6 shadow-lg">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-lg font-semibold text-gray-800 dark:text-white">Special Task Speed Boost</h2>
-        <button
-          onClick={() => setShowBoostModal(false)}
-          className="text-gray-500 hover:text-gray-700 dark:text-gray-300"
-        >
-          ✕
-        </button>
-      </div>
 
-      <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-        Auto-complete any 1-turn task instantly. Saves time and opens up bandwidth for higher-value tasks. <br />
-        <span className="text-indigo-500 font-medium">Cost: 50 Venture coins</span>
-      </p>
 
-      <div className="space-y-3 max-h-60 overflow-y-auto">
-        {[
-          { id: 1, name: "Fix Signup Flow", credits : 50 },
-          { id: 2, name: "Optimize CTA", credits: 50 },
-          { id: 3, name: "Polish UI Spacing", credits: 50 },
-        ].map((task) => (
-          <div key={task.id} className="flex justify-between items-center p-3 rounded-lg border border-gray-200 dark:border-gray-700">
-            <div>
-              <h3 className="text-sm font-semibold text-gray-800 dark:text-white">{task.name}</h3>
-              <p className="text-xs text-gray-500 dark:text-gray-400">1-turn task — Cost: 50 Venture coins</p>
+      {confirmationAction && (
+        <div className="fixed inset-0 z-[999999] flex items-center m-5 justify-center bg-black/50 backdrop-blur-sm">
+          <div className="bg-white dark:bg-boxdark p-6 rounded-xl w-full max-w-sm shadow-lg text-center">
+            <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">Confirm Action</h2>
+            <p className="text-sm text-gray-600 dark:text-gray-300 mb-6">
+              Are you sure you want to {confirmationAction === 'skip'
+                ? 'skip the bug fix duration (60 Venture coins)?'
+                : confirmationAction === 'buyout'
+                  ? 'buy out this bug (60 Venture coins)?'
+                  : 'use Bug Prevention Insurance (25 Venture coins)?'}
+            </p>
+
+            <div className="flex justify-center gap-4">
+              <button
+                onClick={handleConfirmBugAction}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg"
+              >
+                Confirm
+              </button>
+              <button
+                onClick={() => setConfirmationAction(null)}
+                className="border border-gray-300 hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-800 text-gray-700 dark:text-white px-4 py-2 rounded-lg"
+              >
+                Cancel
+              </button>
             </div>
-            <button
-              onClick={() => {
-                // console.log(`Boosted task: ${task.name}`);
-                setShowBoostModal(false);
+          </div>
+        </div>
+      )}
+
+
+      {/* Notification Modal */}
+      {showNotificationModal && (
+        <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4">
+          <div
+            className="absolute inset-0 bg-black/60 backdrop-blur-md"
+            onClick={() => setShowNotificationModal(false)}
+          />
+          <div className="relative w-full max-w-2xl rounded-2xl bg-white dark:bg-gray-800 p-6 shadow-2xl border border-gray-200 dark:border-gray-700">
+            <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Notifications</h2>
+              <button
+                onClick={() => setShowNotificationModal(false)}
+                className="rounded-lg p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:hover:bg-gray-700 dark:hover:text-gray-200 transition-colors"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <div className="max-h-[500px] overflow-y-auto space-y-3 pr-2">
+              {notificationMessages.length === 0 ? (
+                <p className="text-center text-gray-500 dark:text-gray-400 py-8">No notifications available</p>
+              ) : (
+                notificationMessages
+                  .slice()
+                  .reverse()
+                  .map((msg, idx) => (
+                    <div
+                      key={idx}
+                      className={`rounded-lg p-4 border ${msg.isPositive
+                          ? "bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800"
+                          : "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800"
+                        }`}
+                    >
+                      <p
+                        className={`text-sm font-medium ${msg.isPositive
+                            ? "text-green-700 dark:text-green-400"
+                            : "text-red-700 dark:text-red-400"
+                          }`}
+                      >
+                        {msg.message}
+                      </p>
+                    </div>
+                  ))
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showSkipBugModal && (
+        <div className="fixed inset-0 z-[99999] flex items-center m-5 lg:m-0 justify-center bg-black/50 backdrop-blur-sm">
+          <div className="bg-white dark:bg-boxdark p-6 rounded-xl w-full max-w-sm shadow-lg text-center">
+            <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-2">Manage Bug</h2>
+            <p className="text-sm text-gray-500 dark:text-gray-300 mb-4">
+              Choose how you want to resolve or prevent bugs. Options vary in cost and effect.
+            </p>
+
+            <div className="flex flex-col space-y-3">
+
+              <button
+                onClick={() => setConfirmationAction('buyout')}
+                className="bg-gray-900 hover:bg-gray-800 dark:bg-gray-700 dark:hover:bg-gray-600 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+              >
+                Buyout Bug
+              </button>
+              <p className="text-xs text-gray-500 dark:text-gray-400 -mt-2 mb-2">
+                Permanently removes one active bug without a turn. Best for critical issues. Cost:  3500 Venture coins.
+              </p>
+
+              <div className="relative border-t pt-2 border-gray-300 dark:border-gray-600">
+                <p className="text-xs uppercase text-gray-400 dark:text-gray-500">OR</p>
+              </div>
+
+              <button
+                onClick={() => setConfirmationAction('prevent')}
+                className="bg-gray-900 hover:bg-gray-800 dark:bg-gray-700 dark:hover:bg-gray-600 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+              >
+                Bug Prevention Insurance
+              </button>
+              <p className="text-xs text-gray-500 dark:text-gray-400 -mt-2">
+                Prevents bugs from triggering this turn. Usable once every 3 turns. Cost: 2500 Venture coins.
+              </p>
+
+              <button
+                onClick={() => setShowSkipBugModal(false)}
+                className="border border-gray-300 hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-800 text-gray-700 dark:text-white px-4 py-2 rounded-lg"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+
+      {chatModalOpen && (
+        <div className="fixed m-5 lg:m-0 inset-0 z-[99999] flex items-center justify-center bg-black/40 backdrop-blur-sm">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95, y: 30 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: 30 }}
+            transition={{ duration: 0.3 }}
+            className="w-full max-w-lg h-[90vh] max-h-[650px] flex flex-col p-5 rounded-3xl shadow-2xl bg-white dark:bg-[#1b1f23]/70 dark:backdrop-blur-xl border border-gray-300 dark:border-gray-700"
+          >
+            {/* Header */}
+            <div className="flex justify-between items-center mb-3">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white">AI Advisor</h2>
+              <button
+                onClick={() => {
+                  setChatModalOpen(false);
+                  setChatMessages([
+                    {
+                      sender: 'elon',
+                      text: "Hey there! I'm Elon, your AI Advisor. Ask me anything about your startup — metrics, hiring, bugs, you name it.",
+                    },
+                  ]);
+                }}
+                className="text-gray-600 hover:text-red-500 dark:text-gray-400 dark:hover:text-red-400 text-lg font-bold"
+              >
+                ×
+              </button>
+            </div>
+
+            {/* Chat Scrollable Area */}
+            <div
+              className="flex-1 overflow-y-auto space-y-4 pr-1 custom-scrollbar"
+              ref={(el) => {
+                if (el && !isTyping) {
+                  const lastMessage = el.lastElementChild;
+                  if (lastMessage) {
+                    lastMessage.scrollIntoView({ behavior: "smooth", block: "start" });
+                  }
+                }
               }}
-              className="bg-indigo-600 hover:bg-indigo-700 text-white text-sm px-3 py-1.5 rounded-lg"
             >
-              Boost
+              {chatMessages.map((msg, idx) => {
+                const isUser = msg.sender === 'user';
+                return (
+                  <motion.div
+                    key={idx}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: idx * 0.04 }}
+                    className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}
+                  >
+                    <div className={`flex items-start gap-3 max-w-[85%] ${isUser ? 'flex-row-reverse' : ''}`}>
+                      {isUser ? (
+                        <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-sm">
+                          {user?.username?.[0]?.toUpperCase() || "U"}
+                        </div>
+                      ) : (
+                        <Image
+                          src="/elon.png"
+                          alt="AI"
+                          width={32}
+                          height={32}
+                          className="rounded-full object-cover flex-shrink-0"
+                        />
+                      )}
+                      <div className={`whitespace-pre-wrap break-words px-4 py-3 rounded-2xl text-sm shadow-md ${isUser
+                          ? "bg-blue-600 text-white"
+                          : "bg-gray-100 dark:bg-[#2d3746]/70 text-gray-900 dark:text-white"
+                        }`}>
+                        {idx === 0 && !isUser
+                          ? <TypewriterText text={msg.text} speed={20} />
+                          : <p>{msg.text}</p>}
+                      </div>
+                    </div>
+                  </motion.div>
+                );
+              })}
+
+              {isTyping && (
+                <div className="flex items-start gap-2">
+                  <Image src="/elon.png" alt="AI" width={32} height={32} className="rounded-full" />
+                  <div className="bg-gray-100 dark:bg-[#2c3440]/80 px-4 py-2 rounded-2xl text-sm shadow-md">
+                    <div className="flex space-x-1 animate-pulse">
+                      <span className="w-2 h-2 bg-gray-500 dark:bg-gray-300 rounded-full" />
+                      <span className="w-2 h-2 bg-gray-500 dark:bg-gray-300 rounded-full" />
+                      <span className="w-2 h-2 bg-gray-500 dark:bg-gray-300 rounded-full" />
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Suggestions */}
+            <div className="mt-2 mb-2 bg-gray-100 dark:bg-[#1e2630]/60 p-2 rounded-xl shadow-inner max-h-[72px] overflow-y-auto">
+              <p className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Need help? Try one of these:</p>
+              <div className="flex flex-wrap gap-2">
+                {[
+                  "How can I increase my user acquisition quickly?",
+                  "What metrics should I prioritize at the FFF stage?",
+                  "How do I reduce the bug percentage in my startup?",
+                  "Should I hire a developer or a salesperson right now?",
+                  "What tasks give the best ROI in the 'pre-seed' stage?",
+                ].map((prompt, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setUserInput(prompt)}
+                    className="text-xs sm:text-sm px-3 py-1 bg-white dark:bg-[#3c4658] hover:bg-gray-200 dark:hover:bg-[#485267] text-gray-900 dark:text-white rounded-full shadow-sm transition-all"
+                  >
+                    {prompt}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Input Field */}
+            <form
+              onSubmit={async (e) => {
+                e.preventDefault();
+                if (!userInput.trim()) return;
+                const question = userInput.trim();
+                setChatMessages(prev => [...prev, { sender: "user", text: question }]);
+                setUserInput("");
+                setIsTyping(true);
+
+                try {
+                  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/ai-hint`, {
+                    method: "POST",
+                    headers: {
+                      "Content-Type": "application/json",
+                      token: localStorage.getItem("userToken") || "",
+                    },
+                    body: JSON.stringify({ gameId: user?.gameId, promptFromUser: question }),
+                  });
+
+                  const data = await res.json();
+                  setUser(data);
+                  setChatMessages(prev => [
+                    ...prev,
+                    {
+                      sender: "elon",
+                      text: res.ok && data?.hint
+                        ? data?.hint
+                        : "Hmm... I'm not sure about that one right now.",
+                    },
+                  ]);
+                } catch {
+                  setChatMessages(prev => [
+                    ...prev,
+                    { sender: "elon", text: "Something went wrong. Try again later." },
+                  ]);
+                } finally {
+                  setIsTyping(false);
+                }
+              }}
+              className="mt-2 flex items-end gap-2"
+            >
+              <textarea
+                rows={1}
+                value={userInput}
+                onChange={(e) => setUserInput(e.target.value)}
+                placeholder="Ask your startup question..."
+                className="flex-grow resize-none overflow-hidden px-4 py-2 text-sm sm:text-base rounded-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-[#2c3440]/80 text-gray-900 dark:text-white shadow-sm placeholder:text-gray-500 dark:placeholder:text-gray-400"
+                onInput={(e) => {
+                  e.currentTarget.style.height = "auto";
+                  e.currentTarget.style.height = `${e.currentTarget.scrollHeight}px`;
+                }}
+              />
+              <button
+                type="submit"
+                className="bg-blue-600 hover:bg-blue-700 text-white text-sm sm:text-base px-4 py-2 rounded-full"
+              >
+                Send
+              </button>
+            </form>
+          </motion.div>
+        </div>
+      )}
+
+      {showBoostModal && (
+        <div className="fixed inset-0 z-[99999] bg-black/50 backdrop-blur-sm flex items-center justify-center">
+          <div className="bg-white dark:bg-boxdark rounded-xl w-full max-w-md p-6 shadow-lg">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg font-semibold text-gray-800 dark:text-white">Special Task Speed Boost</h2>
+              <button
+                onClick={() => setShowBoostModal(false)}
+                className="text-gray-500 hover:text-gray-700 dark:text-gray-300 font-bold"
+              >
+                ×
+              </button>
+            </div>
+
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+              Auto-complete any 1-turn task instantly. Saves time and opens up bandwidth for higher-value tasks. <br />
+              <span className="text-indigo-500 font-medium">Cost: 50 Venture coins</span>
+            </p>
+
+            <div className="space-y-3 max-h-60 overflow-y-auto">
+              {[
+                { id: 1, name: "Fix Signup Flow", credits: 50 },
+                { id: 2, name: "Optimize CTA", credits: 50 },
+                { id: 3, name: "Polish UI Spacing", credits: 50 },
+              ].map((task) => (
+                <div key={task.id} className="flex justify-between items-center p-3 rounded-lg border border-gray-200 dark:border-gray-700">
+                  <div>
+                    <h3 className="text-sm font-semibold text-gray-800 dark:text-white">{task.name}</h3>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">1-turn task — Cost: 50 Venture coins</p>
+                  </div>
+                  <button
+                    onClick={() => {
+                      // console.log(`Boosted task: ${task.name}`);
+                      setShowBoostModal(false);
+                    }}
+                    className="bg-indigo-600 hover:bg-indigo-700 text-white text-sm px-3 py-1.5 rounded-lg"
+                  >
+                    Boost
+                  </button>
+                </div>
+              ))}
+            </div>
+
+            <button
+              onClick={() => setShowBoostModal(false)}
+              className="mt-4 w-full text-sm border border-gray-300 hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-800 px-4 py-2 rounded-lg text-gray-700 dark:text-white"
+            >
+              Cancel
             </button>
           </div>
-        ))}
-      </div>
-
-      <button
-        onClick={() => setShowBoostModal(false)}
-        className="mt-4 w-full text-sm border border-gray-300 hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-800 px-4 py-2 rounded-lg text-gray-700 dark:text-white"
-      >
-        Cancel
-      </button>
-    </div>
-  </div>
-)}
+        </div>
+      )}
 
 
 

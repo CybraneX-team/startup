@@ -25,7 +25,7 @@ const DealModal: React.FC<DealModalProps> = ({
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center">
       <div
-        className="absolute inset-0 bg-black/30 dark:bg-black/50"
+        className="absolute inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-sm"
         onClick={onClose}
       ></div>
       <div className="relative z-10 w-full max-w-md rounded-2xl bg-white p-6 shadow-xl dark:bg-[#1A232F] dark:text-white">

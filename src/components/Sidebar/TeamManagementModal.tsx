@@ -85,7 +85,7 @@ const TeamManagementModal = ({ isOpen, onClose }: TeamManagementModalProps) => {
 
   return (
     <div className="fixed inset-0 z-[99999] flex items-center justify-center  mx-7 lg:mx-0">
-      <div className="fixed inset-0 bg-black bg-opacity-50 " onClick={onClose}></div>
+      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm " onClick={onClose}></div>
 
       <div className="relative w-full max-w-md rounded-lg bg-white p-6 shadow-lg dark:bg-[#1A222C]">
         <h2 className="mb-2 text-xl font-semibold dark:text-white">Team Management</h2>

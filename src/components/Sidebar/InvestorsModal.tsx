@@ -75,7 +75,7 @@ const InvestorsModal: React.FC<InvestorsModalProps> = ({ isOpen, onClose }) => {
 
   return (
     <>
-      <div className="fixed md:top-20 top-10 lg:top-8 lg:w-full  m-5 lg:m-0 z-[99999] flex justify-center items-center bg-black/40 px-2">
+      <div className="fixed md:top-20 top-10 lg:top-8 lg:w-full  m-5 lg:m-0 z-[99999] flex justify-center items-center bg-black/40 backdrop-blur-sm px-2">
         <button
           onClick={onClose}
           className="absolute top-4 right-4  lg:right-32  md:right-15 z-50 text-red-500 hover:text-red-600"
@@ -191,7 +191,7 @@ const InvestorsModal: React.FC<InvestorsModalProps> = ({ isOpen, onClose }) => {
 
       {/* Confirm Modal */}
       {(showSignConfirm || showBuyoutConfirm) && selectedInvestor && (
-        <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/50 px-4">
+        <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
           <div className="rounded-xl bg-white dark:bg-[#1A232F] p-6 shadow-xl max-w-sm w-full text-gray-800 dark:text-white">
             <h2 className="text-lg font-semibold mb-2">
               {showSignConfirm ? "Make a deal with investor?" : "Buyout investor’s share?"}

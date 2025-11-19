@@ -158,7 +158,7 @@ const MentorsModal: React.FC<MentorsModalProps> = ({ isOpen, onClose }) => {
   return (
 <div className="fixed inset-0 z-[99999] flex items-center justify-center">
 
-      <div className="absolute inset-0 bg-black/30 " onClick={onClose}></div>
+      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm " onClick={onClose}></div>
       
 <div className="relative w-full max-w-4xl mx-4 sm:mx-auto my-6 rounded-xl bg-white p-6 shadow-lg dark:bg-boxdark max-h-[95vh] overflow-y-auto">
       {/* Close button */}

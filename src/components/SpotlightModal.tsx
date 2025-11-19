@@ -23,7 +23,7 @@ const SpotlightModal: React.FC<SpotlightModalProps> = ({
   return (
     <div className="fixed inset-0 z-[99998] flex items-center justify-center">
       <div 
-        className="absolute inset-0 bg-black bg-opacity-50" 
+        className="absolute inset-0 bg-black/50 backdrop-blur-sm" 
         onClick={onClose}
       />
       

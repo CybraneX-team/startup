@@ -13,7 +13,7 @@ const HintModal: React.FC<HintModalProps> = ({ isOpen, onClose, title = "AI Hint
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black bg-opacity-50 p-4">
+    <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
       <div className="relative w-full max-w-2xl rounded-2xl bg-white dark:bg-boxdark p-6">
         <div className="flex justify-between items-center border-b pb-4 mb-4">
           <h2 className="text-xl font-semibold text-gray-800 dark:text-white">{title}</h2>

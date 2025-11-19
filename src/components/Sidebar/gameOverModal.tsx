@@ -94,7 +94,7 @@ const GameOverModal = () => {
   return (
     <>
       {/* Game Over Modal */}
-      <div className="fixed inset-0 z-99999 bg-black bg-opacity-60 flex items-center justify-center p-4">
+      <div className="fixed inset-0 z-99999 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
         <div className="bg-white dark:bg-[#1A232F] dark:border dark:border-blue-500 rounded-3xl p-6 sm:p-8 text-center w-full max-w-sm space-y-6 shadow-xl mx-4">
           {/* Image */}
           <Image
@@ -148,7 +148,7 @@ const GameOverModal = () => {
 
       {/* Confirmation Modal */}
       {showConfirm && (
-        <div className="fixed inset-0 z-[999999] flex items-center justify-center bg-black bg-opacity-50 p-4">
+        <div className="fixed inset-0 z-[999999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
           <div className="bg-white dark:bg-[#1F2937] p-6 rounded-2xl shadow-2xl w-full max-w-xs text-center space-y-4">
             <AlertCircle className="mx-auto text-yellow-600 dark:text-yellow-300" size={32} />
             <h3 className="text-lg font-semibold text-gray-800 dark:text-white">

@@ -53,7 +53,7 @@ const TooltipModal: React.FC<TooltipModalProps> = ({
   return (
     <>
       <div 
-        className="fixed inset-0 bg-black bg-opacity-50 z-[99998]"
+        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[99998]"
         onClick={onClose}
       />
       <div
