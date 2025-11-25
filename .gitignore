@@ -45,3 +45,4 @@ yarn.lock
 .netlify
 
 *.tar
+temp.txt
