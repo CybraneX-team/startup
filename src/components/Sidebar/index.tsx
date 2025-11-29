@@ -252,15 +252,15 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, sidebarCollapsed = false, setSid
                 title={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
               >
                 {sidebarCollapsed ? (
-                  <ChevronRight className="h-4 w-4 text-bodydark dark:text-bodydark1" />
+                <ChevronRight className="h-4 w-4 text-gray-700 dark:text-gray-300" />
                 ) : (
-                  <ChevronLeft className="h-4 w-4 text-bodydark dark:text-bodydark1" />
+                <ChevronLeft className="h-4 w-4 text-gray-700 dark:text-gray-300" />
                 )}
               </button>
             )}
             <button
               onClick={() => setSidebarOpen(false)}
-              className="lg:hidden text-bodydark dark:text-bodydark1 hover:text-black dark:hover:text-white"
+              className="lg:hidden text-gray-700 dark:text-gray-300 hover:text-black dark:hover:text-white"
             >
               <X className="h-5 w-5" />
             </button>
@@ -277,13 +277,13 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, sidebarCollapsed = false, setSid
                 className="w-12 h-12 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors border border-stroke dark:border-strokedark"
                 title="Business Idea"
               >
-                <Lightbulb className="h-5 w-5 text-bodydark dark:text-bodydark1" />
+                <Lightbulb className="h-5 w-5 text-gray-700 dark:text-gray-300" />
               </button>
               <div className="w-12 h-12 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center border border-stroke dark:border-strokedark" title="Financials">
-                <DollarSign className="h-5 w-5 text-bodydark dark:text-bodydark1" />
+                <DollarSign className="h-5 w-5 text-gray-700 dark:text-gray-300" />
               </div>
               <div className="w-12 h-12 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center border border-stroke dark:border-strokedark" title="Team">
-                <Users className="h-5 w-5 text-bodydark dark:text-bodydark1" />
+                <Users className="h-5 w-5 text-gray-700 dark:text-gray-300" />
               </div>
             </div>
           ) : (
@@ -299,12 +299,12 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, sidebarCollapsed = false, setSid
                 className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                 title="Game Options"
               >
-                <Info className="h-4 w-4 text-bodydark dark:text-bodydark1" />
+                <Info className="h-4 w-4 text-gray-700 dark:text-gray-300" />
               </button>
             </div>
 
             <div className="rounded-lg bg-gray-50 dark:bg-boxdark-2 border border-stroke dark:border-strokedark p-3">
-              <p className="text-sm leading-relaxed text-bodydark dark:text-bodydark1">
+              <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
                 {user.businessDescription
                   ? showFullDesc
                     ? user.businessDescription
@@ -332,7 +332,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, sidebarCollapsed = false, setSid
             {/* Funds Chart - New compact layout */}
             <div className="mb-4 rounded-lg bg-gray-50 dark:bg-boxdark-2 border border-stroke dark:border-strokedark p-4">
               <div className="flex items-center justify-between mb-3">
-                <span className="text-xs font-medium text-bodydark dark:text-bodydark1">Fund Distribution</span>
+                <span className="text-xs font-medium text-gray-800 dark:text-gray-200">Fund Distribution</span>
                 <span className="text-sm font-bold text-black dark:text-white">${user.finances.toLocaleString() || "0"}</span>
               </div>
               
@@ -341,7 +341,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, sidebarCollapsed = false, setSid
                 <div className="flex flex-col gap-2 flex-1">
                   <div className="flex items-center gap-2 text-xs">
                     <span className="inline-block h-3 w-3 rounded-full bg-[#6577F3]"></span>
-                    <span className="text-bodydark dark:text-bodydark1 flex-1">Founder</span>
+                    <span className="text-gray-800 dark:text-gray-200 flex-1">Founder</span>
                     <span className="font-semibold text-black dark:text-white">{renderValue(breakdown["Founder"])}%</span>
                   </div>
                   <div 
@@ -349,7 +349,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, sidebarCollapsed = false, setSid
                     onClick={openInvestorsModal}
                   >
                     <span className="inline-block h-3 w-3 rounded-full bg-[#A5D6A7] investment-step-1"></span>
-                    <span className="text-bodydark dark:text-bodydark1 flex-1">Investors</span>
+                    <span className="text-gray-800 dark:text-gray-200 flex-1">Investors</span>
                     <span className="font-semibold text-black dark:text-white">{renderValue(breakdown.Investors)}%</span>
                   </div>
                   <div 
@@ -357,7 +357,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, sidebarCollapsed = false, setSid
                     onClick={openMentorsModal}
                   >
                     <span className="inline-block h-3 w-3 rounded-full bg-[#8FD0EF] mentor-step-1"></span>
-                    <span className="text-bodydark dark:text-bodydark1 flex-1">Mentors</span>
+                    <span className="text-gray-800 dark:text-gray-200 flex-1">Mentors</span>
                     <span className="font-semibold text-black dark:text-white">{renderValue(breakdown.Mentor)}%</span>
                   </div>
                 </div>
@@ -372,7 +372,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, sidebarCollapsed = false, setSid
                     width={120}
                   />
                   <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
-                    <span className="text-[10px] font-medium text-bodydark dark:text-bodydark1 uppercase">Funds</span>
+                    <span className="text-[10px] font-medium text-gray-800 dark:text-gray-200 uppercase">Funds</span>
                     <span className="text-xs font-bold text-black dark:text-white">${user.finances.toLocaleString() || "0"}</span>
                   </div>
                 </div>
@@ -382,36 +382,36 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, sidebarCollapsed = false, setSid
             {/* Revenue & Expenses - Restructured as compact list */}
             <div className="mb-4 space-y-2 rounded-lg bg-gray-50 dark:bg-boxdark-2 border border-stroke dark:border-strokedark p-3">
               <div className="flex justify-between items-center py-1.5 border-b border-stroke dark:border-strokedark">
-                <span className="text-xs font-medium text-bodydark dark:text-bodydark1">Revenue</span>
+                <span className="text-xs font-medium text-gray-800 dark:text-gray-200">Revenue</span>
                 <span className="text-sm font-semibold tabular-nums text-meta-3">${user.revenue || 40}</span>
               </div>
               <div className="flex justify-between items-center py-1.5 border-b border-stroke dark:border-strokedark">
-                <span className="text-xs font-medium text-bodydark dark:text-bodydark1">Salaries</span>
+                <span className="text-xs font-medium text-gray-800 dark:text-gray-200">Salaries</span>
                 <span className="text-sm font-semibold tabular-nums text-meta-1">-${user.salaries || 3400}</span>
               </div>
               <div className="flex justify-between items-center py-1.5 border-b border-stroke dark:border-strokedark">
-                <span className="text-xs font-medium text-bodydark dark:text-bodydark1">Rent</span>
+                <span className="text-xs font-medium text-gray-800 dark:text-gray-200">Rent</span>
                 <span className="text-sm font-semibold tabular-nums text-meta-1">-${user.rent || 600}</span>
               </div>
               <div className="flex justify-between items-center py-1.5 border-b border-stroke dark:border-strokedark">
-                <span className="text-xs font-medium text-bodydark dark:text-bodydark1">Marketing</span>
+                <span className="text-xs font-medium text-gray-800 dark:text-gray-200">Marketing</span>
                 <span className="text-sm font-semibold tabular-nums text-meta-5">${user.marketing || 3600}</span>
               </div>
               <div className="flex justify-between items-center py-1.5">
-                <span className="text-xs font-medium text-bodydark dark:text-bodydark1">Cost of Sales</span>
+                <span className="text-xs font-medium text-gray-800 dark:text-gray-200">Cost of Sales</span>
                 <span className="text-sm font-semibold tabular-nums text-meta-1">-${user.costOfSales || 44}</span>
               </div>
             </div>
 
             {/* Available Market - Compact design */}
             <div className="flex items-center justify-between rounded-lg bg-gray-50 dark:bg-boxdark-2 border border-stroke dark:border-strokedark px-3 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors" onClick={openMarketModal}>
-              <span className="text-xs font-medium text-bodydark dark:text-bodydark1">Available Market</span>
+              <span className="text-xs font-medium text-gray-800 dark:text-gray-200">Available Market</span>
               <div className="flex items-center gap-1.5">
                 <span className="text-xs font-semibold text-black dark:text-white">
                   USD 999B
                 </span>
                 <Info 
-                  className="h-3.5 w-3.5 text-bodydark dark:text-bodydark1 cursor-pointer hover:text-primary transition-colors" 
+                  className="h-3.5 w-3.5 text-gray-700 dark:text-gray-300 cursor-pointer hover:text-primary transition-colors" 
                 />
               </div>
             </div>
@@ -428,7 +428,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, sidebarCollapsed = false, setSid
                 className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                 title="Edit Team"
               >
-                <Edit className="h-4 w-4 text-bodydark dark:text-bodydark1" />
+                <Edit className="h-4 w-4 text-gray-700 dark:text-gray-300" />
               </button>
             </div>
             <div className="grid grid-cols-3 gap-2.5">
@@ -440,7 +440,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, sidebarCollapsed = false, setSid
                   <div className="mb-2 rounded-lg bg-white dark:bg-boxdark p-2">
                     {roleIcons[item.roleName.toLowerCase()] || <span>No Icon</span>}
                   </div>
-                  <span className="text-xs font-medium text-bodydark dark:text-bodydark1 capitalize mb-0.5">{item.roleName}</span>
+                  <span className="text-xs font-medium text-gray-800 dark:text-gray-200 capitalize mb-0.5">{item.roleName}</span>
                   <span className="text-sm font-bold text-black dark:text-white tabular-nums">{item.quantity}</span>
                 </div>
               ))}
@@ -459,9 +459,9 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, sidebarCollapsed = false, setSid
               title={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
             >
               {sidebarCollapsed ? (
-                <ChevronRight className="h-5 w-5 text-bodydark dark:text-bodydark1" />
+                <ChevronRight className="h-5 w-5 text-gray-700 dark:text-gray-300" />
               ) : (
-                <ChevronLeft className="h-5 w-5 text-bodydark dark:text-bodydark1" />
+                <ChevronLeft className="h-5 w-5 text-gray-700 dark:text-gray-300" />
               )}
             </button>
           </div>

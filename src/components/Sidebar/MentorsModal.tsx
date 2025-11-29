@@ -1,8 +1,6 @@
 "use client"
 import React, { useEffect, useState } from "react";
-import Image from "next/image";
 import { useUser } from "@/context/UserContext";
-import { mentorsIcon } from "../roleIcons";
 import DealModal from "./dealModel";
 
 interface MentorCardProps {
@@ -23,6 +21,28 @@ const MentorCard: React.FC<MentorCardProps> = ({
 }) => {
   const [showDealModal, setShowDealModal] = useState(false);
   const {user, setUser, setUserState, setnotificationMessages, notificationMessages } = useUser()
+
+  const getInitials = (name: string) => {
+    const parts = name?.split(" ").filter(Boolean) || [];
+    if (parts.length === 0) return "M";
+    if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+    return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+  };
+
+  const getAvatarColor = (name: string) => {
+    const colors = [
+      "bg-blue-500",
+      "bg-green-500",
+      "bg-purple-500",
+      "bg-pink-500",
+      "bg-indigo-500",
+      "bg-teal-500",
+      "bg-orange-500",
+      "bg-red-500",
+    ];
+    const index = name.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    return colors[index % colors.length];
+  };
 
   async function signMentor(mentorName : string) {
     const request = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/hireMentor`,{
@@ -62,12 +82,12 @@ const MentorCard: React.FC<MentorCardProps> = ({
         flex-none rounded-xl border border-gray-200 bg-white p-5 hover:shadow-lg transition dark:bg-[#24303F]"
       >
         <div className="mb-4 flex items-center gap-3">
-          <div className="h-full rounded-full overflow-hidden">
-            <div className="w-full h-full">
-              {mentorsIcon[title] || <span>No Icon</span>}
-            </div>
+          <div className={`h-14 w-14 rounded-full ${getAvatarColor(title)} flex items-center justify-center flex-shrink-0`}>
+            <span className="text-lg font-semibold text-white">
+              {getInitials(title)}
+            </span>
           </div>
-          <h3 className="text-xl font-medium text-gray-800 dark:text-white">{title}</h3>
+          <h3 className="text-xl font-medium text-gray-800 dark:text-white flex-1">{title}</h3>
         </div>
 
         <p className="mb-6 text-sm w-70 lg:w-90 text-gray-600 dark:text-white">{description}</p>

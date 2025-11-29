@@ -2,8 +2,6 @@
 import React, { useEffect, useState } from "react";
 import { X } from "lucide-react";
 import { useUser } from "@/context/UserContext";
-import { getInvestorImage } from "../investorImages";
-import Image from "next/image";
 
 interface InvestorsModalProps {
   isOpen: boolean;
@@ -73,19 +71,46 @@ const InvestorsModal: React.FC<InvestorsModalProps> = ({ isOpen, onClose }) => {
     }
   };
 
+  const getInitials = (name: string) => {
+    const parts = name?.split(" ").filter(Boolean) || [];
+    if (parts.length === 0) return "I";
+    if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+    return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+  };
+
+  const getAvatarColor = (name: string) => {
+    const colors = [
+      "bg-blue-500",
+      "bg-green-500",
+      "bg-purple-500",
+      "bg-pink-500",
+      "bg-indigo-500",
+      "bg-teal-500",
+      "bg-orange-500",
+      "bg-red-500",
+    ];
+    const index = name.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    return colors[index % colors.length];
+  };
+
   return (
     <>
-      <div className="fixed md:top-20 top-10 lg:top-8 lg:w-full  m-5 lg:m-0 z-[99999] flex justify-center items-center bg-black/40 backdrop-blur-sm px-2">
-        <button
+      <div className="fixed inset-0 z-[99999] flex items-center justify-center">
+        {/* Full screen backdrop */}
+        <div 
+          className="absolute inset-0 bg-black/40 backdrop-blur-sm"
           onClick={onClose}
-          className="absolute top-4 right-4  lg:right-32  md:right-15 z-50 text-red-500 hover:text-red-600"
-        >
-          <X className="h-6 w-6" />
-        </button>
-
+        ></div>
 
         {/* Modal Container */}
-        <div className="relative w-full max-w-[95vw] sm:max-w-[90vw] md:max-w-[85vw] lg:max-w-screen-xl max-h-[90vh] bg-white dark:bg-[#1A232F] rounded-xl shadow-lg overflow-y-auto overflow-x-hidden">
+        <div className="relative w-full max-w-[95vw] sm:max-w-[90vw] md:max-w-[85vw] lg:max-w-screen-xl max-h-[90vh] bg-white dark:bg-[#1A232F] rounded-xl shadow-lg overflow-y-auto overflow-x-hidden mx-4">
+          {/* Close button */}
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 z-50 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+          >
+            <X className="h-6 w-6" />
+          </button>
 
           {/* Header */}
           <div className="p-6 border-b border-gray-200 dark:border-gray-700 sticky top-0 bg-white dark:bg-[#1A232F] z-40">
@@ -113,24 +138,20 @@ const InvestorsModal: React.FC<InvestorsModalProps> = ({ isOpen, onClose }) => {
                     className="w-full sm:w-[320px] flex-shrink-0 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#1A232F] p-5"
                   >
                     <div className="flex items-center gap-4 mb-4">
-                      {getInvestorImage(e.name) && (
-                        <div className="h-20 w-20 rounded-full overflow-hidden">
-                          <Image
-                            src={getInvestorImage(e.name) ?? "/elon.png"} 
-                            alt={e.name}
-                            width={80}
-                            height={80}
-                            className="object-cover"
-                          />
-                        </div>
-                      )}
-                      <div>
-                        <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
+                      <div className={`h-16 w-16 rounded-full ${getAvatarColor(e.name)} flex items-center justify-center flex-shrink-0`}>
+                        <span className="text-xl font-semibold text-white">
+                          {getInitials(e.name)}
+                        </span>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-lg font-semibold text-gray-800 dark:text-white truncate">
                           {e.name}
                         </h3>
-                        <p className="text-sm italic text-blue-500 dark:text-blue-400">
-                          {e.quote}
-                        </p>
+                        {e.quote && (
+                          <p className="text-sm italic text-blue-500 dark:text-blue-400 mt-1 line-clamp-2">
+                            {e.quote}
+                          </p>
+                        )}
                       </div>
                     </div>
 
