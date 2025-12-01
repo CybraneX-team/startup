@@ -12,6 +12,8 @@ import TeamManagementModal from "./TeamManagementModal";
 import InvestorsModal from "./InvestorsModal";
 import { roleIcons } from "../roleIcons";
 import GameOptionsModal from "./GameOptionsModal";
+import {aiSkinnedEmployees } from "../../context/interface.types";
+
 
 // Dynamically import ReactApexChart to avoid window is not defined errors
 const ReactApexChart = dynamic(() => import('react-apexcharts'), { ssr: false });
@@ -36,6 +38,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, sidebarCollapsed = false, setSid
   const { user, setUser, setUserState, setnotificationMessages, notificationMessages, setloader, setHeaderDark, elonStep } = useUser();
   const [optionsModalOpen, setOptionsModalOpen] = useState(false);
   const [showFullDesc, setShowFullDesc] = useState(false);
+  console.log("user?.aiSkinnedEmployees" , user?.aiSkinnedEmployees)
 
   const finances = user?.finances || 0;
   const options: ApexOptions = {
@@ -432,7 +435,12 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, sidebarCollapsed = false, setSid
               </button>
             </div>
             <div className="grid grid-cols-3 gap-2.5">
-              {user.teamMembers?.map((item) => (
+              
+              {user.teamMembers?.map((item, idx) =>{
+                  const member = user.aiSkinnedEmployees.find(
+                  e  => e?.actualName?.toLowerCase() === item.roleName.toLowerCase()
+                );
+               return (
                 <div 
                   key={item._id} 
                   className="flex flex-col items-center rounded-lg bg-gray-50 dark:bg-boxdark-2 border border-stroke dark:border-strokedark p-3 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors cursor-pointer"
@@ -440,10 +448,15 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, sidebarCollapsed = false, setSid
                   <div className="mb-2 rounded-lg bg-white dark:bg-boxdark p-2">
                     {roleIcons[item.roleName.toLowerCase()] || <span>No Icon</span>}
                   </div>
-                  <span className="text-xs font-medium text-gray-800 dark:text-gray-200 capitalize mb-0.5">{item.roleName}</span>
-                  <span className="text-sm font-bold text-black dark:text-white tabular-nums">{item.quantity}</span>
+                  <span className="text-xs font-medium text-gray-800 dark:text-gray-200 capitalize mb-0.5">
+                    {member?.roleName ? member.roleName :  "" }
+                  </span>
+                  <span className="text-sm font-bold text-black dark:text-white tabular-nums">{
+                  item.quantity
+                  }</span>
                 </div>
-              ))}
+              )}
+            )}
             </div>
           </div>
             </>

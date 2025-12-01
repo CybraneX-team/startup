@@ -2,7 +2,8 @@ import React, { useEffect, useState } from "react";
 import { Minus, Plus } from "lucide-react";
 import { useUser } from "@/context/UserContext";
 import {  roleIcons } from "../roleIcons";
-import {UserData} from "../../context/UserContext"
+// import {UserData} from "../../context/UserContext"
+import {UserData} from '../../context/interface.types'
 interface TeamManagementModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -13,6 +14,7 @@ interface Employee {
   roleName: string;
   salary: number;
   quantity: number;
+  skinnedRolename : string;
 }
 
 const TeamManagementModal = ({ isOpen, onClose }: TeamManagementModalProps) => {
@@ -20,26 +22,29 @@ const TeamManagementModal = ({ isOpen, onClose }: TeamManagementModalProps) => {
   const [team, setTeam] = useState<Employee[]>([]);
   const [maxEmployees, setMaxEmployees] = useState<number>(0);
   const [totalCount, setTotalCount] = useState<number>(0);
-
+  console.log(user?.aiSkinnedEmployees)
   useEffect(() => {
     if (user?.employeesAvailable?.[0]?.availableEmployes) {
       const availableEmployees = user.employeesAvailable[0].availableEmployes;
-      const newTeam = availableEmployees.map((emp) => {
+      const aiSkinnedEmployees = user.aiSkinnedEmployees;
+      const newTeam = availableEmployees.map((emp, idx) => {
         const existingMember = user.teamMembers.find((tm) => tm.roleName === emp.roleName);
         return {
           _id: emp._id,
           roleName: emp.roleName,
+          skinnedRolename : aiSkinnedEmployees[idx].roleName,
           salary: emp.salary,
           quantity: existingMember ? existingMember.quantity : 0, 
         };
       });
 
       setTeam(newTeam);
+      console.log("newTeam", newTeam)
       setMaxEmployees(user.employeesAvailable[0].maximum_allowed_employess || 0);
       setTotalCount(newTeam.reduce((sum, emp) => sum + emp.quantity, 0));
     }
   }, [user]);
-
+  console.log("Team", team)
   const increaseCount = (roleName: string) => {
     if (totalCount < maxEmployees) {
       setTeam((prevTeam) =>
@@ -106,7 +111,11 @@ const TeamManagementModal = ({ isOpen, onClose }: TeamManagementModalProps) => {
                   {roleIcons[member.roleName.toLowerCase()] || <span>No Icon</span>}
                 </div>
                 <div>
-                  <p className="text-sm font-medium dark:text-white">{member.roleName}</p>
+                  <p className="text-sm font-medium dark:text-white">{ 
+                  user?.aiSkinnedEmployees[index].roleName ? 
+                  user?.aiSkinnedEmployees[index].roleName :
+                  ""
+                   }</p>
                   {member.roleName === "ceo" && (
                     <p className="text-xs text-gray-500 dark:text-white">Can replace any other role</p>
                   )}

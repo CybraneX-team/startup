@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { toast, ToastContainer, Bounce } from "react-toastify";
 import { Sparkles } from "lucide-react"; // Optional icon
 import Sparkle from "react-sparkle"; // ✅ Add this import
+import { aiSkinnedEmployees } from "@/context/interface.types";
 
 // import { FixedSizeList as List } from 'react-window';
 
@@ -824,21 +825,72 @@ useEffect(() => {
     return metricMap[metricName] || metricName;
   }
 
-  const filteredTasks = useMemo(() => {
-    if (!user?.tasks) return [];
+const filteredTasks = useMemo(() => {
+    // Safety checks
+    if (!user?.tasks || !user?.aiSkinnedEmployees) return [];
 
-    return user.tasks.filter((task: any, index: number) => {
-      if (activeFilters.has("all")) return true;
-      if (activeFilters.has("in_progress")) return selectedTasks.has(task._id);
-      if (task.metricsImpact) {
-        return Object.entries(task.metricsImpact).some(([metric, value]) => {
+    // ---------------------------------------------------------
+    // STEP 1: Build the Lookup Map (Fast Setup)
+    // Complexity: O(Skins) -> Very small, negligible
+    // ---------------------------------------------------------
+    const roleMap = user.aiSkinnedEmployees.reduce((acc: any, skin: any) => {
+      acc[skin.actualName] = skin.roleName;
+      return acc;
+    }, {});
+
+    // FIX: Handle the "dev" vs "developer" mismatch manually
+    // If we have a role for "dev", assign the same role to "developer"
+    if (roleMap["dev"]) {
+      roleMap["developer"] = roleMap["dev"];
+    }
+
+    // ---------------------------------------------------------
+    // STEP 2: Filter AND Transform in ONE pass
+    // Complexity: O(Tasks) -> The most efficient way possible
+    // ---------------------------------------------------------
+    return user.tasks.reduce((acc: any[], task: any) => {
+
+      // --- A. FILTERING LOGIC (From your original code) ---
+      let isMatch = false;
+
+      if (activeFilters.has("all")) {
+        isMatch = true;
+      } else if (activeFilters.has("in_progress")) {
+        isMatch = selectedTasks.has(task._id);
+      } else if (task.metricsImpact) {
+        isMatch = Object.entries(task.metricsImpact).some(([metric, value]) => {
           const shortMetric = getShortName(metric);
-          return activeFilters.has(shortMetric) && value !== 0;
+          // Cast value to number to ensure safe comparison
+          return activeFilters.has(shortMetric) && (value as number) !== 0;
         });
       }
-      return false;
-    });
-  }, [user?.tasks, activeFilters, selectedTasks]);
+
+      // --- B. TRANSFORMATION LOGIC (Only runs if filter passed) ---
+      // If the task matches, we transform it immediately and push it.
+      if (isMatch) {
+        const transformedRequirements: any = {};
+
+        // Fast object iteration
+        for (const key in task.requiredTeamMembers) {
+          const quantity = task.requiredTeamMembers[key];
+
+          // O(1) LOOKUP: Get the fancy name (e.g., "Trainer") or keep "developer"
+          const newRoleName = roleMap[key] || key;
+          
+          transformedRequirements[newRoleName] = quantity;
+        }
+
+        // Push the new object with replaced team members
+        acc.push({
+          ...task,
+          requiredTeamMembers: transformedRequirements
+        });
+      }
+
+      return acc;
+    }, []);
+
+  }, [user?.tasks, user?.aiSkinnedEmployees, activeFilters, selectedTasks]);
 
   const metrics = ["UA", "C1", "AOV", "COGS", "APC", "CPA", "bugs"];
 const makeBrainstrom = async (turnAmount: string) => {

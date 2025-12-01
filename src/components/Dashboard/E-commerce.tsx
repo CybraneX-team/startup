@@ -875,7 +875,7 @@ const ECommerce: React.FC = () => {
 
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
           {stages.map((stage, index) => {
-            const isLocked = index > 1;
+            const isLocked = index > 1 && !user?.isPurchaseDone ;
             const isActive = user?.startupStage === stage;
             return (
               <button
