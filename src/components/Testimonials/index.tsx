@@ -14,8 +14,8 @@ const testimonialData: Testimonial[] = [
   },
   {
     id: 2,
-    name: "Rajesh Kumar",
-    designation: "CEO @EduInnovate",
+    name: "Ananya Sharma",
+    designation: "Founder @EduInnovate",
     content:
       "As a first-time founder, I was clueless about financial modeling and runway calculations. Unicorn Simulator taught me everything through gameplay. Now I can confidently discuss burn rates and funding rounds with investors. Game-changing tool for entrepreneurs!",
     image: "/images/user/user-02.png",
@@ -23,7 +23,7 @@ const testimonialData: Testimonial[] = [
   },
   {
     id: 3,
-    name: "Emily Rodriguez",
+    name: "Arjun Mehta",
     designation: "Co-founder @HealthTech Solutions",
     content:
       "The stage progression from FFF to Series A feels incredibly realistic. I learned how to balance hiring, marketing spend, and product development. The bug management feature is genius - it shows how technical debt can derail growth. Highly recommend for any aspiring founder!",
