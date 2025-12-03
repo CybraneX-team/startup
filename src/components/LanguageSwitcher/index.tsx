@@ -27,7 +27,7 @@ const LanguageSwitcher: React.FC = () => {
     setIsOpen(false);
   };
 
-  const currentLanguage = languages[language];
+  const currentLanguage: { name: string; nativeName: string; code: string } = languages[language] || languages.en;
 
   return (
     <div className="relative" ref={dropdownRef}>

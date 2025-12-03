@@ -110,7 +110,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, sidebarCollapsed = false, setSid
         },
       });
     }
-  }, [user]);
+  }, [user, t]);
   
 
   // Ensure no undefined values before rendering
@@ -439,7 +439,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, sidebarCollapsed = false, setSid
             <div className="grid grid-cols-3 gap-2.5">
               
               {user.teamMembers?.map((item, idx) =>{
-                  const member = user.aiSkinnedEmployees.find(
+                  const member = user.aiSkinnedEmployees?.find(
                   e  => e?.actualName?.toLowerCase() === item.roleName.toLowerCase()
                 );
                return (

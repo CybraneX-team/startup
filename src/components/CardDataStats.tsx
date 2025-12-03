@@ -78,7 +78,7 @@ const CancelTaskModal: React.FC<CancelTaskModalProps> = ({
   onCancel,
 }) => {
   const { setHeaderDark, setloader } = useUser();
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
   const [translatedTaskName, setTranslatedTaskName] = useState(
     translateTaskNameSync(taskName, language)
   );
@@ -172,7 +172,7 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
   onAdd,
   onMakeTurn,
 }) => {
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
   const [translatedTaskName, setTranslatedTaskName] = useState(
     task ? translateTaskNameSync(task.name, language) : ''
   );
@@ -864,14 +864,16 @@ useEffect(() => {
   }
 
 const filteredTasks = useMemo(() => {
-    // Safety checks
-    if (!user?.tasks || !user?.aiSkinnedEmployees) return [];
+    // Safety checks - only require tasks, aiSkinnedEmployees is optional
+    if (!user?.tasks) return [];
 
     // ---------------------------------------------------------
     // STEP 1: Build the Lookup Map (Fast Setup)
     // Complexity: O(Skins) -> Very small, negligible
     // ---------------------------------------------------------
-    const roleMap = user.aiSkinnedEmployees.reduce((acc: any, skin: any) => {
+    // Use empty array as fallback if aiSkinnedEmployees is missing
+    const aiSkinnedEmployees = user.aiSkinnedEmployees || [];
+    const roleMap = aiSkinnedEmployees.reduce((acc: any, skin: any) => {
       acc[skin.actualName] = skin.roleName;
       return acc;
     }, {});
