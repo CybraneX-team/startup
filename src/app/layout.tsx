@@ -13,6 +13,7 @@ import Head from 'next/head';
 import { TourProvider } from '@reactour/tour'
 import { SessionProvider } from "next-auth/react";
 import Script from "next/script";
+import AuthSyncHandler from "@/components/AuthSyncHandler";
 
 export default function RootLayout({
   children,
@@ -39,6 +40,7 @@ export default function RootLayout({
           <LanguageProvider>
             <UserProvider>
               <SessionProvider>
+                <AuthSyncHandler />
                 {loading ? <Loader /> : children}
               </SessionProvider>
             </UserProvider>

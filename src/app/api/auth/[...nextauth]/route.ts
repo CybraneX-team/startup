@@ -28,6 +28,18 @@ const handler = NextAuth({
     (session as any).accessToken = token.accessToken;
       return session;
     },
+    async redirect({ url, baseUrl }) {
+      // After successful Google OAuth, redirect to home page
+      // A global sync handler will handle the backend sync
+      if (url === `${baseUrl}/auth/signin` || url === `${baseUrl}/api/auth/signin` || url.startsWith(`${baseUrl}/api/auth/callback`)) {
+        return `${baseUrl}/`;
+      }
+      // Allow relative callback URLs
+      if (url.startsWith("/")) return `${baseUrl}${url}`;
+      // Allow callback URLs on the same origin
+      if (new URL(url).origin === baseUrl) return url;
+      return baseUrl;
+    },
   },
   secret: process.env.NEXTAUTH_SECRET,
 });
