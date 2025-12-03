@@ -1,5 +1,6 @@
 "use client"
 import React from "react";
+import { useLanguage } from "@/context/LanguageContext";
 
 interface MarketInfoModalProps {
   isOpen: boolean;
@@ -7,6 +8,7 @@ interface MarketInfoModalProps {
 }
 
 const MarketInfoModal = ({ isOpen, onClose }: MarketInfoModalProps) => {
+  const { t } = useLanguage();
   if (!isOpen) return null;
 
   return (
@@ -44,28 +46,28 @@ const MarketInfoModal = ({ isOpen, onClose }: MarketInfoModalProps) => {
         <div className="mb-6">
           <div className="flex items-center gap-4">
             <h2 className="text-xl font-medium text-gray-700 dark:text-white">
-              Total market value
+              {t("modals.marketInfo.title")}
             </h2>
             <p className="text-xl font-medium text-green-500">$10 000 000 000</p>
           </div>
           <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-            Here you can see the overall climate of the market, as well as your share.
+            {t("modals.marketInfo.description")}
           </p>
         </div>
 
         {/* Table headers */}
         <div className="mb-2 grid grid-cols-3 gap-6">
-          <h3 className="text-base font-medium text-gray-600 dark:text-gray-300">Social Status</h3>
-          <h3 className="text-base font-medium text-gray-600 dark:text-gray-300">Clients</h3>
-          <h3 className="text-base font-medium text-gray-600 dark:text-gray-300">Capital</h3>
+          <h3 className="text-base font-medium text-gray-600 dark:text-gray-300">{t("modals.marketInfo.socialStatus")}</h3>
+          <h3 className="text-base font-medium text-gray-600 dark:text-gray-300">{t("modals.marketInfo.clients")}</h3>
+          <h3 className="text-base font-medium text-gray-600 dark:text-gray-300">{t("modals.marketInfo.capital")}</h3>
         </div>
 
         {/* Data rows */}
         {[
-          ["Working class", "20 000 000", "$200 000 000"],
-          ["Middle Class", "70 000 000", "$6 500 000 000"],
-          ["Wealthy", "10 000 000", "$3 300 000 000"],
-          ["Available", "100 000 000", "$9 999 999 950.5"],
+          [t("modals.marketInfo.workingClass"), "20 000 000", "$200 000 000"],
+          [t("modals.marketInfo.middleClass"), "70 000 000", "$6 500 000 000"],
+          [t("modals.marketInfo.wealthy"), "10 000 000", "$3 300 000 000"],
+          [t("modals.marketInfo.available"), "100 000 000", "$9 999 999 950.5"],
         ].map(([label, clients, capital], i) => (
           <div
             key={i}
@@ -82,14 +84,14 @@ const MarketInfoModal = ({ isOpen, onClose }: MarketInfoModalProps) => {
 
         {/* Ownership headers */}
         <div className="mb-2 grid grid-cols-2 gap-6">
-          <h3 className="text-base font-medium text-gray-600 dark:text-gray-300">Yours</h3>
-          <h3 className="text-base font-medium text-gray-600 dark:text-gray-300">Competitors</h3>
+          <h3 className="text-base font-medium text-gray-600 dark:text-gray-300">{t("modals.marketInfo.yours")}</h3>
+          <h3 className="text-base font-medium text-gray-600 dark:text-gray-300">{t("modals.marketInfo.competitors")}</h3>
         </div>
 
         {/* Market share comparison */}
         <div className="grid grid-cols-2 gap-6 rounded-lg bg-gray-50 p-3 dark:bg-gray-800">
           <div>
-            <p className="text-sm text-gray-700 dark:text-gray-100">Market Share</p>
+            <p className="text-sm text-gray-700 dark:text-gray-100">{t("modals.marketInfo.marketShare")}</p>
             <p className="text-sm text-blue-500">0%</p>
           </div>
           <div className="flex items-end">

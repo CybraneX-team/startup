@@ -10,7 +10,9 @@ import SpotlightModal from "@/components/SpotlightModal";
 
 // import { Dice1, InfoIcon } from "lucide-react";
 import { useUser } from "@/context/UserContext";
+import { useLanguage } from "@/context/LanguageContext";
 import { useRouter } from "next/navigation";
+import { translateTaskName } from "@/utils/taskTranslator";
 import { Bounce, toast, ToastContainer } from "react-toastify";
 import "@/components/Dashboard/index.css";
 import GameOverModal from "../Sidebar/gameOverModal";
@@ -144,6 +146,99 @@ const InfoModal: React.FC<ModalProps> = ({
         </div>
       </div>
     </>
+  );
+};
+
+// Component to translate stage content dynamically
+const StageModalContent: React.FC<{ info: any }> = ({ info }) => {
+  const { t, language } = useLanguage();
+  const [translatedContent, setTranslatedContent] = React.useState(info.content);
+  const [translatedRoundGoal, setTranslatedRoundGoal] = React.useState(info.roundGoal || "");
+  const [isTranslating, setIsTranslating] = React.useState(false);
+
+  React.useEffect(() => {
+    let isMounted = true;
+
+    const runTranslation = async () => {
+      if (language === "en") {
+        if (!isMounted) return;
+        setTranslatedContent(info.content);
+        setTranslatedRoundGoal(info.roundGoal || "");
+        setIsTranslating(false);
+        return;
+      }
+
+      try {
+        setIsTranslating(true);
+        const [contentTx, goalTx] = await Promise.all([
+          translateTaskName(info.content, language as any),
+          info.roundGoal
+            ? translateTaskName(info.roundGoal, language as any)
+            : Promise.resolve(info.roundGoal || ""),
+        ]);
+
+        if (!isMounted) return;
+        setTranslatedContent(contentTx);
+        setTranslatedRoundGoal(goalTx || "");
+      } finally {
+        if (isMounted) setIsTranslating(false);
+      }
+    };
+
+    runTranslation();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [info, language]);
+
+  if (isTranslating) {
+    return (
+      <div className="py-4 text-sm text-gray-500 dark:text-gray-300">
+        {t("common.loading")}
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <h3 className="mb-2 font-medium">{t("modals.stageModal.description")}</h3>
+      <p className="border-b border-[#d0cdcd] pb-4">{translatedContent}</p>
+      {info.roundGoal && (
+        <>
+          <h3 className="mb-2 mt-3 font-medium">{t("modals.stageModal.roundGoal")}</h3>
+          <p className="mb-4 border-b border-[#d0cdcd] pb-4 text-blue-500">
+            {translatedRoundGoal}
+          </p>
+        </>
+      )}
+      {info.employees && (
+        <>
+          <h3 className="mb-2 mt-3 font-medium">{t("modals.stageModal.employees")}</h3>
+          <ul className="mb-4 list-none border-b border-[#d0cdcd] pb-4">
+            {info.employees.map((emp: string, index: number) => (
+              <li key={index} className="italic text-blue-500">
+                • {emp}
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
+      {info.investors && (
+        <>
+          <h3 className="mb-2 font-medium">{t("modals.stageModal.investors")}</h3>
+          <p className="mb-4 border-b border-[#d0cdcd] pb-4 text-green-500">
+            {info.investors}
+          </p>
+        </>
+      )}
+      {info.mentors && (
+        <>
+          <h3 className="mb-2 font-medium">{t("modals.stageModal.mentors")}</h3>
+          <p className="text-green-500">{info.mentors}</p>
+        </>
+      )}
+    </div>
   );
 };
 
@@ -408,6 +503,7 @@ const ECommerce: React.FC = () => {
     setElonStep,
     setLoaderMessage
   } = useUser();
+  const { t } = useLanguage();
 
   const router = useRouter();
 
@@ -758,44 +854,9 @@ const ECommerce: React.FC = () => {
         title: info.title,
         anchorEl: event.currentTarget,
         content: (
-          <div>
-            <h3 className="mb-2 font-medium">Description</h3>
-            <p className="border-b border-[#d0cdcd] pb-4">{info.content}</p>
-            {info.roundGoal && (
-              <>
-                <h3 className="mb-2 mt-3 font-medium">Round goal</h3>
-                <p className="mb-4 border-b border-[#d0cdcd] pb-4 text-blue-500">
-                  {info.roundGoal}
-                </p>
-              </>
-            )}
-            {info.employees && (
-              <>
-                <h3 className="mb-2 mt-3 font-medium">Employees</h3>
-                <ul className="mb-4 list-none border-b border-[#d0cdcd] pb-4">
-                  {info.employees.map((emp, index) => (
-                    <li key={index} className="italic text-blue-500">
-                      • {emp}
-                    </li>
-                  ))}
-                </ul>
-              </>
-            )}
-            {info.investors && (
-              <>
-                <h3 className="mb-2 font-medium">Investors</h3>
-                <p className="mb-4 border-b border-[#d0cdcd] pb-4 text-green-500">
-                  {info.investors}
-                </p>
-              </>
-            )}
-            {info.mentors && (
-              <>
-                <h3 className="mb-2 font-medium">Mentors</h3>
-                <p className="text-green-500">{info.mentors}</p>
-              </>
-            )}
-          </div>
+          <StageModalContent 
+            info={info}
+          />
         ),
       });
     }
@@ -848,28 +909,28 @@ const ECommerce: React.FC = () => {
         <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between mb-4">
           <div>
             <p className="text-xs uppercase tracking-[0.2em] text-gray-500 dark:text-gray-400">
-              Startup Stages
+              {t("dashboard.startupStages")}
             </p>
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-              Choose the stage to unlock new goals
+              {t("dashboard.chooseStage")}
             </h3>
           </div>
           <div className="text-sm text-gray-500 dark:text-gray-400">
             {user?.startupStage === "FFF"
-              ? "Goal: reach 10 buyers"
+              ? `${t("dashboard.goal")}: ${t("dashboard.reachBuyers", { count: 10 })}`
               : user?.startupStage === "Angels"
-                ? "Goal: reach 100 buyers"
+                ? `${t("dashboard.goal")}: ${t("dashboard.reachBuyers", { count: 100 })}`
                 : user?.startupStage === "pre_seed"
-                  ? "Goal: reach 500 buyers"
+                  ? `${t("dashboard.goal")}: ${t("dashboard.reachBuyers", { count: 500 })}`
                   : user?.startupStage === "Seed"
-                    ? "Goal: reach 2,500 buyers + positive CM"
+                    ? `${t("dashboard.goal")}: ${t("dashboard.reachBuyersWithCM", { count: "2,500" })}`
                     : user?.startupStage === "a"
-                      ? "Goal: 10,000 buyers + $100k CM"
+                      ? `${t("dashboard.goal")}: ${t("dashboard.reachBuyersWithCMAndRevenue", { count: "10,000", cm: "100k", revenue: "0" })}`
                       : user?.startupStage === "b"
-                        ? "Goal: 50,000 buyers + $500k CM + $100k revenue"
+                        ? `${t("dashboard.goal")}: ${t("dashboard.reachBuyersWithCMAndRevenue", { count: "50,000", cm: "500k", revenue: "100k" })}`
                         : user?.startupStage === "c"
-                          ? "Goal: 100,000 buyers + $1M CM + $500k revenue"
-                          : "Highest stage unlocked"}
+                          ? `${t("dashboard.goal")}: ${t("dashboard.reachBuyersWithCMAndRevenue", { count: "100,000", cm: "1M", revenue: "500k" })}`
+                          : t("dashboard.highestStageUnlocked")}
           </div>
         </div>
 
@@ -890,7 +951,7 @@ const ECommerce: React.FC = () => {
                 }`}
                 data-tooltip-id="my-tooltip"
                 data-tooltip-content={
-                  isLocked ? "Purchase a plan to play this stage" : ""
+                  isLocked ? t("dashboard.purchasePlanToPlay") : ""
                 }
               >
                 <span className="text-sm font-semibold">{stage}</span>
@@ -913,14 +974,14 @@ const ECommerce: React.FC = () => {
         <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between mb-4">
           <div>
             <p className="text-xs uppercase tracking-[0.2em] text-gray-500 dark:text-gray-400">
-              Core metrics
+              {t("dashboard.coreMetrics")}
             </p>
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-              Track the numbers powering your turn
+              {t("dashboard.trackNumbers")}
             </h3>
           </div>
           <p className="text-sm text-gray-500 dark:text-gray-400">
-            Tap a metric to see context in the stage guide.
+            {t("dashboard.tapMetric")}
           </p>
         </div>
 
@@ -971,15 +1032,15 @@ const ECommerce: React.FC = () => {
           className="flex items-center justify-center gap-2 text-sm font-medium bg-gray-900 dark:bg-gray-700 text-white dark:text-white px-5 py-2.5 rounded-lg shadow-sm hover:bg-gray-800 dark:hover:bg-gray-600 transition duration-200 w-full sm:w-auto sm:min-w-[160px]"
         >
           <InfoIcon className="w-4 h-4" />
-          Ask AI Advisor
+          {t("dashboard.askAIAdvisor")}
         </button>
         <button
           onClick={handleShowTutorial}
           className="flex items-center justify-center gap-2 text-sm font-medium bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-750 px-5 py-2.5 rounded-lg transition duration-150 w-full sm:w-auto"
-          title="Start the Elon tutorial"
+          title={t("dashboard.startElonTutorial")}
         >
           <ArrowRight className="w-4 h-4" />
-          Show Tutorial
+          {t("dashboard.showTutorial")}
         </button>
       </div>
 
@@ -1039,7 +1100,7 @@ const ECommerce: React.FC = () => {
               {/* Bugs and Funds */}
               <div className="flex justify-between gap-4">
                 <div className="flex-1 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-3">
-                  <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">Bugs</p>
+                  <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">{t("dashboard.bugs")}</p>
                   <div className={`flex items-center gap-2 
                ${elonStep === 6 ? "ring-2 ring-blue-500 p-2 rounded-lg animate-pulse" : ''}`}>
                     <span className="text-lg font-bold text-gray-900 dark:text-white">{user?.bugPercentage}%</span>
@@ -1053,12 +1114,12 @@ const ECommerce: React.FC = () => {
                   ${elonStep === 5 ? "ring-2 ring-blue-500 animate-pulse" : ""}
                 `}
                     >
-                      Manage Bug
+                      {t("dashboard.manageBug")}
                     </button>
                   </div>
                 </div>
                 <div className="flex-1 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-3">
-                  <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">Funds</p>
+                  <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">{t("dashboard.funds")}</p>
                   <p className="text-lg font-bold text-gray-900 dark:text-white">${user?.finances}</p>
                 </div>
               </div>
@@ -1072,9 +1133,9 @@ const ECommerce: React.FC = () => {
          ${elonStep === 7 ? 'ring-2 ring-blue-500 animate-pulse' : ''}
         `}
           >
-            <span className="font-bold text-white text-lg mb-2">Make turn</span>
+            <span className="font-bold text-white text-lg mb-2">{t("dashboard.makeTurn")}</span>
             <div className="flex justify-between items-center w-full px-2 pt-2 border-t border-white/10">
-              <span className="text-white text-sm font-medium">Income</span>
+              <span className="text-white text-sm font-medium">{t("dashboard.income")}</span>
               <span className={`text-lg font-bold ${Number(turnAmount) >= 0 ? 'text-green-300' : 'text-red-300'}`}>${turnAmount}</span>
             </div>
           </button>
@@ -1091,13 +1152,13 @@ const ECommerce: React.FC = () => {
                     : "text-red-600 dark:text-red-400"
                   }`}
               >
-                {notificationMessages[notificationMessages.length - 1]?.message || "Welcome to the game"}
+                {notificationMessages[notificationMessages.length - 1]?.message || t("dashboard.welcomeToGame")}
               </p>
               <button
                 onClick={() => setShowNotificationModal(true)}
                 className="flex items-center gap-1.5 text-xs font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 transition-colors flex-shrink-0"
               >
-                <span>Show</span>
+                <span>{t("dashboard.show")}</span>
                 <Bell className="h-4 w-4" />
               </button>
             </div>
@@ -1108,7 +1169,7 @@ const ECommerce: React.FC = () => {
             {/* Bugs and Funds */}
             <div className="flex gap-4">
               <div className="rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-4 py-3 min-w-[140px]">
-                <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">Bugs</p>
+                <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">{t("dashboard.bugs")}</p>
                 <div className="flex items-center gap-2">
                   <span className="text-xl font-bold text-gray-900 dark:text-white joyride-step-4">{user?.bugPercentage}%</span>
                   <button
@@ -1121,13 +1182,13 @@ const ECommerce: React.FC = () => {
                 ${elonStep === 5 ? "ring-2 ring-blue-500 animate-pulse" : ""}
               `}
                   >
-                    Manage Bug
+                    {t("dashboard.manageBug")}
                   </button>
                 </div>
               </div>
 
               <div className="rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-4 py-3 min-w-[140px]">
-                <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">Funds</p>
+                <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">{t("dashboard.funds")}</p>
                 <p className="text-xl font-bold text-gray-900 dark:text-white">${user?.finances}</p>
               </div>
             </div>
@@ -1139,9 +1200,9 @@ const ECommerce: React.FC = () => {
           ${elonStep === 7 ? 'ring-2 ring-blue-500 animate-pulse' : ''}
         `}
             >
-              <span className="font-bold text-white text-lg mb-2">Make turn</span>
+              <span className="font-bold text-white text-lg mb-2">{t("dashboard.makeTurn")}</span>
               <div className="flex justify-between items-center w-full px-2 pt-2 border-t border-white/10">
-                <span className="font-medium text-white text-sm">Income</span>
+                <span className="font-medium text-white text-sm">{t("dashboard.income")}</span>
                 <span className={`text-lg font-bold ${Number(turnAmount) >= 0 ? 'text-green-300' : 'text-red-300'}`}>${turnAmount}</span>
               </div>
             </button>

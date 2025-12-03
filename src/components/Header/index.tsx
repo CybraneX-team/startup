@@ -5,7 +5,9 @@ import DropdownNotification from "./DropdownNotification";
 import DropdownUser from "./DropdownUser";
 import Image from "next/image";
 import { useUser } from "@/context/UserContext";
+import { useLanguage } from "@/context/LanguageContext";
 import GameSwitchMenu from "./GameSwitchMenu";
+import LanguageSwitcher from "../LanguageSwitcher";
 import { Coins, Trophy } from "lucide-react";
 import { useState } from "react";
 import LeaderboardModal from "../LeaderboardModal";
@@ -15,6 +17,7 @@ const Header = (props: {
   setSidebarOpen: (arg0: boolean) => void | any;
 }) => {
     const {HeaderDark, user, elonStep} = useUser()
+    const { t } = useLanguage();
     const [isLeaderboardOpen, setIsLeaderboardOpen] = useState(false);
   
   return (
@@ -46,7 +49,7 @@ const Header = (props: {
   {elonStep === 6 ? (
   <div className="flex items-center gap-2 px-4 py-2 rounded-lg ring-2 ring-yellow-400 animate-pulse bg-white/10 dark:bg-white/10 backdrop-blur-md shadow-lg transition-all duration-300 text-yellow-200 dark:text-yellow-100 font-semibold">
     <Coins className="w-4 h-4 text-yellow-300 animate-bounce" />
-    <span className="text-sm tracking-wide">Credits: {user?.credits}</span>
+    <span className="text-sm tracking-wide">{t("header.credits")}: {user?.credits}</span>
   </div>
 ) : (
   <>
@@ -56,14 +59,14 @@ const Header = (props: {
       title="View Leaderboard"
     >
       <Trophy className="w-4 h-4 text-white" />
-      <span className="text-sm font-semibold tracking-wide">Leaderboard</span>
+      <span className="text-sm font-semibold tracking-wide">{t("header.leaderboard")}</span>
     </button>
     <div
       className="hidden lg:flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-900 dark:bg-gray-700 text-sm font-semibold text-white shadow-sm cursor-pointer hover:bg-gray-800 dark:hover:bg-gray-600 transition-all duration-200"
     >
       <Coins className="w-4 h-4 text-white" />
       <span className="text-sm font-semibold tracking-wide">
-        Venture Coins: {user?.credits}
+        {t("header.ventureCoins")}: {user?.credits}
       </span>
     </div>
   </>
@@ -72,6 +75,7 @@ const Header = (props: {
 
 
 
+    <LanguageSwitcher />
     <DarkModeSwitcher />
     <GameSwitchMenu />
     <DropdownUser />

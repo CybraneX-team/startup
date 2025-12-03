@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Minus, Plus } from "lucide-react";
 import { useUser } from "@/context/UserContext";
+import { useLanguage } from "@/context/LanguageContext";
 import {  roleIcons } from "../roleIcons";
 // import {UserData} from "../../context/UserContext"
 import {UserData} from '../../context/interface.types'
@@ -19,6 +20,7 @@ interface Employee {
 
 const TeamManagementModal = ({ isOpen, onClose }: TeamManagementModalProps) => {
   const { user, setUser, setUserState } = useUser();
+  const { t } = useLanguage();
   const [team, setTeam] = useState<Employee[]>([]);
   const [maxEmployees, setMaxEmployees] = useState<number>(0);
   const [totalCount, setTotalCount] = useState<number>(0);
@@ -93,15 +95,15 @@ const TeamManagementModal = ({ isOpen, onClose }: TeamManagementModalProps) => {
       <div className="fixed inset-0 bg-black/50 backdrop-blur-sm " onClick={onClose}></div>
 
       <div className="relative w-full max-w-md rounded-lg bg-white p-6 shadow-lg dark:bg-[#1A222C]">
-        <h2 className="mb-2 text-xl font-semibold dark:text-white">Team Management</h2>
+        <h2 className="mb-2 text-xl font-semibold dark:text-white">{t("modals.teamManagement.title")}</h2>
 
         {totalCount >= maxEmployees && (
           <p className="mb-4 text-sm text-red-500">
-            You have reached the maximum team limit ({maxEmployees} employees)
+            {t("modals.teamManagement.maxLimitReached", { count: maxEmployees })}
           </p>
         )}
 
-        <p className="mb-4 text-sm text-gray-600 dark:text-white">Hire, fire, and manage</p>
+        <p className="mb-4 text-sm text-gray-600 dark:text-white">{t("modals.teamManagement.description")}</p>
 
         <div className="space-y-4">
           {team.map((member, index) => (
@@ -117,7 +119,7 @@ const TeamManagementModal = ({ isOpen, onClose }: TeamManagementModalProps) => {
                   ""
                    }</p>
                   {member.roleName === "ceo" && (
-                    <p className="text-xs text-gray-500 dark:text-white">Can replace any other role</p>
+                    <p className="text-xs text-gray-500 dark:text-white">{t("modals.teamManagement.canReplace")}</p>
                   )}
                 </div>
               </div>
@@ -157,10 +159,10 @@ const TeamManagementModal = ({ isOpen, onClose }: TeamManagementModalProps) => {
 
         <div className="mt-6 space-y-3">
           <button className="w-full rounded-md dark:bg-[#24303F] hover:dark:bg-[#1C2E5B] bg-green-400 py-3 text-white hover:bg-green-500" onClick={handleConfirm}>
-            Confirm
+            {t("modals.teamManagement.confirm")}
           </button>
           <button className="w-full dark:text-white rounded-md border dark:bg-[#24303F] hover:dark:bg-[#1C2E5B] dark:border-blue-400 border-gray-300 py-3 text-gray-700 hover:bg-gray-50" onClick={onClose}>
-            Cancel
+            {t("modals.teamManagement.cancel")}
           </button>
         </div>
       </div>

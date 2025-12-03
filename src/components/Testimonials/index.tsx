@@ -5,29 +5,29 @@ import SingleTestimonial from "./SingleTestimonial";
 const testimonialData: Testimonial[] = [
   {
     id: 1,
-    name: "Musharof Chy",
-    designation: "Founder @TailGrids",
+    name: "Sarah Chen",
+    designation: "Founder @TechFlow",
     content:
-      "Our members are so impressed. It's intuitive. It's clean. It's distraction free. If you're building a community.",
-    image: "/images/testimonials/auth-01.png",
+      "This simulator completely changed how I understand startup funding. I finally get why investors care about metrics like CAC and LTV. The hands-on experience of managing a team and making strategic decisions is invaluable. Wish I had this before my first pitch!",
+    image: "/images/user/user-01.png",
     star: 5,
   },
   {
     id: 2,
-    name: "Devid Weilium",
-    designation: "Founder @UIdeck",
+    name: "Rajesh Kumar",
+    designation: "CEO @EduInnovate",
     content:
-      "Our members are so impressed. It's intuitive. It's clean. It's distraction free. If you're building a community.",
-    image: "/images/testimonials/auth-02.png",
+      "As a first-time founder, I was clueless about financial modeling and runway calculations. Unicorn Simulator taught me everything through gameplay. Now I can confidently discuss burn rates and funding rounds with investors. Game-changing tool for entrepreneurs!",
+    image: "/images/user/user-02.png",
     star: 5,
   },
   {
     id: 3,
-    name: "Lethium Frenci",
-    designation: "Founder @Lineicons",
+    name: "Emily Rodriguez",
+    designation: "Co-founder @HealthTech Solutions",
     content:
-      "Our members are so impressed. It's intuitive. It's clean. It's distraction free. If you're building a community.",
-    image: "/images/testimonials/auth-03.png",
+      "The stage progression from FFF to Series A feels incredibly realistic. I learned how to balance hiring, marketing spend, and product development. The bug management feature is genius - it shows how technical debt can derail growth. Highly recommend for any aspiring founder!",
+    image: "/images/user/user-03.png",
     star: 5,
   },
 ];

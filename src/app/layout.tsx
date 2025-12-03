@@ -7,6 +7,7 @@ import "./globals.css";
 import React, { useEffect, useState } from "react";
 import Loader from "@/components/common/Loader";
 import { UserProvider } from "@/context/UserContext";
+import { LanguageProvider } from "@/context/LanguageContext";
 import { Bounce, ToastContainer } from "react-toastify";
 import Head from 'next/head';
 import { TourProvider } from '@reactour/tour'
@@ -35,11 +36,13 @@ export default function RootLayout({
       </head>
       <body suppressHydrationWarning={true} className="custom-scrollbar">
         <div className="dark:bg-boxdark-2 dark:text-bodydark">
-          <UserProvider>
-          <SessionProvider>
-          {loading ? <Loader /> : children}
-          </SessionProvider>
-          </UserProvider>
+          <LanguageProvider>
+            <UserProvider>
+              <SessionProvider>
+                {loading ? <Loader /> : children}
+              </SessionProvider>
+            </UserProvider>
+          </LanguageProvider>
         </div>
         <Script
           src="https://checkout.razorpay.com/v1/checkout.js"

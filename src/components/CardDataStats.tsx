@@ -2,7 +2,9 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Users, CheckSquare, Square, ChevronDown, Info, X } from "lucide-react";
 import { useUser } from "@/context/UserContext";
+import { useLanguage } from "@/context/LanguageContext";
 import { useRouter } from "next/navigation";
+import { translateTaskName, translateTaskNameSync } from "@/utils/taskTranslator";
 import { toast, ToastContainer, Bounce } from "react-toastify";
 import { Sparkles } from "lucide-react"; // Optional icon
 import Sparkle from "react-sparkle"; // ✅ Add this import
@@ -76,6 +78,18 @@ const CancelTaskModal: React.FC<CancelTaskModalProps> = ({
   onCancel,
 }) => {
   const { setHeaderDark, setloader } = useUser();
+  const { language } = useLanguage();
+  const [translatedTaskName, setTranslatedTaskName] = useState(
+    translateTaskNameSync(taskName, language)
+  );
+
+  useEffect(() => {
+    if (language !== "en") {
+      translateTaskName(taskName, language).then(setTranslatedTaskName);
+    } else {
+      setTranslatedTaskName(taskName);
+    }
+  }, [taskName, language]);
   useEffect(() => {
     setHeaderDark(isOpen);
     return () => setHeaderDark(false);
@@ -89,18 +103,18 @@ const CancelTaskModal: React.FC<CancelTaskModalProps> = ({
     >
       <div className="w-full max-w-md rounded-2xl bg-white p-6 dark:bg-[#1A232F] dark:text-white">
         <h2 className="mb-4 text-xl font-semibold text-gray-900 dark:text-white">
-          Cancel task?
+          {t("modals.cancelTask.title")}
         </h2>
 
         <div className="mb-6 rounded-lg border border-gray-200 p-4 dark:border-gray-700">
           <h3 className="mb-3 text-base font-medium text-gray-900 dark:text-white">
-            {taskName}
+            {translatedTaskName}
           </h3>
 
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-600 dark:text-gray-400">
-                Turns required
+                {t("modals.cancelTask.turns")}
               </span>
               <div className="flex items-center gap-1">
                 <span className="text-sm text-gray-900 dark:text-white">
@@ -114,7 +128,7 @@ const CancelTaskModal: React.FC<CancelTaskModalProps> = ({
 
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-600 dark:text-gray-400">
-                Effect on Metrics
+                {t("modals.cancelTask.metrics")}
               </span>
               <div className="flex items-center gap-2">
                 {metrics.map((metric, index) => (
@@ -137,13 +151,13 @@ const CancelTaskModal: React.FC<CancelTaskModalProps> = ({
             onClick={onConfirm}
             className="w-full rounded-lg bg-emerald-500 py-2.5 text-white transition-colors hover:bg-emerald-600"
           >
-            Yes, cancel
+            {t("modals.cancelTask.confirm")}
           </button>
           <button
             onClick={onCancel}
             className="w-full rounded-lg border border-gray-200 bg-white py-2.5 text-gray-900 transition-colors hover:bg-gray-50 dark:border-gray-700 dark:bg-[#1A232F] dark:text-white dark:hover:bg-gray-800"
           >
-            No
+            {t("modals.cancelTask.noCancel")}
           </button>
         </div>
       </div>
@@ -158,6 +172,19 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
   onAdd,
   onMakeTurn,
 }) => {
+  const { language } = useLanguage();
+  const [translatedTaskName, setTranslatedTaskName] = useState(
+    task ? translateTaskNameSync(task.name, language) : ''
+  );
+
+  useEffect(() => {
+    if (task && language !== 'en') {
+      translateTaskName(task.name, language).then(setTranslatedTaskName);
+    } else if (task) {
+      setTranslatedTaskName(task.name);
+    }
+  }, [task, language]);
+
   const { setHeaderDark } = useUser();
 
   useEffect(() => {
@@ -173,10 +200,10 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
         <div className="mb-6 flex items-start justify-between gap-4">
           <div>
             <p className="text-[11px] uppercase tracking-[0.4em] text-gray-500 dark:text-gray-400">
-              Task details
+              {t("modals.taskDetail.title")}
             </p>
             <h2 className="mt-1 text-3xl font-semibold text-gray-900 dark:text-white leading-tight">
-              {task.name}
+              {translatedTaskName}
             </h2>
             <p className="mt-3 text-sm text-gray-600 dark:text-gray-300">
               {task.description}
@@ -193,7 +220,7 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
         <div className="mb-6 grid gap-4 sm:grid-cols-2">
           <div className="rounded-3xl border border-gray-100 bg-gray-50/80 p-4 dark:border-gray-800 dark:bg-gray-900/40">
             <p className="text-xs uppercase tracking-[0.35em] text-gray-500 dark:text-gray-400">
-              Turns required
+              {t("modals.taskDetail.turnsRequired")}
             </p>
             <p className="mt-3 text-4xl font-semibold text-gray-900 dark:text-white">
               {task.turnsRequired}
@@ -201,17 +228,17 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
           </div>
           <div className="rounded-3xl border border-gray-100 bg-gray-50/80 p-4 dark:border-gray-800 dark:bg-gray-900/40">
             <p className="text-xs uppercase tracking-[0.35em] text-gray-500 dark:text-gray-400">
-              Type
+              {t("modals.taskDetail.type")}
             </p>
             <p className="mt-3 text-lg font-semibold text-gray-900 dark:text-white">
-              {task.isBug ? "Bug" : "Task"}
+              {task.isBug ? t("modals.taskDetail.bug") : t("modals.taskDetail.task")}
             </p>
           </div>
         </div>
 
         <div className="mb-6 rounded-3xl border border-gray-100 bg-gray-50/80 p-5 dark:border-gray-800 dark:bg-gray-900/40">
           <p className="text-xs uppercase tracking-[0.35em] text-gray-500 dark:text-gray-400 mb-3">
-            Effects
+            {t("modals.taskDetail.effects")}
           </p>
           <div className="flex flex-wrap gap-2">
             {task.metricsImpact &&
@@ -233,7 +260,7 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
 
         <div className="mb-8 rounded-3xl border border-gray-100 bg-gray-50/80 p-5 dark:border-gray-800 dark:bg-gray-900/40">
           <p className="text-xs uppercase tracking-[0.35em] text-gray-500 dark:text-gray-400 mb-3">
-            Required team
+            {t("modals.taskDetail.requiredTeam")}
           </p>
           <div className="flex flex-wrap gap-2">
             {task.requiredTeamMembers &&
@@ -257,13 +284,13 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
             onClick={onAdd}
             className="flex-1 rounded-xl border border-gray-200 px-4 py-3 text-sm font-semibold text-gray-700 transition-all hover:border-gray-300 hover:bg-gray-50 dark:border-gray-700 dark:text-white dark:hover:bg-gray-800"
           >
-            Add to selection
+            {t("modals.taskDetail.addToSelection")}
           </button>
           <button
             onClick={onMakeTurn}
             className="flex-1 rounded-xl bg-gray-900 px-4 py-3 text-sm font-semibold text-white transition-all hover:bg-gray-800 dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-gray-200"
           >
-            Make turn now
+            {t("modals.taskDetail.makeTurnNow")}
           </button>
         </div>
       </div>
@@ -356,6 +383,17 @@ const TaskCard: React.FC<TaskCardProps> = ({
   onShowDetails,
 }) => {
   const [showDescription, setShowDescription] = useState(false);
+  const { language } = useLanguage();
+  const [translatedName, setTranslatedName] = useState(translateTaskNameSync(name, language));
+
+  // Translate asynchronously when component mounts or language changes
+  useEffect(() => {
+    if (language !== "en") {
+      translateTaskName(name, language).then(setTranslatedName);
+    } else {
+      setTranslatedName(name);
+    }
+  }, [name, language]);
 return (
   <div
     onClick={onToggle}
@@ -391,7 +429,7 @@ return (
           </button>
         </div>
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white leading-snug">
-          {name}
+          {translatedName}
         </h3>
       </div>
       <button
@@ -477,6 +515,7 @@ const BrainstormModal = ({
   setPowerBoost,
 }: BrainstormModalProps) => {
   const { setHeaderDark } = useUser();
+  const { t } = useLanguage();
 
   useEffect(() => {
     setHeaderDark(isOpen);
@@ -491,18 +530,16 @@ const BrainstormModal = ({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-4 sm:px-0">
       <div className="relative w-full max-w-md rounded-2xl bg-white p-6 dark:bg-[#1A232F] dark:text-white">
         <h2 className="mb-4 text-xl font-semibold text-gray-900 dark:text-white">
-          Would you like to start a brainstorm session?
+          {t("dashboard.brainstormSession")}
         </h2>
         <p className="mb-6 text-sm text-gray-600 dark:text-gray-400">
-          You can brainstorm with your team and generate more tasks. All
-          employees are involved in brainstorming and will not continue to work
-          on active ones.
+          {t("dashboard.brainstormDescription")}
         </p>
 
         <div className="mb-6 space-y-3 text-sm">
           <div className="flex justify-between">
             <span className="text-gray-600 dark:text-gray-400">
-              Turns required
+              {t("dashboard.turnsRequired")}
             </span>
             <span className="text-gray-900 dark:text-white">
               {turnsRequired}
@@ -510,7 +547,7 @@ const BrainstormModal = ({
           </div>
           <div className="flex justify-between">
             <span className="text-gray-600 dark:text-gray-400">
-              Tasks generated
+              {t("dashboard.tasksGenerated")}
             </span>
             <span className="text-gray-900 dark:text-white">
               {tasksGenerated + extraTasks}
@@ -540,7 +577,7 @@ const BrainstormModal = ({
           <div className="z-10 flex items-center gap-2 text-sm">
             <Sparkles className="h-4 w-4 text-emerald-500" />
             <span className="text-gray-700 dark:text-gray-300">
-              Power Boost: +5 tasks for 3500 Venture coins
+              {t("dashboard.powerBoost")}
             </span>
           </div>
 
@@ -560,13 +597,13 @@ const BrainstormModal = ({
             onClick={() => onConfirm()}
             className="w-full rounded-lg bg-emerald-500 py-2.5 text-white hover:bg-emerald-600"
           >
-            Yes, start brainstorming {powerBoost ? "(with Power Boost)" : ""}
+            {t("dashboard.startBrainstorming")} {powerBoost ? t("dashboard.withPowerBoost") : ""}
           </button>
           <button
             onClick={onCancel}
             className="w-full rounded-lg border border-gray-200 bg-white py-2.5 text-gray-900 hover:bg-gray-50 dark:border-gray-700 dark:bg-[#1A232F] dark:text-white dark:hover:bg-gray-800"
           >
-            No, cancel
+            {t("dashboard.noCancel")}
           </button>
         </div>
       </div>
@@ -596,6 +633,7 @@ const TaskGrid: React.FC = () => {
     turnAmount,
     setloader
   } = useUser();
+  const { t } = useLanguage();
 
   // const [Tasks, setTasks] = useState([]);
   const router = useRouter();
@@ -1000,13 +1038,13 @@ const makeBrainstrom = async (turnAmount: string) => {
         <div className="flex flex-wrap justify-between gap-2">
           <div className="flex flex-wrap gap-2">
             <FilterButton
-              label="All tasks"
+              label={t("dashboard.allTasks")}
               count={user?.tasks?.length}
               isActive={activeFilters.has("all")}
               onClick={() => toggleFilter("all")}
             />
             <FilterButton
-              label="In progress"
+              label={t("dashboard.inProgress")}
               count={selectedTasks.size}
               isActive={activeFilters.has("in_progress")}
               onClick={() => toggleFilter("in_progress")}
@@ -1023,14 +1061,14 @@ const makeBrainstrom = async (turnAmount: string) => {
               onClick={() => setActiveFilters(new Set(["all"]))}
               className="text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
             >
-              Reset filters
+              {t("dashboard.resetFilters")}
             </button>
           </div>
           <button
             className="flex self-end rounded-lg bg-gray-900 dark:bg-gray-700 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 dark:hover:bg-gray-600 transition-colors shadow-sm"
             onClick={() => setBrainstormModalOpen(true)}
           >
-            Brainstorm
+            {t("dashboard.brainstorm")}
           </button>
         </div>
         <div className="columns-1 gap-4 space-y-4 sm:columns-2 xl:columns-3 pb-10">

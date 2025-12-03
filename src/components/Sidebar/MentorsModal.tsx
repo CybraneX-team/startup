@@ -1,6 +1,7 @@
 "use client"
 import React, { useEffect, useState } from "react";
 import { useUser } from "@/context/UserContext";
+import { useLanguage } from "@/context/LanguageContext";
 import DealModal from "./dealModel";
 
 interface MentorCardProps {
@@ -21,6 +22,7 @@ const MentorCard: React.FC<MentorCardProps> = ({
 }) => {
   const [showDealModal, setShowDealModal] = useState(false);
   const {user, setUser, setUserState, setnotificationMessages, notificationMessages } = useUser()
+  const { t } = useLanguage();
 
   const getInitials = (name: string) => {
     const parts = name?.split(" ").filter(Boolean) || [];
@@ -93,12 +95,12 @@ const MentorCard: React.FC<MentorCardProps> = ({
         <p className="mb-6 text-sm w-70 lg:w-90 text-gray-600 dark:text-white">{description}</p>
 
         <div className="mb-3 flex items-center justify-between border-b border-gray-200 pb-3">
-          <span className="text-sm font-medium text-gray-700 dark:text-white">Conditions (required stake)</span>
+          <span className="text-sm font-medium text-gray-700 dark:text-white">{t("modals.mentors.conditions")}</span>
           <span className="text-sm font-medium text-blue-500">{conditions}%</span>
         </div>
 
         <div className="mb-3">
-          <h4 className="mb-2 text-sm font-medium text-gray-700 dark:text-white">Benefits</h4>
+          <h4 className="mb-2 text-sm font-medium text-gray-700 dark:text-white">{t("modals.mentors.benefits")}</h4>
           <ul>
             <li className="flex items-start gap-2 text-sm text-blue-500">
               <span className="mt-1 h-2 w-2 flex-none rounded-full bg-blue-500"></span>
@@ -108,7 +110,7 @@ const MentorCard: React.FC<MentorCardProps> = ({
         </div>
 
         <div>
-          <h4 className="mb-2 text-sm font-medium text-gray-700 dark:text-white">Limitations</h4>
+          <h4 className="mb-2 text-sm font-medium text-gray-700 dark:text-white">{t("modals.mentors.limitations")}</h4>
           <ul>
             <li className="flex items-start gap-2 text-sm text-blue-500">
               <span className="mt-1 h-2 w-2 flex-none rounded-full bg-blue-500"></span>
@@ -121,7 +123,7 @@ const MentorCard: React.FC<MentorCardProps> = ({
                     (element) => element.mentorName === title,
                   ) ? (
                     <span className="rounded border border-green-600 px-2 py-1 font-semibold text-green-600">
-                      SIGNED
+                      {t("modals.mentors.signed")}
                     </span> 
                   ): null
                 }
@@ -152,6 +154,7 @@ interface MentorsModalProps {
 
 const MentorsModal: React.FC<MentorsModalProps> = ({ isOpen, onClose }) => {
   const {user} = useUser()
+  const { t } = useLanguage();
   const [mentorsArray, setmentorsArray] = useState<any[]>([]);
   
     useEffect(() => {
@@ -194,11 +197,11 @@ const MentorsModal: React.FC<MentorsModalProps> = ({ isOpen, onClose }) => {
         {/* Modal header */}
         <div className="mb-6">
           <div className="flex items-center gap-2">
-            <h2 className="text-2xl font-medium text-gray-800 dark:text-white">Available Mentors</h2>
+            <h2 className="text-2xl font-medium text-gray-800 dark:text-white">{t("modals.mentors.title")}</h2>
             <span className="text-2xl font-medium text-green-500">{user?.mentorsAvailable.length || 0}</span>
           </div>
           <p className="mt-2 text-sm  text-gray-600 dark:text-white">
-            A startup mentor is someone who offers guidance and support, helping startup workers to develop their skills, grow their networks, and achieve their professional goals.
+            {t("modals.mentors.description")}
           </p>
          
         </div>

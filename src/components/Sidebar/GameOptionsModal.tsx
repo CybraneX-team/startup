@@ -3,6 +3,7 @@ import Image from "next/image";
 import { X, RotateCcw, Rocket, AlertCircle } from "lucide-react";
 import image from '../../../illustrationImage.svg';
 import { useUser } from "@/context/UserContext";
+import { useLanguage } from "@/context/LanguageContext";
 
 interface GameOptionsModalProps {
   isOpen: boolean;
@@ -17,6 +18,7 @@ const GameOptionsModal = ({
   onResetGame,
   onStartNewGame,
 }: GameOptionsModalProps) => {
+  const { t } = useLanguage();
   const [showConfirm, setShowConfirm] = useState(false);
 
   if (!isOpen) return null;
@@ -54,7 +56,7 @@ const GameOptionsModal = ({
 
           {/* Heading */}
           <h2 className="text-xl font-semibold text-center text-gray-800 dark:text-white mb-4">
-            What would you like to do?
+            {t("modals.gameOptions.title")}
           </h2>
 
           {/* Buttons */}
@@ -67,7 +69,7 @@ const GameOptionsModal = ({
               }}
             >
               <RotateCcw size={18} />
-              Reset Current Game
+              {t("modals.gameOptions.resetGame")}
             </button>
 
             <button
@@ -75,15 +77,15 @@ const GameOptionsModal = ({
               onClick={() => setShowConfirm(true)}
             >
               <Rocket size={18} />
-              Start New Simulation
+              {t("modals.gameOptions.startNewSimulation")}
             </button>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 text-sm px-3 py-2 rounded-md border bg-[#FFF8D6] text-yellow-900 border-yellow-400 text-center dark:bg-yellow-900 dark:text-yellow-200 dark:border-yellow-700">
   <div className="flex items-center gap-1">
     <AlertCircle size={16} className="text-yellow-600 dark:text-yellow-300" />
-    <span className="break-words text-sm">Starting a new simulation will cost</span>
+    <span className="break-words text-sm">{t("modals.gameOptions.costWarning")}</span>
   </div>
-  <span className="text-violet-700 dark:text-violet-400 font-semibold">2000 Venture coins</span>
+  <span className="text-violet-700 dark:text-violet-400 font-semibold">2000 {t("modals.gameOptions.ventureCoins")}</span>
           </div>
 
           </div>
@@ -95,24 +97,24 @@ const GameOptionsModal = ({
         <div className="fixed inset-0 z-[3001] flex items-center justify-center bg-black/40 backdrop-blur-sm">
           <div className="w-[90%] max-w-sm bg-white dark:bg-[#1F2937] rounded-2xl p-6 shadow-2xl text-center">
             <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-3">
-              Are you sure?
+              {t("modals.gameOptions.areYouSure")}
             </h3>
             <p className="text-sm text-gray-600 dark:text-gray-300 mb-5">
-              Starting a new simulation will cost 
-              <span className="font-bold text-violet-600 dark:text-violet-400">200 venture coins</span>
+              {t("modals.gameOptions.costWarning")} 
+              <span className="font-bold text-violet-600 dark:text-violet-400">200 {t("modals.gameOptions.ventureCoins")}</span>
             </p>
             <div className="flex justify-center gap-4">
               <button
                 onClick={() => setShowConfirm(false)}
                 className="px-4 py-2 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white hover:bg-gray-300 dark:hover:bg-gray-600"
               >
-                Cancel
+                {t("common.cancel")}
               </button>
               <button
                 onClick={handleConfirmStart}
                 className="px-4 py-2 rounded-lg bg-violet-600 text-white font-semibold hover:bg-violet-700 dark:hover:bg-violet-500"
               >
-                Confirm
+                {t("modals.gameOptions.confirm")}
               </button>
             </div>
           </div>

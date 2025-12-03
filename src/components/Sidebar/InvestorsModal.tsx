@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { X } from "lucide-react";
 import { useUser } from "@/context/UserContext";
+import { useLanguage } from "@/context/LanguageContext";
 
 interface InvestorsModalProps {
   isOpen: boolean;
@@ -10,6 +11,7 @@ interface InvestorsModalProps {
 
 const InvestorsModal: React.FC<InvestorsModalProps> = ({ isOpen, onClose }) => {
   const { user, setUser, setUserState } = useUser();
+  const { t } = useLanguage();
   const [investmentsArray, setInvestmentsArray] = useState<any[]>([]);
   const [selectedInvestor, setSelectedInvestor] = useState<any | null>(null);
   const [showSignConfirm, setShowSignConfirm] = useState(false);
@@ -115,14 +117,13 @@ const InvestorsModal: React.FC<InvestorsModalProps> = ({ isOpen, onClose }) => {
           {/* Header */}
           <div className="p-6 border-b border-gray-200 dark:border-gray-700 sticky top-0 bg-white dark:bg-[#1A232F] z-40">
             <h2 className="text-2xl font-medium text-gray-800 dark:text-white inline">
-              Available Investors{" "}
+              {t("modals.investors.title")}{" "}
             </h2>
             <span className="text-2xl font-medium text-green-500">
               {user?.availableInvestments.length}
             </span>
             <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
-              Each round, new investors will be available to you. They bring
-              funds and benefits in exchange for shares.
+              {t("modals.investors.description")}
             </p>
           </div>
 
@@ -159,28 +160,28 @@ const InvestorsModal: React.FC<InvestorsModalProps> = ({ isOpen, onClose }) => {
 
                     <div className="space-y-3 border-t border-gray-200 dark:border-gray-700 pt-3 text-sm">
                       <div className="flex justify-between">
-                        <span className="text-gray-600 dark:text-white">Investment</span>
+                        <span className="text-gray-600 dark:text-white">{t("modals.investors.investment")}</span>
                         <span className="text-green-600">${e.money}</span>
                       </div>
                       {signed && (
                         <div className="flex justify-between">
-                          <span className="text-gray-600 dark:text-white">Buyout price</span>
+                          <span className="text-gray-600 dark:text-white">{t("modals.investors.buyoutPrice")}</span>
                           <span className="text-green-600">${e.buyout}</span>
                         </div>
                       )}
                       <div className="flex justify-between">
-                        <span className="text-gray-600 dark:text-white">Investor&apos;s share</span>
+                        <span className="text-gray-600 dark:text-white">{t("modals.investors.investorsShare")}</span>
                         <span className="text-blue-500">{e.share}%</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-600 dark:text-white flex items-center">
                           <span className="h-2 w-2 rounded-full bg-blue-500 mr-2" />
-                          Advantages
+                          {t("modals.investors.advantages")}
                         </span>
                         <span className="text-blue-500">
                           {e.bug_percent_point < 0
-                            ? `Decreases bugs by ${Math.abs(e.bug_percent_point)}%`
-                            : `Increases bugs by ${e.bug_percent_point}%`}
+                            ? t("modals.investors.decreasesBugs", { count: Math.abs(e.bug_percent_point) })
+                            : t("modals.investors.increasesBugs", { count: e.bug_percent_point })}
                         </span>
                       </div>
                     </div>
@@ -188,7 +189,7 @@ const InvestorsModal: React.FC<InvestorsModalProps> = ({ isOpen, onClose }) => {
                     <div className="mt-4 text-right">
                       {signed ? (
                         <span className="rounded border border-green-600 px-2 py-1 text-sm font-semibold text-green-600">
-                          SIGNED
+                          {t("modals.investors.signed")}
                         </span>
                       ) : (
                         <button
@@ -198,7 +199,7 @@ const InvestorsModal: React.FC<InvestorsModalProps> = ({ isOpen, onClose }) => {
                           }}
                           className="mt-2 rounded border border-gray-300 px-3 py-1 text-sm hover:border-green-500"
                         >
-                          Sign Investment
+                          {t("modals.investors.signInvestment")}
                         </button>
                       )}
                     </div>
@@ -215,11 +216,11 @@ const InvestorsModal: React.FC<InvestorsModalProps> = ({ isOpen, onClose }) => {
         <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
           <div className="rounded-xl bg-white dark:bg-[#1A232F] p-6 shadow-xl max-w-sm w-full text-gray-800 dark:text-white">
             <h2 className="text-lg font-semibold mb-2">
-              {showSignConfirm ? "Make a deal with investor?" : "Buyout investor’s share?"}
+              {showSignConfirm ? t("modals.investors.makeDeal") : t("modals.investors.buyoutShare")}
             </h2>
             <p className="mb-2">{selectedInvestor.name}</p>
             <p className="text-sm">
-              {showSignConfirm ? "Investment" : "Share"}:{" "}
+              {showSignConfirm ? t("modals.investors.investment") : t("modals.investors.share")}:{" "}
               <span className="text-green-600">
                 {showSignConfirm
                   ? `$${selectedInvestor.money}`
@@ -229,16 +230,16 @@ const InvestorsModal: React.FC<InvestorsModalProps> = ({ isOpen, onClose }) => {
             <p className="text-sm mb-4">
               {showSignConfirm ? (
                 <>
-                  Advantage:{" "}
+                  {t("modals.investors.advantage")}:{" "}
                   <span className="text-blue-500">
                     {selectedInvestor.bug_percent_point < 0
-                      ? `Reduces bugs by ${Math.abs(selectedInvestor.bug_percent_point)}%`
-                      : `Increases bugs by ${selectedInvestor.bug_percent_point}%`}
+                      ? t("modals.investors.reducesBugs", { count: Math.abs(selectedInvestor.bug_percent_point) })
+                      : t("modals.investors.increasesBugs", { count: selectedInvestor.bug_percent_point })}
                   </span>
                 </>
               ) : (
                 <>
-                  Buyout price:{" "}
+                  {t("modals.investors.buyoutPrice")}:{" "}
                   <span className="text-green-600">${selectedInvestor.buyout}</span>
                 </>
               )}
@@ -252,7 +253,7 @@ const InvestorsModal: React.FC<InvestorsModalProps> = ({ isOpen, onClose }) => {
                 }}
                 className="px-4 py-2 border rounded text-gray-600 dark:text-white dark:border-gray-500"
               >
-                No, cancel
+                {t("modals.investors.noCancel")}
               </button>
               <button
                 onClick={() => {
@@ -267,7 +268,7 @@ const InvestorsModal: React.FC<InvestorsModalProps> = ({ isOpen, onClose }) => {
                 }}
                 className="px-4 py-2 rounded bg-green-500 text-white"
               >
-                Yes
+                {t("modals.investors.yes")}
               </button>
             </div>
           </div>
