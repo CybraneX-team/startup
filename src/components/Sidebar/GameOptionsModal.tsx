@@ -85,7 +85,7 @@ const GameOptionsModal = ({
     <AlertCircle size={16} className="text-yellow-600 dark:text-yellow-300" />
     <span className="break-words text-sm">{t("modals.gameOptions.costWarning")}</span>
   </div>
-  <span className="text-violet-700 dark:text-violet-400 font-semibold">2000 {t("modals.gameOptions.ventureCoins")}</span>
+  <span className="text-violet-700 dark:text-violet-400 font-semibold"> 2000 {t("modals.gameOptions.ventureCoins")}</span>
           </div>
 
           </div>
@@ -101,7 +101,7 @@ const GameOptionsModal = ({
             </h3>
             <p className="text-sm text-gray-600 dark:text-gray-300 mb-5">
               {t("modals.gameOptions.costWarning")} 
-              <span className="font-bold text-violet-600 dark:text-violet-400">200 {t("modals.gameOptions.ventureCoins")}</span>
+              <span className="font-bold text-violet-600 dark:text-violet-400"> 2000 {t("modals.gameOptions.ventureCoins")}</span>
             </p>
             <div className="flex justify-center gap-4">
               <button

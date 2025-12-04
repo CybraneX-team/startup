@@ -13,7 +13,8 @@ import TeamManagementModal from "./TeamManagementModal";
 import InvestorsModal from "./InvestorsModal";
 import { roleIcons } from "../roleIcons";
 import GameOptionsModal from "./GameOptionsModal";
-import {aiSkinnedEmployees } from "../../context/interface.types";
+import { aiSkinnedEmployees } from "../../context/interface.types";
+import { startNewSimulation as startNewSimulationAction } from "@/utils/gameActions";
 
 
 // Dynamically import ReactApexChart to avoid window is not defined errors
@@ -186,33 +187,13 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, sidebarCollapsed = false, setSid
     }
   }
   
-  async function startNewSimulation(){
-    try {
-      const makeReq = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/create-new-game`, {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-          token: `${localStorage.getItem("userToken")}`,
-        },
-        body: JSON.stringify({
-          gameId: user?.gameId
-        })
-      })
-  
-      if(makeReq.ok){
-        const response = await makeReq.json()
-        setUser(response)
-        setUserState(response);
-      }else {
-        console.error(
-          `Request failed with status ${makeReq.status}: ${makeReq.statusText}`,
-        );
-      }
-    } catch (error) {
-      console.error("An error occurred:", error);
-      
-    }
+  async function startNewSimulation() {
+    await startNewSimulationAction({
+      user,
+      setUser,
+      setUserState,
+      setloader,
+    });
   }
   return (
     <>

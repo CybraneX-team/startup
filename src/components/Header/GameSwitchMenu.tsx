@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { ChevronDown, Pencil, Check, Rocket } from "lucide-react";
 import { useUser } from "@/context/UserContext";
 import { useLanguage } from "@/context/LanguageContext";
+import { startNewSimulation as startNewSimulationAction } from "@/utils/gameActions";
 interface userGameType{
   gameId: string;
   gameName: string;
@@ -95,37 +96,19 @@ const GameSwitchMenu = () => {
     setEditIndex(null);
   };
 
-  async function startNewSimulation() {
-    try {
-      setloader(true);
-      const makeReq = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/create-new-game`, {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-          token: `${localStorage.getItem("userToken")}`,
-        },
-        body: JSON.stringify({
-          gameId: user?.gameId
-        })
-      });
+  const handleStartNewSimulation = async () => {
+    const res = await startNewSimulationAction({
+      user,
+      setUser,
+      setUserState,
+      setloader,
+    });
 
-      if (makeReq.ok) {
-        const response = await makeReq.json();
-        setUser(response);
-        setUserState(response);
-        setIsOpen(false);
-      } else {
-        console.error(
-          `Request failed with status ${makeReq.status}: ${makeReq.statusText}`,
-        );
-      }
-    } catch (error) {
-      console.error("An error occurred:", error);
-    } finally {
-      setloader(false);
+    // Close dropdown only if the API call succeeded
+    if (res) {
+      setIsOpen(false);
     }
-  }
+  };
 
   return (
     <div className="relative" ref={dropdownRef}>
@@ -200,7 +183,7 @@ const GameSwitchMenu = () => {
           {/* Start New Simulation Button */}
           <li className="border-t border-gray-200 dark:border-gray-700">
             <button
-              onClick={startNewSimulation}
+              onClick={handleStartNewSimulation}
               className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-violet-600 hover:bg-violet-700 dark:bg-violet-600 dark:hover:bg-violet-500 transition-all"
             >
               <Rocket size={16} />
@@ -208,7 +191,7 @@ const GameSwitchMenu = () => {
             </button>
             <div className="px-4 py-1.5 text-xs text-center text-yellow-700 dark:text-yellow-300 bg-yellow-50 dark:bg-yellow-900/20 border-t border-yellow-200 dark:border-yellow-800 rounded-b-lg">
               <span>{t("modals.gameOptions.costWarning")} </span>
-              <span className="font-semibold text-violet-700 dark:text-violet-400">2000 {t("modals.gameOptions.ventureCoins")}</span>
+              <span className="font-semibold text-violet-700 dark:text-violet-400"> 2000 {t("modals.gameOptions.ventureCoins")}</span>
             </div>
           </li>
         </ul>
