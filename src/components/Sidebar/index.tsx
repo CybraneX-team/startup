@@ -15,6 +15,7 @@ import { roleIcons } from "../roleIcons";
 import GameOptionsModal from "./GameOptionsModal";
 import { aiSkinnedEmployees } from "../../context/interface.types";
 import { startNewSimulation as startNewSimulationAction } from "@/utils/gameActions";
+import { toast } from "react-toastify";
 
 
 // Dynamically import ReactApexChart to avoid window is not defined errors
@@ -188,12 +189,23 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, sidebarCollapsed = false, setSid
   }
   
   async function startNewSimulation() {
-    await startNewSimulationAction({
+    const result = await startNewSimulationAction({
       user,
       setUser,
       setUserState,
       setloader,
     });
+    
+    if (result.insufficientCredits) {
+      toast.error("You don't have enough Venture Coins! You need 2000 coins to start a new simulation.", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
+    }
   }
   return (
     <>

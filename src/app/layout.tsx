@@ -9,6 +9,7 @@ import Loader from "@/components/common/Loader";
 import { UserProvider } from "@/context/UserContext";
 import { LanguageProvider } from "@/context/LanguageContext";
 import { Bounce, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import Head from 'next/head';
 import { TourProvider } from '@reactour/tour'
 import { SessionProvider } from "next-auth/react";
@@ -42,6 +43,19 @@ export default function RootLayout({
               <SessionProvider>
                 <AuthSyncHandler />
                 {loading ? <Loader /> : children}
+                <ToastContainer
+                  position="top-right"
+                  autoClose={5000}
+                  hideProgressBar={false}
+                  newestOnTop={false}
+                  closeOnClick
+                  rtl={false}
+                  pauseOnFocusLoss
+                  draggable
+                  pauseOnHover
+                  theme="light"
+                  transition={Bounce}
+                />
               </SessionProvider>
             </UserProvider>
           </LanguageProvider>

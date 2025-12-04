@@ -4,6 +4,7 @@ import { ChevronDown, Pencil, Check, Rocket } from "lucide-react";
 import { useUser } from "@/context/UserContext";
 import { useLanguage } from "@/context/LanguageContext";
 import { startNewSimulation as startNewSimulationAction } from "@/utils/gameActions";
+import { toast } from "react-toastify";
 interface userGameType{
   gameId: string;
   gameName: string;
@@ -97,15 +98,28 @@ const GameSwitchMenu = () => {
   };
 
   const handleStartNewSimulation = async () => {
-    const res = await startNewSimulationAction({
+    const result = await startNewSimulationAction({
       user,
       setUser,
       setUserState,
       setloader,
     });
 
+    if (result.insufficientCredits) {
+      toast.error("You don't have enough Venture Coins! You need 2000 coins to start a new simulation.", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
+      // Don't close dropdown if credits are insufficient
+      return;
+    }
+
     // Close dropdown only if the API call succeeded
-    if (res) {
+    if (result.success) {
       setIsOpen(false);
     }
   };

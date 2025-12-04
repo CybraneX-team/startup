@@ -1,6 +1,18 @@
+"use client";
 import Link from "next/link";
+import { useUser } from "@/context/UserContext";
+import { useEffect, useState } from "react";
 
 const Hero = () => {
+  const { user } = useUser();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    // Check if user is logged in via token or user context
+    const token = localStorage.getItem("userToken");
+    setIsLoggedIn(!!(token || user));
+  }, [user]);
+
   return (
     <>
       <section
@@ -29,12 +41,21 @@ const Hero = () => {
                   Simulation.Simulation into Reality
                 </p>
                 <div className="flex flex-col items-center justify-center space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
-                  <Link
-                    href="/auth/signup"
-                    className="rounded-sm bg-primary px-8 py-4 text-base font-semibold text-white duration-300 ease-in-out hover:bg-primary/80"
-                  >
-                    🔥 Start Your Journey
-                  </Link>
+                  {isLoggedIn ? (
+                    <Link
+                      href="/"
+                      className="rounded-sm bg-primary px-8 py-4 text-base font-semibold text-white duration-300 ease-in-out hover:bg-primary/80"
+                    >
+                      📊 Go to Dashboard
+                    </Link>
+                  ) : (
+                    <Link
+                      href="/auth/signup"
+                      className="rounded-sm bg-primary px-8 py-4 text-base font-semibold text-white duration-300 ease-in-out hover:bg-primary/80"
+                    >
+                      🔥 Start Your Journey
+                    </Link>
+                  )}
                   
                 </div>
               </div>
