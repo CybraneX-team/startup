@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useUser } from "@/context/UserContext";
 import { useLanguage } from "@/context/LanguageContext";
 import DealModal from "./dealModel";
+import { translateTaskName } from "@/utils/taskTranslator";
 
 interface MentorCardProps {
   title: string;
@@ -22,7 +23,12 @@ const MentorCard: React.FC<MentorCardProps> = ({
 }) => {
   const [showDealModal, setShowDealModal] = useState(false);
   const {user, setUser, setUserState, setnotificationMessages, notificationMessages } = useUser()
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const [translatedTitle, setTranslatedTitle] = useState(title);
+  const [translatedDescription, setTranslatedDescription] = useState(description);
+  const [translatedBenefits, setTranslatedBenefits] = useState<string[]>(Array.isArray(benefits) ? benefits : [benefits]);
+  const [translatedLimitations, setTranslatedLimitations] = useState<string[]>(Array.isArray(limitations) ? limitations : [limitations]);
+  const [isTranslating, setIsTranslating] = useState(false);
 
   const getInitials = (name: string) => {
     const parts = name?.split(" ").filter(Boolean) || [];
@@ -45,6 +51,48 @@ const MentorCard: React.FC<MentorCardProps> = ({
     const index = name.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
     return colors[index % colors.length];
   };
+
+  // Translate mentor card content when language changes
+  useEffect(() => {
+    const translateContent = async () => {
+      if (language === 'en') {
+        setTranslatedTitle(title);
+        setTranslatedDescription(description);
+        setTranslatedBenefits(Array.isArray(benefits) ? benefits : [benefits]);
+        setTranslatedLimitations(Array.isArray(limitations) ? limitations : [limitations]);
+        setIsTranslating(false);
+        return;
+      }
+
+      setIsTranslating(true);
+      try {
+        const benefitsArray = Array.isArray(benefits) ? benefits : [benefits];
+        const limitationsArray = Array.isArray(limitations) ? limitations : [limitations];
+
+        const [titleTx, descTx, benefitsTx, limitationsTx] = await Promise.all([
+          translateTaskName(title, language as any),
+          translateTaskName(description, language as any),
+          Promise.all(benefitsArray.map(b => translateTaskName(b, language as any))),
+          Promise.all(limitationsArray.map(l => translateTaskName(l, language as any))),
+        ]);
+
+        setTranslatedTitle(titleTx);
+        setTranslatedDescription(descTx);
+        setTranslatedBenefits(benefitsTx);
+        setTranslatedLimitations(limitationsTx);
+      } catch (error) {
+        console.warn('Failed to translate mentor content:', error);
+        setTranslatedTitle(title);
+        setTranslatedDescription(description);
+        setTranslatedBenefits(Array.isArray(benefits) ? benefits : [benefits]);
+        setTranslatedLimitations(Array.isArray(limitations) ? limitations : [limitations]);
+      } finally {
+        setIsTranslating(false);
+      }
+    };
+
+    translateContent();
+  }, [title, description, benefits, limitations, language]);
 
   async function signMentor(mentorName : string) {
     const request = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/hireMentor`,{
@@ -89,10 +137,14 @@ const MentorCard: React.FC<MentorCardProps> = ({
               {getInitials(title)}
             </span>
           </div>
-          <h3 className="text-xl font-medium text-gray-800 dark:text-white flex-1">{title}</h3>
+          <h3 className="text-xl font-medium text-gray-800 dark:text-white flex-1">
+            {isTranslating ? t("common.loading") : translatedTitle}
+          </h3>
         </div>
 
-        <p className="mb-6 text-sm w-70 lg:w-90 text-gray-600 dark:text-white">{description}</p>
+        <p className="mb-6 text-sm w-70 lg:w-90 text-gray-600 dark:text-white">
+          {isTranslating ? t("common.loading") : translatedDescription}
+        </p>
 
         <div className="mb-3 flex items-center justify-between border-b border-gray-200 pb-3">
           <span className="text-sm font-medium text-gray-700 dark:text-white">{t("modals.mentors.conditions")}</span>
@@ -102,20 +154,38 @@ const MentorCard: React.FC<MentorCardProps> = ({
         <div className="mb-3">
           <h4 className="mb-2 text-sm font-medium text-gray-700 dark:text-white">{t("modals.mentors.benefits")}</h4>
           <ul>
-            <li className="flex items-start gap-2 text-sm text-blue-500">
-              <span className="mt-1 h-2 w-2 flex-none rounded-full bg-blue-500"></span>
-              {benefits}
-            </li>
+            {isTranslating ? (
+              <li className="flex items-start gap-2 text-sm text-blue-500">
+                <span className="mt-1 h-2 w-2 flex-none rounded-full bg-blue-500"></span>
+                {t("common.loading")}
+              </li>
+            ) : (
+              translatedBenefits.map((benefit, idx) => (
+                <li key={idx} className="flex items-start gap-2 text-sm text-blue-500">
+                  <span className="mt-1 h-2 w-2 flex-none rounded-full bg-blue-500"></span>
+                  {benefit}
+                </li>
+              ))
+            )}
           </ul>
         </div>
 
         <div>
           <h4 className="mb-2 text-sm font-medium text-gray-700 dark:text-white">{t("modals.mentors.limitations")}</h4>
           <ul>
-            <li className="flex items-start gap-2 text-sm text-blue-500">
-              <span className="mt-1 h-2 w-2 flex-none rounded-full bg-blue-500"></span>
-              {limitations}
-            </li>
+            {isTranslating ? (
+              <li className="flex items-start gap-2 text-sm text-blue-500">
+                <span className="mt-1 h-2 w-2 flex-none rounded-full bg-blue-500"></span>
+                {t("common.loading")}
+              </li>
+            ) : (
+              translatedLimitations.map((limitation, idx) => (
+                <li key={idx} className="flex items-start gap-2 text-sm text-blue-500">
+                  <span className="mt-1 h-2 w-2 flex-none rounded-full bg-blue-500"></span>
+                  {limitation}
+                </li>
+              ))
+            )}
           </ul>
         </div>
         <div className="mt-4 text-right">
@@ -133,10 +203,10 @@ const MentorCard: React.FC<MentorCardProps> = ({
       <DealModal
         isOpen={showDealModal}
         onClose={() => setShowDealModal(false)}
-        mentorName={title}
+        mentorName={translatedTitle}
         conditions={conditions.toString()}
-        benefits={[benefits]}        // 👈 string → string[]
-        limitations={[limitations]}  
+        benefits={translatedBenefits}
+        limitations={translatedLimitations}
         onSign={() => {
           signMentor(title)
         }}

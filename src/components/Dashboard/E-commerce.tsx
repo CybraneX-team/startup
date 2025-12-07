@@ -242,6 +242,62 @@ const StageModalContent: React.FC<{ info: any }> = ({ info }) => {
   );
 };
 
+// Component to translate metric content dynamically
+const MetricModalContent: React.FC<{ title: string; content: string }> = ({ title, content }) => {
+  const { t, language } = useLanguage();
+  const [translatedTitle, setTranslatedTitle] = React.useState(title);
+  const [translatedContent, setTranslatedContent] = React.useState(content);
+  const [isTranslating, setIsTranslating] = React.useState(false);
+
+  React.useEffect(() => {
+    let isMounted = true;
+
+    const runTranslation = async () => {
+      if (language === "en") {
+        if (!isMounted) return;
+        setTranslatedTitle(title);
+        setTranslatedContent(content);
+        setIsTranslating(false);
+        return;
+      }
+
+      try {
+        setIsTranslating(true);
+        const [titleTx, contentTx] = await Promise.all([
+          translateTaskName(title, language as any),
+          translateTaskName(content, language as any),
+        ]);
+
+        if (!isMounted) return;
+        setTranslatedTitle(titleTx);
+        setTranslatedContent(contentTx);
+      } finally {
+        if (isMounted) setIsTranslating(false);
+      }
+    };
+
+    runTranslation();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [title, content, language]);
+
+  if (isTranslating) {
+    return (
+      <div className="py-4 text-sm text-gray-500 dark:text-gray-300">
+        {t("common.loading")}
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <p className="text-gray-600 dark:text-gray-300">{translatedContent}</p>
+    </div>
+  );
+};
+
 const metricsInfo: MetricsData = {
   UA: {
     title: "User acquisition (UA)",
@@ -503,7 +559,7 @@ const ECommerce: React.FC = () => {
     setElonStep,
     setLoaderMessage
   } = useUser();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   const router = useRouter();
 
@@ -587,6 +643,41 @@ const ECommerce: React.FC = () => {
       setShowMore(false)
     }
   }, [elonStep])
+
+  // Translate notification messages when language or notificationMessages change
+  useEffect(() => {
+    const translateNotifications = async () => {
+      if (!notificationMessages || notificationMessages.length === 0) {
+        setTranslatedNotifications([]);
+        return;
+      }
+
+      // If English, use original messages
+      if (language === 'en') {
+        setTranslatedNotifications(notificationMessages);
+        return;
+      }
+
+      setIsTranslatingNotifications(true);
+      try {
+        const translated = await Promise.all(
+          notificationMessages.map(async (msg) => ({
+            ...msg,
+            message: await translateTaskName(msg.message, language as any),
+          }))
+        );
+        setTranslatedNotifications(translated);
+      } catch (error) {
+        console.warn('Failed to translate notifications:', error);
+        setTranslatedNotifications(notificationMessages);
+      } finally {
+        setIsTranslatingNotifications(false);
+      }
+    };
+
+    translateNotifications();
+  }, [notificationMessages, language]);
+
   const [showElon, setShowElon] = useState<boolean>(false);
 
   // inside ECommerce component (after user & userLoaded are available)
@@ -622,11 +713,61 @@ const ECommerce: React.FC = () => {
 
   const [chatModalOpen, setChatModalOpen] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
+  const [translatedGreeting, setTranslatedGreeting] = useState("");
 
   const [chatMessages, setChatMessages] = useState([
-    { sender: 'elon', text: "Hey there! I'm Elon, your AI Advisor 🤖. Ask me anything about your startup — metrics, hiring, bugs, you name it." }
+    { sender: 'elon', text: "" }
   ]);
   const [userInput, setUserInput] = useState("");
+
+  // Translate greeting message when language changes
+  useEffect(() => {
+    const translateGreeting = async () => {
+      const greetingText = t("modals.aiAdvisor.greeting");
+      if (language === 'en') {
+        setTranslatedGreeting(greetingText);
+        setChatMessages(prev => {
+          // Only update if chat is empty or has only empty greeting, or if first message is from elon
+          if (prev.length === 0 || (prev.length === 1 && prev[0].sender === 'elon' && prev[0].text === "")) {
+            return [{ sender: 'elon', text: greetingText }];
+          } else if (prev.length === 1 && prev[0].sender === 'elon') {
+            // Update the first message if it's the greeting
+            return [{ sender: 'elon', text: greetingText }];
+          }
+          return prev;
+        });
+        return;
+      }
+
+      try {
+        const translated = await translateTaskName(greetingText, language as any);
+        setTranslatedGreeting(translated);
+        setChatMessages(prev => {
+          // Only update if chat is empty or has only empty greeting, or if first message is from elon
+          if (prev.length === 0 || (prev.length === 1 && prev[0].sender === 'elon' && prev[0].text === "")) {
+            return [{ sender: 'elon', text: translated }];
+          } else if (prev.length === 1 && prev[0].sender === 'elon') {
+            // Update the first message if it's the greeting
+            return [{ sender: 'elon', text: translated }];
+          }
+          return prev;
+        });
+      } catch (error) {
+        console.warn('Failed to translate greeting:', error);
+        setTranslatedGreeting(greetingText);
+        setChatMessages(prev => {
+          if (prev.length === 0 || (prev.length === 1 && prev[0].sender === 'elon' && prev[0].text === "")) {
+            return [{ sender: 'elon', text: greetingText }];
+          } else if (prev.length === 1 && prev[0].sender === 'elon') {
+            return [{ sender: 'elon', text: greetingText }];
+          }
+          return prev;
+        });
+      }
+    };
+
+    translateGreeting();
+  }, [language, t]);
 
   useEffect(() => {
     const scrollTarget = messagesEndRef.current;
@@ -720,6 +861,8 @@ const ECommerce: React.FC = () => {
   const [selectedStage, setSelectedStage] = useState<string | null>(null);
   const [showBoostModal, setShowBoostModal] = useState(false);
   const [showNotificationModal, setShowNotificationModal] = useState(false);
+  const [translatedNotifications, setTranslatedNotifications] = useState<Array<{ message: string; isPositive: boolean }>>([]);
+  const [isTranslatingNotifications, setIsTranslatingNotifications] = useState(false);
   const [showSkipBugModal, setShowSkipBugModal] = useState(false);
   const [gameOverModal, setGameOverModal] = useState(() => {
     return user?.finances !== undefined && user.finances < 0;
@@ -829,17 +972,33 @@ const ECommerce: React.FC = () => {
     "pre-IPO",
     "IPO",
   ];
-  const handleMetricClick = (
+  const handleMetricClick = async (
     metricKey: string,
     event: React.MouseEvent<HTMLElement>,
   ) => {
     const info = metricsInfo[metricKey];
     if (info) {
       setSelectedMetric(metricKey);
+      
+      // Translate title if not English
+      let translatedTitle = info.title;
+      if (language !== 'en') {
+        try {
+          translatedTitle = await translateTaskName(info.title, language as any);
+        } catch (error) {
+          console.warn('Failed to translate metric title:', error);
+        }
+      }
+      
       setModalInfo({
         isOpen: true,
-        title: info.title,
-        content: info.content,
+        title: translatedTitle,
+        content: (
+          <MetricModalContent 
+            title={info.title}
+            content={info.content}
+          />
+        ),
         anchorEl: event.currentTarget,
       });
     }
@@ -1255,7 +1414,7 @@ const ECommerce: React.FC = () => {
           />
           <div className="relative w-full max-w-2xl rounded-2xl bg-white dark:bg-gray-800 p-6 shadow-2xl border border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Notifications</h2>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t("modals.notifications.title")}</h2>
               <button
                 onClick={() => setShowNotificationModal(false)}
                 className="rounded-lg p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:hover:bg-gray-700 dark:hover:text-gray-200 transition-colors"
@@ -1264,10 +1423,12 @@ const ECommerce: React.FC = () => {
               </button>
             </div>
             <div className="max-h-[500px] overflow-y-auto space-y-3 pr-2">
-              {notificationMessages.length === 0 ? (
-                <p className="text-center text-gray-500 dark:text-gray-400 py-8">No notifications available</p>
+              {isTranslatingNotifications ? (
+                <p className="text-center text-gray-500 dark:text-gray-400 py-8">{t("common.loading")}</p>
+              ) : translatedNotifications.length === 0 ? (
+                <p className="text-center text-gray-500 dark:text-gray-400 py-8">{t("modals.notifications.noNotificationsAvailable")}</p>
               ) : (
-                notificationMessages
+                translatedNotifications
                   .slice()
                   .reverse()
                   .map((msg, idx) => (
@@ -1351,14 +1512,14 @@ const ECommerce: React.FC = () => {
           >
             {/* Header */}
             <div className="flex justify-between items-center mb-3">
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white">AI Advisor</h2>
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white">{t("modals.aiAdvisor.title")}</h2>
               <button
                 onClick={() => {
                   setChatModalOpen(false);
                   setChatMessages([
                     {
                       sender: 'elon',
-                      text: "Hey there! I'm Elon, your AI Advisor. Ask me anything about your startup — metrics, hiring, bugs, you name it.",
+                      text: translatedGreeting || t("modals.aiAdvisor.greeting"),
                     },
                   ]);
                 }}
@@ -1433,14 +1594,14 @@ const ECommerce: React.FC = () => {
 
             {/* Suggestions */}
             <div className="mt-2 mb-2 bg-gray-100 dark:bg-[#1e2630]/60 p-2 rounded-xl shadow-inner max-h-[72px] overflow-y-auto">
-              <p className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Need help? Try one of these:</p>
+              <p className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">{t("modals.aiAdvisor.needHelp")}</p>
               <div className="flex flex-wrap gap-2">
                 {[
-                  "How can I increase my user acquisition quickly?",
-                  "What metrics should I prioritize at the FFF stage?",
-                  "How do I reduce the bug percentage in my startup?",
-                  "Should I hire a developer or a salesperson right now?",
-                  "What tasks give the best ROI in the 'pre-seed' stage?",
+                  t("modals.aiAdvisor.suggestions.increaseUA"),
+                  t("modals.aiAdvisor.suggestions.prioritizeMetrics"),
+                  t("modals.aiAdvisor.suggestions.reduceBugs"),
+                  t("modals.aiAdvisor.suggestions.hireDecision"),
+                  t("modals.aiAdvisor.suggestions.bestTasks"),
                 ].map((prompt, idx) => (
                   <button
                     key={idx}
@@ -1481,13 +1642,13 @@ const ECommerce: React.FC = () => {
                       sender: "elon",
                       text: res.ok && data?.hint
                         ? data?.hint
-                        : "Hmm... I'm not sure about that one right now.",
+                        : t("modals.aiAdvisor.errorUnknown"),
                     },
                   ]);
                 } catch {
                   setChatMessages(prev => [
                     ...prev,
-                    { sender: "elon", text: "Something went wrong. Try again later." },
+                    { sender: "elon", text: t("modals.aiAdvisor.errorGeneric") },
                   ]);
                 } finally {
                   setIsTyping(false);
@@ -1499,7 +1660,7 @@ const ECommerce: React.FC = () => {
                 rows={1}
                 value={userInput}
                 onChange={(e) => setUserInput(e.target.value)}
-                placeholder="Ask your startup question..."
+                placeholder={t("modals.aiAdvisor.placeholder")}
                 className="flex-grow resize-none overflow-hidden px-4 py-2 text-sm sm:text-base rounded-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-[#2c3440]/80 text-gray-900 dark:text-white shadow-sm placeholder:text-gray-500 dark:placeholder:text-gray-400"
                 onInput={(e) => {
                   e.currentTarget.style.height = "auto";
@@ -1510,7 +1671,7 @@ const ECommerce: React.FC = () => {
                 type="submit"
                 className="bg-blue-600 hover:bg-blue-700 text-white text-sm sm:text-base px-4 py-2 rounded-full"
               >
-                Send
+                {t("modals.aiAdvisor.send")}
               </button>
             </form>
           </motion.div>

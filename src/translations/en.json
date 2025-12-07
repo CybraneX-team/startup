@@ -196,6 +196,44 @@
     },
     "hint": {
       "title": "AI Hint"
+    },
+    "notifications": {
+      "title": "Notifications",
+      "noNotificationsAvailable": "No notifications available"
+    },
+    "aiAdvisor": {
+      "title": "AI Advisor",
+      "greeting": "Hey there! I'm Elon, your AI Advisor 👑. Ask me anything about your startup — metrics, hiring, bugs, you name it.",
+      "needHelp": "Need help? Try one of these:",
+      "suggestions": {
+        "increaseUA": "How can I increase my user acquisition quickly?",
+        "prioritizeMetrics": "What metrics should I prioritize at the FFF stage?",
+        "reduceBugs": "How do I reduce the bug percentage in my startup?",
+        "hireDecision": "Should I hire a developer or a salesperson right now?",
+        "bestTasks": "What tasks give the best ROI in the 'pre-seed' stage?"
+      },
+      "placeholder": "Ask your startup question...",
+      "send": "Send",
+      "errorUnknown": "Hmm... I'm not sure about that one right now.",
+      "errorGeneric": "Something went wrong. Try again later."
+    },
+    "leaderboard": {
+      "title": "Global Leaderboard",
+      "winningMetric": "Winning Metric",
+      "revenueVelocity": "Revenue Velocity",
+      "totalRevenuePerTurns": "Total Revenue / Total Turns",
+      "topPerformer": "Top Performer",
+      "yourRank": "Your Rank",
+      "notInTop10": "Not in Top 10",
+      "velocity": "Velocity",
+      "perTurn": "per turn",
+      "calculating": "Calculating...",
+      "noDataYet": "No data yet",
+      "loadingRankings": "Loading rankings...",
+      "unableToLoad": "Unable to load leaderboard",
+      "noRankingsYet": "No simulations have been ranked yet.",
+      "you": "You",
+      "unknown": "Unknown"
     }
   }
 }

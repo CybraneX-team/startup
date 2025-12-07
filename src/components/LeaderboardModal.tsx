@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { X, Trophy, Medal, Award, TrendingUp } from "lucide-react";
 import { useUser } from "@/context/UserContext";
+import { useLanguage } from "@/context/LanguageContext";
 
 // Interface matching the structure returned by your API
 interface LeaderboardEntry {
@@ -27,6 +28,7 @@ const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
   onClose,
 }) => {
   const { user } = useUser();
+  const { t } = useLanguage();
   const [leaderboardData, setLeaderboardData] = useState<LeaderboardEntry[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -61,7 +63,7 @@ const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
       setLeaderboardData(data);
     } catch (err) {
       console.error("Leaderboard fetch error:", err);
-      setError("Unable to load leaderboard");
+      setError(t("modals.leaderboard.unableToLoad"));
     } finally {
       setLoading(false);
     }
@@ -115,7 +117,7 @@ const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
         <div className="mb-8 flex items-center justify-between border-b border-gray-200/80 pb-6 dark:border-gray-700/80">
           <div className="flex items-center gap-3">
             <h2 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
-              Global Leaderboard
+              {t("modals.leaderboard.title")}
             </h2>
           </div>
           <button
@@ -134,37 +136,37 @@ const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
             <div className="flex items-center gap-2 mb-1">
                 <TrendingUp className="w-4 h-4 text-blue-500" />
                 <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
-                Winning Metric
+                {t("modals.leaderboard.winningMetric")}
                 </p>
             </div>
             <p className="text-lg font-semibold text-gray-900 dark:text-white">
-              Revenue Velocity
+              {t("modals.leaderboard.revenueVelocity")}
             </p>
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              Total Revenue / Total Turns
+              {t("modals.leaderboard.totalRevenuePerTurns")}
             </p>
           </div>
 
           {/* Box 2: Top Performer */}
           <div className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/60 p-4">
             <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-1">
-              Top Performer
+              {t("modals.leaderboard.topPerformer")}
             </p>
             {topPerformer ? (
               <>
                 <p className="text-lg font-semibold text-gray-900 dark:text-white truncate">
-                  {topPerformer.userId?.username || "Unknown"}
+                  {topPerformer.userId?.username || t("modals.leaderboard.unknown")}
                 </p>
                 <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
                   <span className="font-medium text-green-600 dark:text-green-400">
                     {formatCurrency(topPerformer.revenueVelocity)}
                   </span>
-                  <span className="text-xs">/ turn</span>
+                  <span className="text-xs">{t("modals.leaderboard.perTurn")}</span>
                 </div>
               </>
             ) : (
               <p className="text-sm text-gray-500 dark:text-gray-400">
-                 {loading ? "Calculating..." : "No data yet"}
+                 {loading ? t("modals.leaderboard.calculating") : t("modals.leaderboard.noDataYet")}
               </p>
             )}
           </div>
@@ -172,15 +174,15 @@ const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
           {/* Box 3: Your Rank */}
           <div className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/60 p-4">
             <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-1">
-              Your Rank
+              {t("modals.leaderboard.yourRank")}
             </p>
             <p className="text-lg font-semibold text-gray-900 dark:text-white">
               {currentUserRank ? `#${currentUserRank}` : "—"}
             </p>
             <p className="text-sm text-gray-500 dark:text-gray-400">
               {currentUserEntry
-                ? `${formatCurrency(currentUserEntry.revenueVelocity)} / turn`
-                : "Not in Top 10"}
+                ? `${formatCurrency(currentUserEntry.revenueVelocity)} ${t("modals.leaderboard.perTurn")}`
+                : t("modals.leaderboard.notInTop10")}
             </p>
           </div>
         </div>
@@ -188,7 +190,7 @@ const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
         {/* Leaderboard List Content */}
         <div className="max-h-[600px] overflow-y-auto custom-scrollbar pr-2">
           {loading ? (
-             <div className="py-16 text-center text-gray-500">Loading rankings...</div>
+             <div className="py-16 text-center text-gray-500">{t("modals.leaderboard.loadingRankings")}</div>
           ) : error ? (
             <div className="py-16 text-center text-red-500">{error}</div>
           ) : leaderboardData.length === 0 ? (
@@ -197,7 +199,7 @@ const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
                 <Trophy className="h-8 w-8 text-gray-400" />
               </div>
               <p className="text-gray-500 dark:text-gray-400 font-medium">
-                No simulations have been ranked yet.
+                {t("modals.leaderboard.noRankingsYet")}
               </p>
             </div>
           ) : (
@@ -250,7 +252,7 @@ const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
                                 : "text-gray-900 dark:text-white"
                             }`}
                             >
-                            {entry.userId?.username || "Unknown User"}
+                            {entry.userId?.username || t("modals.leaderboard.unknown")}
                             </span>
                             {/* Optional: Show Business Name if available */}
                             {entry.businessName && (
@@ -262,7 +264,7 @@ const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
                         
                         {isCurrentUser && (
                           <span className="rounded-full bg-gradient-to-r from-cyan-500 to-blue-500 px-2.5 py-0.5 text-xs font-semibold text-white shadow-md">
-                            You
+                            {t("modals.leaderboard.you")}
                           </span>
                         )}
                       </div>
@@ -272,7 +274,7 @@ const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
                     <div className="text-right">
                       <div className="inline-flex flex-col items-end rounded-xl bg-gray-50 dark:bg-gray-800/70 border border-gray-200 dark:border-gray-700 px-4 py-2.5 min-w-[120px]">
                         <span className="text-[11px] uppercase tracking-wide text-gray-500 dark:text-gray-400">
-                          Velocity
+                          {t("modals.leaderboard.velocity")}
                         </span>
                         <span
                           className={`text-xl font-semibold ${
@@ -284,7 +286,7 @@ const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
                           {formatCurrency(entry.revenueVelocity)}
                         </span>
                         <span className="text-[10px] text-gray-400">
-                             per turn
+                             {t("modals.leaderboard.perTurn")}
                         </span>
                       </div>
                     </div>

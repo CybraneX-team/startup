@@ -527,7 +527,7 @@ const BrainstormModal = ({
   const extraTasks = powerBoost ? 5 : 0;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-4 sm:px-0">
+    <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/50 backdrop-blur-sm px-4 sm:px-0">
       <div className="relative w-full max-w-md rounded-2xl bg-white p-6 dark:bg-[#1A232F] dark:text-white">
         <h2 className="mb-4 text-xl font-semibold text-gray-900 dark:text-white">
           {t("dashboard.brainstormSession")}

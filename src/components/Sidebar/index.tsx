@@ -16,6 +16,7 @@ import GameOptionsModal from "./GameOptionsModal";
 import { aiSkinnedEmployees } from "../../context/interface.types";
 import { startNewSimulation as startNewSimulationAction } from "@/utils/gameActions";
 import { toast } from "react-toastify";
+import { translateTaskName } from "@/utils/taskTranslator";
 
 
 // Dynamically import ReactApexChart to avoid window is not defined errors
@@ -41,8 +42,10 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, sidebarCollapsed = false, setSid
   const { user, setUser, setUserState, setnotificationMessages, notificationMessages, setloader, setHeaderDark, elonStep } = useUser();
   const [optionsModalOpen, setOptionsModalOpen] = useState(false);
   const [showFullDesc, setShowFullDesc] = useState(false);
+  const [translatedBusinessDesc, setTranslatedBusinessDesc] = useState<string>("");
+  const [isTranslatingDesc, setIsTranslatingDesc] = useState(false);
   console.log("user?.aiSkinnedEmployees" , user?.aiSkinnedEmployees)
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   const finances = user?.finances || 0;
   const options: ApexOptions = {
@@ -113,6 +116,37 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, sidebarCollapsed = false, setSid
       });
     }
   }, [user, t]);
+
+  // Translate business description when language or business description changes
+  useEffect(() => {
+    const translateDescription = async () => {
+      if (!user?.businessDescription) {
+        setTranslatedBusinessDesc("");
+        return;
+      }
+
+      // If English, use original text
+      if (language === 'en') {
+        setTranslatedBusinessDesc(user.businessDescription);
+        return;
+      }
+
+      // Show loading state
+      setIsTranslatingDesc(true);
+
+      try {
+        const translated = await translateTaskName(user.businessDescription, language);
+        setTranslatedBusinessDesc(translated);
+      } catch (error) {
+        console.warn('Failed to translate business description:', error);
+        setTranslatedBusinessDesc(user.businessDescription);
+      } finally {
+        setIsTranslatingDesc(false);
+      }
+    };
+
+    translateDescription();
+  }, [user?.businessDescription, language]);
   
 
   // Ensure no undefined values before rendering
@@ -303,19 +337,25 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, sidebarCollapsed = false, setSid
 
             <div className="rounded-lg bg-gray-50 dark:bg-boxdark-2 border border-stroke dark:border-strokedark p-3">
               <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
-                {user.businessDescription
-                  ? showFullDesc
-                    ? user.businessDescription
-                    : `${user.businessDescription.slice(0, 80)}...`
-                  : "Subscription service that delivers a monthly package of pet care items."}
+                {isTranslatingDesc ? (
+                  <span className="text-gray-500 italic">{t("common.loading")}</span>
+                ) : (
+                  <>
+                    {translatedBusinessDesc || user.businessDescription
+                      ? showFullDesc
+                        ? (translatedBusinessDesc || user.businessDescription)
+                        : `${(translatedBusinessDesc || user.businessDescription).slice(0, 80)}...`
+                      : "Subscription service that delivers a monthly package of pet care items."}
 
-                {user.businessDescription && user.businessDescription.length > 120 && (
-                  <button
-                    onClick={() => setShowFullDesc(!showFullDesc)}
-                    className="ml-2 text-xs font-medium text-primary hover:underline"
-                  >
-                    {showFullDesc ? t("sidebar.seeLess") : t("sidebar.seeMore")}
-                  </button>
+                    {(translatedBusinessDesc || user.businessDescription) && (translatedBusinessDesc || user.businessDescription).length > 120 && (
+                      <button
+                        onClick={() => setShowFullDesc(!showFullDesc)}
+                        className="ml-2 text-xs font-medium text-primary hover:underline"
+                      >
+                        {showFullDesc ? t("sidebar.seeLess") : t("sidebar.seeMore")}
+                      </button>
+                    )}
+                  </>
                 )}
               </p>
             </div>

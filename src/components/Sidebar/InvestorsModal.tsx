@@ -3,19 +3,186 @@ import React, { useEffect, useState } from "react";
 import { X } from "lucide-react";
 import { useUser } from "@/context/UserContext";
 import { useLanguage } from "@/context/LanguageContext";
+import { translateTaskName } from "@/utils/taskTranslator";
 
 interface InvestorsModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
+// Component to translate investor card content
+const InvestorCard: React.FC<{
+  investor: any;
+  signed: boolean;
+  onSignClick: () => void;
+  user: any;
+  t: any;
+  language: string;
+}> = ({ investor, signed, onSignClick, user, t, language }) => {
+  const [translatedName, setTranslatedName] = useState(investor.name);
+  const [translatedDescription, setTranslatedDescription] = useState(investor.description);
+  const [translatedQuote, setTranslatedQuote] = useState(investor.quote || "");
+  const [isTranslating, setIsTranslating] = useState(false);
+
+  useEffect(() => {
+    const translateContent = async () => {
+      if (language === 'en') {
+        setTranslatedName(investor.name);
+        setTranslatedDescription(investor.description);
+        setTranslatedQuote(investor.quote || "");
+        setIsTranslating(false);
+        return;
+      }
+
+      setIsTranslating(true);
+      try {
+        const translations = await Promise.all([
+          translateTaskName(investor.name, language as any),
+          translateTaskName(investor.description, language as any),
+          investor.quote ? translateTaskName(investor.quote, language as any) : Promise.resolve(""),
+        ]);
+
+        setTranslatedName(translations[0]);
+        setTranslatedDescription(translations[1]);
+        setTranslatedQuote(translations[2]);
+      } catch (error) {
+        console.warn('Failed to translate investor content:', error);
+        setTranslatedName(investor.name);
+        setTranslatedDescription(investor.description);
+        setTranslatedQuote(investor.quote || "");
+      } finally {
+        setIsTranslating(false);
+      }
+    };
+
+    translateContent();
+  }, [investor.name, investor.description, investor.quote, language]);
+
+  const getInitials = (name: string) => {
+    const parts = name?.split(" ").filter(Boolean) || [];
+    if (parts.length === 0) return "I";
+    if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+    return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+  };
+
+  const getAvatarColor = (name: string) => {
+    const colors = [
+      "bg-blue-500",
+      "bg-green-500",
+      "bg-purple-500",
+      "bg-pink-500",
+      "bg-indigo-500",
+      "bg-teal-500",
+      "bg-orange-500",
+      "bg-red-500",
+    ];
+    const index = name.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    return colors[index % colors.length];
+  };
+
+  return (
+    <div className="w-full sm:w-[320px] flex-shrink-0 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#1A232F] p-5">
+      <div className="flex items-center gap-4 mb-4">
+        <div className={`h-16 w-16 rounded-full ${getAvatarColor(investor.name)} flex items-center justify-center flex-shrink-0`}>
+          <span className="text-xl font-semibold text-white">
+            {getInitials(investor.name)}
+          </span>
+        </div>
+        <div className="flex-1 min-w-0">
+          <h3 className="text-lg font-semibold text-gray-800 dark:text-white truncate">
+            {isTranslating ? t("common.loading") : translatedName}
+          </h3>
+          {investor.quote && (
+            <p className="text-sm italic text-blue-500 dark:text-blue-400 mt-1 line-clamp-2">
+              {isTranslating ? t("common.loading") : translatedQuote}
+            </p>
+          )}
+        </div>
+      </div>
+
+      <p className="mb-4 text-sm text-gray-600 dark:text-gray-300">
+        {isTranslating ? t("common.loading") : translatedDescription}
+      </p>
+
+      <div className="space-y-3 border-t border-gray-200 dark:border-gray-700 pt-3 text-sm">
+        <div className="flex justify-between">
+          <span className="text-gray-600 dark:text-white">{t("modals.investors.investment")}</span>
+          <span className="text-green-600">${investor.money}</span>
+        </div>
+        {signed && (
+          <div className="flex justify-between">
+            <span className="text-gray-600 dark:text-white">{t("modals.investors.buyoutPrice")}</span>
+            <span className="text-green-600">${investor.buyout}</span>
+          </div>
+        )}
+        <div className="flex justify-between">
+          <span className="text-gray-600 dark:text-white">{t("modals.investors.investorsShare")}</span>
+          <span className="text-blue-500">{investor.share}%</span>
+        </div>
+        <div className="flex justify-between">
+          <span className="text-gray-600 dark:text-white flex items-center">
+            <span className="h-2 w-2 rounded-full bg-blue-500 mr-2" />
+            {t("modals.investors.advantages")}
+          </span>
+          <span className="text-blue-500">
+            {investor.bug_percent_point < 0
+              ? t("modals.investors.decreasesBugs", { count: Math.abs(investor.bug_percent_point) })
+              : t("modals.investors.increasesBugs", { count: investor.bug_percent_point })}
+          </span>
+        </div>
+      </div>
+
+      <div className="mt-4 text-right">
+        {signed ? (
+          <span className="rounded border border-green-600 px-2 py-1 text-sm font-semibold text-green-600">
+            {t("modals.investors.signed")}
+          </span>
+        ) : (
+          <button
+            onClick={onSignClick}
+            className="mt-2 rounded border border-gray-300 px-3 py-1 text-sm hover:border-green-500"
+          >
+            {t("modals.investors.signInvestment")}
+          </button>
+        )}
+      </div>
+    </div>
+  );
+};
+
 const InvestorsModal: React.FC<InvestorsModalProps> = ({ isOpen, onClose }) => {
   const { user, setUser, setUserState } = useUser();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [investmentsArray, setInvestmentsArray] = useState<any[]>([]);
   const [selectedInvestor, setSelectedInvestor] = useState<any | null>(null);
   const [showSignConfirm, setShowSignConfirm] = useState(false);
   const [showBuyoutConfirm, setShowBuyoutConfirm] = useState(false);
+  const [translatedSelectedName, setTranslatedSelectedName] = useState("");
+
+  // Translate selected investor name when it changes
+  useEffect(() => {
+    const translateSelectedName = async () => {
+      if (!selectedInvestor) {
+        setTranslatedSelectedName("");
+        return;
+      }
+
+      if (language === 'en') {
+        setTranslatedSelectedName(selectedInvestor.name);
+        return;
+      }
+
+      try {
+        const translated = await translateTaskName(selectedInvestor.name, language as any);
+        setTranslatedSelectedName(translated);
+      } catch (error) {
+        console.warn('Failed to translate selected investor name:', error);
+        setTranslatedSelectedName(selectedInvestor.name);
+      }
+    };
+
+    translateSelectedName();
+  }, [selectedInvestor, language]);
 
   useEffect(() => {
     if (user) {
@@ -73,28 +240,6 @@ const InvestorsModal: React.FC<InvestorsModalProps> = ({ isOpen, onClose }) => {
     }
   };
 
-  const getInitials = (name: string) => {
-    const parts = name?.split(" ").filter(Boolean) || [];
-    if (parts.length === 0) return "I";
-    if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
-    return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
-  };
-
-  const getAvatarColor = (name: string) => {
-    const colors = [
-      "bg-blue-500",
-      "bg-green-500",
-      "bg-purple-500",
-      "bg-pink-500",
-      "bg-indigo-500",
-      "bg-teal-500",
-      "bg-orange-500",
-      "bg-red-500",
-    ];
-    const index = name.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
-    return colors[index % colors.length];
-  };
-
   return (
     <>
       <div className="fixed inset-0 z-[99999] flex items-center justify-center">
@@ -134,76 +279,18 @@ const InvestorsModal: React.FC<InvestorsModalProps> = ({ isOpen, onClose }) => {
                 const signed = user?.investmentsMade.some((inv: any) => inv.name === e.name);
 
                 return (
-                  <div
+                  <InvestorCard
                     key={i}
-                    className="w-full sm:w-[320px] flex-shrink-0 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#1A232F] p-5"
-                  >
-                    <div className="flex items-center gap-4 mb-4">
-                      <div className={`h-16 w-16 rounded-full ${getAvatarColor(e.name)} flex items-center justify-center flex-shrink-0`}>
-                        <span className="text-xl font-semibold text-white">
-                          {getInitials(e.name)}
-                        </span>
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h3 className="text-lg font-semibold text-gray-800 dark:text-white truncate">
-                          {e.name}
-                        </h3>
-                        {e.quote && (
-                          <p className="text-sm italic text-blue-500 dark:text-blue-400 mt-1 line-clamp-2">
-                            {e.quote}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-
-                    <p className="mb-4 text-sm text-gray-600 dark:text-gray-300">{e.description}</p>
-
-                    <div className="space-y-3 border-t border-gray-200 dark:border-gray-700 pt-3 text-sm">
-                      <div className="flex justify-between">
-                        <span className="text-gray-600 dark:text-white">{t("modals.investors.investment")}</span>
-                        <span className="text-green-600">${e.money}</span>
-                      </div>
-                      {signed && (
-                        <div className="flex justify-between">
-                          <span className="text-gray-600 dark:text-white">{t("modals.investors.buyoutPrice")}</span>
-                          <span className="text-green-600">${e.buyout}</span>
-                        </div>
-                      )}
-                      <div className="flex justify-between">
-                        <span className="text-gray-600 dark:text-white">{t("modals.investors.investorsShare")}</span>
-                        <span className="text-blue-500">{e.share}%</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-600 dark:text-white flex items-center">
-                          <span className="h-2 w-2 rounded-full bg-blue-500 mr-2" />
-                          {t("modals.investors.advantages")}
-                        </span>
-                        <span className="text-blue-500">
-                          {e.bug_percent_point < 0
-                            ? t("modals.investors.decreasesBugs", { count: Math.abs(e.bug_percent_point) })
-                            : t("modals.investors.increasesBugs", { count: e.bug_percent_point })}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="mt-4 text-right">
-                      {signed ? (
-                        <span className="rounded border border-green-600 px-2 py-1 text-sm font-semibold text-green-600">
-                          {t("modals.investors.signed")}
-                        </span>
-                      ) : (
-                        <button
-                          onClick={() => {
-                            setSelectedInvestor(e);
-                            setShowSignConfirm(true);
-                          }}
-                          className="mt-2 rounded border border-gray-300 px-3 py-1 text-sm hover:border-green-500"
-                        >
-                          {t("modals.investors.signInvestment")}
-                        </button>
-                      )}
-                    </div>
-                  </div>
+                    investor={e}
+                    signed={signed}
+                    onSignClick={() => {
+                      setSelectedInvestor(e);
+                      setShowSignConfirm(true);
+                    }}
+                    user={user}
+                    t={t}
+                    language={language}
+                  />
                 );
               })}
             </div>
@@ -218,7 +305,7 @@ const InvestorsModal: React.FC<InvestorsModalProps> = ({ isOpen, onClose }) => {
             <h2 className="text-lg font-semibold mb-2">
               {showSignConfirm ? t("modals.investors.makeDeal") : t("modals.investors.buyoutShare")}
             </h2>
-            <p className="mb-2">{selectedInvestor.name}</p>
+            <p className="mb-2">{translatedSelectedName || selectedInvestor.name}</p>
             <p className="text-sm">
               {showSignConfirm ? t("modals.investors.investment") : t("modals.investors.share")}:{" "}
               <span className="text-green-600">
