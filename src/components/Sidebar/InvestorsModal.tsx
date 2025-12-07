@@ -276,7 +276,7 @@ const InvestorsModal: React.FC<InvestorsModalProps> = ({ isOpen, onClose }) => {
           <div className="sm:overflow-x-auto overflow-y-auto">
             <div className="flex flex-col sm:flex-row gap-4 p-6  lg:w-80 sm:min-w-full">
               {investmentsArray.map((e, i) => {
-                const signed = user?.investmentsMade.some((inv: any) => inv.name === e.name);
+                const signed = user?.investmentsMade?.some((inv: any) => inv.name === e.name) ?? false;
 
                 return (
                   <InvestorCard

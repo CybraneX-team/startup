@@ -33,13 +33,6 @@ const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch data when modal opens
-  useEffect(() => {
-    if (isOpen) {
-      fetchLeaderboard();
-    }
-  }, [isOpen]);
-
   const fetchLeaderboard = async () => {
     try {
       setLoading(true);
@@ -68,6 +61,14 @@ const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
       setLoading(false);
     }
   };
+
+  // Fetch data when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      fetchLeaderboard();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen]);
 
   // Helper to format currency
   const formatCurrency = (val: number) => {
