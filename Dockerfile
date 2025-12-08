@@ -2,6 +2,28 @@ FROM node:18-slim
 
 WORKDIR /app
 
+# -----------------------------------
+# Declare build args BEFORE everything
+# -----------------------------------
+ARG NEXT_PUBLIC_API_URL
+ARG googleClientId
+ARG googleClientScret
+ARG NEXTAUTH_URL
+ARG NEXTAUTH_SECRET
+ARG razorpay_key_secret
+ARG razorpay_key_id
+ARG logoutUrl
+
+# Make them available during build
+ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+ENV googleClientId=${googleClientId}
+ENV googleClientScret=${googleClientScret}
+ENV NEXTAUTH_URL=${NEXTAUTH_URL}
+ENV NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
+ENV razorpay_key_secret=${razorpay_key_secret}
+ENV razorpay_key_id=${razorpay_key_id}
+ENV logoutUrl=${logoutUrl}
+
 # Install dependencies for sharp + canvas
 RUN apt-get update && apt-get install -y \
   build-essential \
@@ -27,28 +49,7 @@ RUN yarn install --frozen-lockfile && \
 
 COPY . .
 
-# ------------------------
-# ALL ENV VARS FOR NEXT.JS
-# ------------------------
-ARG NEXT_PUBLIC_API_URL
-ARG googleClientId
-ARG googleClientScret
-ARG NEXTAUTH_URL
-ARG NEXTAUTH_SECRET
-ARG razorpay_key_secret
-ARG razorpay_key_id
-ARG logoutUrl
-
-ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
-ENV googleClientId=$googleClientId
-ENV googleClientScret=$googleClientScret
-ENV NEXTAUTH_URL=$NEXTAUTH_URL
-ENV NEXTAUTH_SECRET=$NEXTAUTH_SECRET
-ENV razorpay_key_secret=$razorpay_key_secret
-ENV razorpay_key_id=$razorpay_key_id
-ENV logoutUrl=$logoutUrl
-
-# Build Next.js
+# Build with env vars available
 RUN yarn build
 
 EXPOSE 3000
