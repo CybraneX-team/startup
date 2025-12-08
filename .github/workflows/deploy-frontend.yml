@@ -29,8 +29,7 @@ jobs:
           push: true
           tags: |
             ${{ secrets.ACR_LOGIN_SERVER }}/frontend:latest
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          no-cache: true
           build-args: |
             NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }}
             googleClientId=${{ secrets.GOOGLE_CLIENT_ID }}
