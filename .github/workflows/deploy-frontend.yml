@@ -1,11 +1,11 @@
-name: Deploy Frontend
+name: Deploy Frontend to Azure
 
 on:
   push:
     branches: [ "main" ]
 
 jobs:
-  build-and-deploy:
+  build-and-push:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -14,47 +14,21 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Login to Docker Hub
+      - name: Login to Azure Container Registry
         uses: docker/login-action@v3
         with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+          registry: ${{ secrets.ACR_LOGIN_SERVER }}
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
 
-      - name: Build and push Frontend
+      - name: Build and Push Frontend Image to ACR
         uses: docker/build-push-action@v5
         with:
           context: .
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/startup-frontend:latest
+          tags: |
+            ${{ secrets.ACR_LOGIN_SERVER }}/frontend:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          # This passes the secret to the Dockerfile
           build-args: |
             NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }}
-
-      - name: Deploy via SSH
-        uses: appleboy/ssh-action@v1.0.0
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          script: |
-            # Pull new image
-            docker pull ${{ secrets.DOCKER_USERNAME }}/startup-frontend:latest
-            
-            # Stop old container
-            docker stop startup-frontend || true
-            docker rm startup-frontend || true
-            
-            # Run new container
-            # We still attach the .env.local file here so the Runtime Secrets
-            # (NEXTAUTH_SECRET, googleClientSecret) are available when the app starts.
-            docker run -d \
-              --name startup-frontend \
-              --restart unless-stopped \
-              --env-file /home/ubuntu/.env.local \
-              -p 3000:3000 \
-              ${{ secrets.DOCKER_USERNAME }}/startup-frontend:latest
-            
-            # Cleanup
-            docker image prune -f
