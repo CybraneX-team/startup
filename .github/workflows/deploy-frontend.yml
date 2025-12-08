@@ -7,6 +7,7 @@ on:
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -32,3 +33,10 @@ jobs:
           cache-to: type=gha,mode=max
           build-args: |
             NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }}
+            googleClientId=${{ secrets.GOOGLE_CLIENT_ID }}
+            googleClientScret=${{ secrets.GOOGLE_CLIENT_SECRET }}
+            NEXTAUTH_URL=${{ secrets.NEXTAUTH_URL }}
+            NEXTAUTH_SECRET=${{ secrets.NEXTAUTH_SECRET }}
+            razorpay_key_secret=${{ secrets.RAZORPAY_KEY_SECRET }}
+            razorpay_key_id=${{ secrets.RAZORPAY_KEY_ID }}
+            logoutUrl=${{ secrets.LOGOUT_URL }}

@@ -2,6 +2,7 @@ FROM node:18-slim
 
 WORKDIR /app
 
+# Install dependencies for sharp + canvas
 RUN apt-get update && apt-get install -y \
   build-essential \
   libcairo2-dev \
@@ -13,6 +14,7 @@ RUN apt-get update && apt-get install -y \
   gnupg \
   && rm -rf /var/lib/apt/lists/*
 
+# Install Yarn
 RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
     echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list && \
     apt-get update && apt-get install -y yarn
@@ -25,13 +27,28 @@ RUN yarn install --frozen-lockfile && \
 
 COPY . .
 
-# --- NEW SECTION STARTS ---
-# Accept the build argument
+# ------------------------
+# ALL ENV VARS FOR NEXT.JS
+# ------------------------
 ARG NEXT_PUBLIC_API_URL
-# Set it as an environment variable for the build command
-ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
-# --- NEW SECTION ENDS ---
+ARG googleClientId
+ARG googleClientScret
+ARG NEXTAUTH_URL
+ARG NEXTAUTH_SECRET
+ARG razorpay_key_secret
+ARG razorpay_key_id
+ARG logoutUrl
 
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+ENV googleClientId=$googleClientId
+ENV googleClientScret=$googleClientScret
+ENV NEXTAUTH_URL=$NEXTAUTH_URL
+ENV NEXTAUTH_SECRET=$NEXTAUTH_SECRET
+ENV razorpay_key_secret=$razorpay_key_secret
+ENV razorpay_key_id=$razorpay_key_id
+ENV logoutUrl=$logoutUrl
+
+# Build Next.js
 RUN yarn build
 
 EXPOSE 3000
