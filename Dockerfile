@@ -50,6 +50,9 @@ RUN yarn install --frozen-lockfile && \
 COPY . .
 
 # Build with env vars available
+RUN rm -rf .next
+
+
 RUN yarn build
 
 EXPOSE 3000
