@@ -31,11 +31,13 @@ jobs:
             ${{ secrets.ACR_LOGIN_SERVER }}/frontend:latest
           no-cache: true
           build-args: |
+
             NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }}
-            googleClientId=${{ secrets.GOOGLE_CLIENT_ID }}
-            googleClientScret=${{ secrets.GOOGLE_CLIENT_SECRET }}
+            GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
+            GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
             NEXTAUTH_URL=${{ secrets.NEXTAUTH_URL }}
             NEXTAUTH_SECRET=${{ secrets.NEXTAUTH_SECRET }}
-            razorpay_key_secret=${{ secrets.RAZORPAY_KEY_SECRET }}
-            razorpay_key_id=${{ secrets.RAZORPAY_KEY_ID }}
-            logoutUrl=${{ secrets.LOGOUT_URL }}
+            RAZORPAY_KEY_ID=${{ secrets.RAZORPAY_KEY_ID }}
+            RAZORPAY_KEY_SECRET=${{ secrets.RAZORPAY_KEY_SECRET }}
+            LOGOUT_URL=${{ secrets.LOGOUT_URL }}
+
