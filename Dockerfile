@@ -2,10 +2,10 @@ FROM node:18-slim
 
 WORKDIR /app
 
-# -----------------------------------
-# Declare build args BEFORE everything
-# -----------------------------------
+# Build-time environment variables
 ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+
 ARG GOOGLE_CLIENT_ID
 ARG GOOGLE_CLIENT_SECRET
 ARG NEXTAUTH_URL
@@ -14,17 +14,15 @@ ARG RAZORPAY_KEY_ID
 ARG RAZORPAY_KEY_SECRET
 ARG LOGOUT_URL
 
-ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
-ENV GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
-ENV GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
-ENV NEXTAUTH_URL=${NEXTAUTH_URL}
-ENV NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
-ENV RAZORPAY_KEY_ID=${RAZORPAY_KEY_ID}
-ENV RAZORPAY_KEY_SECRET=${RAZORPAY_KEY_SECRET}
-ENV LOGOUT_URL=${LOGOUT_URL}
+ENV GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID
+ENV GOOGLE_CLIENT_SECRET=$GOOGLE_CLIENT_SECRET
+ENV NEXTAUTH_URL=$NEXTAUTH_URL
+ENV NEXTAUTH_SECRET=$NEXTAUTH_SECRET
+ENV RAZORPAY_KEY_ID=$RAZORPAY_KEY_ID
+ENV RAZORPAY_KEY_SECRET=$RAZORPAY_KEY_SECRET
+ENV LOGOUT_URL=$LOGOUT_URL
 
-
-# Install dependencies for sharp + canvas
+# Install dependencies for sharp
 RUN apt-get update && apt-get install -y \
   build-essential \
   libcairo2-dev \
@@ -43,17 +41,13 @@ RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
 
 COPY package.json yarn.lock ./
 
-RUN yarn install --frozen-lockfile && \
-    yarn add sharp && \
-    npm rebuild sharp --platform=linux --arch=x64 --libc=glibc
+RUN yarn install --frozen-lockfile
 
 COPY . .
 
-# Build with env vars available
-RUN rm -rf .next
-
-
-RUN yarn build
+# ❌ DO NOT DELETE .next BUILD
+# ❌ DO NOT REBUILD TWICE
+RUN yarn build    # <-- Next.js now builds with CORRECT env vars
 
 EXPOSE 3000
 
