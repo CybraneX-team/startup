@@ -244,7 +244,7 @@ export default function StartupBasicsForm() {
                     >
                     <option value="">Select...</option>
                     {options?.map((opt) => (
-                        <option key={opt} value={opt.split(' ')[0]}>{opt}</option>
+                        <option key={opt} value={opt}>{opt}</option>
                     ))}
                     </select>
                 ) : key === "businessDescription" ? (
