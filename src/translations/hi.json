@@ -234,6 +234,23 @@
       "noRankingsYet": "अभी तक कोई सिमुलेशन रैंक नहीं किया गया है।",
       "you": "आप",
       "unknown": "अज्ञात"
+    },
+    "turnProgress": {
+      "title": "टर्न सारांश",
+      "subtitle": "इस टर्न में क्या बदला",
+      "metricsChanges": "मेट्रिक्स परिवर्तन",
+      "financialChanges": "वित्तीय परिवर्तन",
+      "activities": "गतिविधियां और घटनाएं",
+      "stageUpgraded": "चरण अपग्रेड!",
+      "noChanges": "इस टर्न में कोई महत्वपूर्ण परिवर्तन नहीं मिला।",
+      "continue": "जारी रखें"
+    },
+    "stageUpgrade": {
+      "congratulations": "बधाई हो!",
+      "madeItTo": "आप पहुंच गए हैं",
+      "round": "राउंड",
+      "yourNextGoal": "आपका अगला लक्ष्य",
+      "letsGrow": "चलो बढ़ते हैं!"
     }
   }
 }

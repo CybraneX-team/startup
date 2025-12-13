@@ -8,17 +8,20 @@ import { useUser } from "@/context/UserContext";
 import { useLanguage } from "@/context/LanguageContext";
 import GameSwitchMenu from "./GameSwitchMenu";
 import LanguageSwitcher from "../LanguageSwitcher";
-import { Coins, Trophy } from "lucide-react";
+import { Coins, Trophy, Bell } from "lucide-react";
 import { useState } from "react";
 import LeaderboardModal from "../LeaderboardModal";
+import { useNotification } from "@/context/NotificationContext";
 
 const Header = (props: {
   sidebarOpen: string | boolean | undefined | any;
   setSidebarOpen: (arg0: boolean) => void | any;
 }) => {
-    const {HeaderDark, user, elonStep} = useUser()
+    const {HeaderDark, user, elonStep, notificationMessages} = useUser()
     const { t } = useLanguage();
     const [isLeaderboardOpen, setIsLeaderboardOpen] = useState(false);
+    const { openNotificationModal } = useNotification();
+    const unreadCount = notificationMessages?.length || 0;
   
   return (
     <>
@@ -75,6 +78,20 @@ const Header = (props: {
 
 
 
+    {/* Notification Icon */}
+    <button
+      onClick={openNotificationModal}
+      className="relative p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-gray-700 dark:text-gray-300"
+      title={t("modals.notifications.title")}
+    >
+      <Bell className="h-5 w-5" />
+      {unreadCount > 0 && (
+        <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white">
+          {unreadCount > 9 ? '9+' : unreadCount}
+        </span>
+      )}
+    </button>
+    
     <LanguageSwitcher />
     <DarkModeSwitcher />
     <GameSwitchMenu />

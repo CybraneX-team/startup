@@ -11,6 +11,8 @@ import SpotlightModal from "@/components/SpotlightModal";
 // import { Dice1, InfoIcon } from "lucide-react";
 import { useUser } from "@/context/UserContext";
 import { useLanguage } from "@/context/LanguageContext";
+import { UserData } from "@/context/interface.types";
+import { useNotification } from "@/context/NotificationContext";
 import { useRouter } from "next/navigation";
 import { translateTaskName } from "@/utils/taskTranslator";
 import { Bounce, toast, ToastContainer } from "react-toastify";
@@ -19,6 +21,8 @@ import GameOverModal from "../Sidebar/gameOverModal";
 // import NotEnoughVenture coins from "../Sidebar/notEnoughVenture coins";
 
 import ElonAssistant from "@/components/Elon";
+import TurnProgressModal from "@/components/TurnProgressModal";
+import StageUpgradeModal from "@/components/StageUpgradeModal";
 
 import TypewriterText from "@/components/TypewriterText/TypewriterText";
 // import elonMusk from "@/app/elon.png";
@@ -560,6 +564,7 @@ const ECommerce: React.FC = () => {
     setLoaderMessage
   } = useUser();
   const { t, language } = useLanguage();
+  const { isNotificationModalOpen, closeNotificationModal } = useNotification();
 
   const router = useRouter();
 
@@ -567,6 +572,11 @@ const ECommerce: React.FC = () => {
   useEffect(() => {
     // console.log("User state changed:", user);
     forceRender((prev) => prev + 1);
+    
+    // Initialize previous metrics on first load if not set
+    if (user?.metrics && !previousMetrics) {
+      setPreviousMetrics(user.metrics);
+    }
   }, [user]);
 
   useEffect(() => {
@@ -636,13 +646,7 @@ const ECommerce: React.FC = () => {
   }, [user, setSelectedTaskIds])
 
 
-  useEffect(() => {
-    if (elonStep === 5) {
-      setShowMore(true)
-    } else {
-      setShowMore(false)
-    }
-  }, [elonStep])
+  // showMore removed - no longer needed
 
   // Translate notification messages when language or notificationMessages change
   useEffect(() => {
@@ -857,10 +861,10 @@ const ECommerce: React.FC = () => {
   });
 
   const [selectedMetric, setSelectedMetric] = useState<string | null>(null);
-  const [showMore, setShowMore] = useState<boolean | null>(false);
+  // showMore state removed - notifications moved to header
   const [selectedStage, setSelectedStage] = useState<string | null>(null);
   const [showBoostModal, setShowBoostModal] = useState(false);
-  const [showNotificationModal, setShowNotificationModal] = useState(false);
+  // Notification modal is now managed by NotificationContext
   const [translatedNotifications, setTranslatedNotifications] = useState<Array<{ message: string; isPositive: boolean }>>([]);
   const [isTranslatingNotifications, setIsTranslatingNotifications] = useState(false);
   const [showSkipBugModal, setShowSkipBugModal] = useState(false);
@@ -876,6 +880,101 @@ const ECommerce: React.FC = () => {
   const dollarMetrics = ['AOV', 'Cogs', 'CLTV', 'ARPU', 'CPA', 'CM'];
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const [isMobile, setIsMobile] = useState(false);
+  const [showTurnProgressModal, setShowTurnProgressModal] = useState(false);
+  const [previousUserState, setPreviousUserState] = useState<UserData | null>(null);
+  const [turnNotifications, setTurnNotifications] = useState<Array<{ message: string; isPositive: boolean }>>([]);
+  const [previousMetrics, setPreviousMetrics] = useState<Metrics | null>(null);
+  const [isScrolling, setIsScrolling] = useState(false);
+  const [showStageUpgradeModal, setShowStageUpgradeModal] = useState(false);
+  const [stageUpgradeData, setStageUpgradeData] = useState<{
+    previousStage: string;
+    currentStage: string;
+    nextGoal: string;
+  } | null>(null);
+  const [pendingTurnProgress, setPendingTurnProgress] = useState(false);
+
+  // Load persisted data on mount
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      // Load persisted notifications
+      const savedNotifications = localStorage.getItem('gameNotifications');
+      if (savedNotifications) {
+        try {
+          const parsed = JSON.parse(savedNotifications);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setnotificationMessages(parsed);
+          }
+        } catch (e) {
+          console.warn('Failed to parse saved notifications:', e);
+        }
+      }
+
+      // Load persisted previous metrics
+      const savedMetrics = localStorage.getItem('previousMetrics');
+      if (savedMetrics) {
+        try {
+          const parsed = JSON.parse(savedMetrics);
+          setPreviousMetrics(parsed);
+        } catch (e) {
+          console.warn('Failed to parse saved previous metrics:', e);
+        }
+      }
+    }
+  }, []);
+
+  // Persist notifications when they change
+  useEffect(() => {
+    if (typeof window !== 'undefined' && notificationMessages.length > 0) {
+      localStorage.setItem('gameNotifications', JSON.stringify(notificationMessages));
+    }
+  }, [notificationMessages]);
+
+  // Persist previous metrics when they change
+  useEffect(() => {
+    if (typeof window !== 'undefined' && previousMetrics) {
+      localStorage.setItem('previousMetrics', JSON.stringify(previousMetrics));
+    }
+  }, [previousMetrics]);
+
+  // Event listener for bug modal from sidebar
+  useEffect(() => {
+    const handleOpenBugModal = () => {
+      setShowSkipBugModal(true);
+    };
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('openBugModal', handleOpenBugModal);
+      return () => {
+        window.removeEventListener('openBugModal', handleOpenBugModal);
+      };
+    }
+  }, []);
+
+  // Scroll detection for Make Turn button
+  useEffect(() => {
+    let scrollTimeout: NodeJS.Timeout;
+    
+    const handleScroll = () => {
+      setIsScrolling(true);
+      
+      // Clear existing timeout
+      clearTimeout(scrollTimeout);
+      
+      // Set timeout to detect when scrolling stops
+      scrollTimeout = setTimeout(() => {
+        setIsScrolling(false);
+      }, 150); // 150ms after scrolling stops
+    };
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('scroll', handleScroll, { passive: true });
+      return () => {
+        window.removeEventListener('scroll', handleScroll);
+        clearTimeout(scrollTimeout);
+      };
+    }
+  }, []);
+  
   async function makeTurn(turnAmount: string) {
     setloader(true);
     const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -885,6 +984,18 @@ const ECommerce: React.FC = () => {
       alert("User is not authenticated. Please log in.");
       setloader(false);
       return;
+    }
+
+    // Store previous state before making the turn
+    const previousState = user ? { ...user } : null;
+    // Store previous metrics BEFORE the turn for comparison
+    const previousMetricsSnapshot = user?.metrics ? { ...user.metrics } : null;
+    if (previousMetricsSnapshot) {
+      setPreviousMetrics(previousMetricsSnapshot);
+      // Persist previous metrics
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('previousMetrics', JSON.stringify(previousMetricsSnapshot));
+      }
     }
 
     let bugId: string[] = []
@@ -907,7 +1018,10 @@ const ECommerce: React.FC = () => {
       preventBug: user?.preventBug
     }
 
-    const makeReq = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/turn`, {
+    // Construct API URL - handle both cases where NEXT_PUBLIC_API_URL includes /api or not
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, ''); // Remove trailing slash
+    const apiUrl = baseUrl?.endsWith('/api') ? `${baseUrl}/turn` : `${baseUrl}/api/turn`;
+    const makeReq = await fetch(apiUrl, {
       method: "POST",
       credentials: "include",
       headers: {
@@ -922,8 +1036,82 @@ const ECommerce: React.FC = () => {
 
       setUser(response);
       setUserState(response);
-      setnotificationMessages([...notificationMessages, ...response.message]);
+      const updatedNotifications = [...notificationMessages, ...response.message];
+      setnotificationMessages(updatedNotifications);
+      
+      // Persist updated notifications
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('gameNotifications', JSON.stringify(updatedNotifications));
+      }
 
+      // Check for stage upgrade
+      const stageChanged = previousState && previousState.startupStage !== response.startupStage;
+      
+      if (stageChanged && previousState) {
+        // Get next goal from stagesInfo
+        const getNextGoal = (stage: string): string => {
+          const stageKeyMap: Record<string, string> = {
+            'FFF': 'FFF',
+            'Angels': 'ANGELS',
+            'pre_seed': 'PRE_SEED',
+            'Seed': 'SEED',
+            'a': 'A',
+            'b': 'B',
+            'c': 'C',
+            'd': 'D',
+            'preIpo': 'PREIPO',
+            'IPO': 'IPO',
+          };
+          const key = stageKeyMap[stage] || stage.toUpperCase();
+          const stageInfo = stagesInfo[key];
+          return stageInfo?.roundGoal || '';
+        };
+
+        const nextGoal = getNextGoal(response.startupStage);
+        
+        // Set stage upgrade data and show modal
+        setStageUpgradeData({
+          previousStage: previousState.startupStage,
+          currentStage: response.startupStage,
+          nextGoal: nextGoal,
+        });
+        setShowStageUpgradeModal(true);
+        // Mark that we need to show turn progress modal after stage upgrade modal closes
+        setPendingTurnProgress(true);
+        setPreviousUserState(previousState);
+        setTurnNotifications(response.message || []);
+      } else {
+        // Show turn progress modal directly if no stage change
+        if (previousState) {
+          setPreviousUserState(previousState);
+          setTurnNotifications(response.message || []);
+          setShowTurnProgressModal(true);
+        }
+      }
+
+      // Store current metrics as previous for next turn (they become the baseline)
+      if (response.metrics) {
+        setPreviousMetrics(response.metrics);
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('previousMetrics', JSON.stringify(response.metrics));
+        }
+      }
+
+      // Show toast notification for the last notification
+      if (response.message && response.message.length > 0) {
+        const lastNotification = response.message[response.message.length - 1];
+        if (lastNotification.isPositive) {
+          toast.success(lastNotification.message, {
+            position: "top-right",
+            autoClose: 4000,
+          });
+        } else {
+          toast.error(lastNotification.message, {
+            position: "top-right",
+            autoClose: 4000,
+          });
+        }
+      }
     }
 
     // await delay(1000);
@@ -1172,11 +1360,31 @@ const ECommerce: React.FC = () => {
                       displayValue = value.toFixed(2);
                     }
 
+                    // Calculate percentage change from previous turn
+                    let percentageChange: number | null = null;
+                    if (previousMetrics && previousMetrics[metric] !== undefined) {
+                      const prevValue = previousMetrics[metric];
+                      if (prevValue !== 0 && Math.abs(prevValue) > 0.01) {
+                        percentageChange = ((value - prevValue) / Math.abs(prevValue)) * 100;
+                      } else if (value !== 0) {
+                        percentageChange = value > 0 ? 100 : -100;
+                      }
+                    }
+
                     return (
                       <>
                         {displayValue}
                         {shortName === "C1" ? "%" : ""}
                         {dollarMetrics.includes(shortName) ? "$" : ""}
+                        {percentageChange !== null && Math.abs(percentageChange) > 0.01 && (
+                          <span className={`ml-2 text-xs font-medium ${
+                            percentageChange > 0 
+                              ? "text-green-600 dark:text-green-400" 
+                              : "text-red-600 dark:text-red-400"
+                          }`}>
+                            ({percentageChange > 0 ? "+" : ""}{percentageChange.toFixed(2)}%)
+                          </span>
+                        )}
                       </>
                     );
                   })()}
@@ -1216,158 +1424,42 @@ const ECommerce: React.FC = () => {
       lg:static md:mt-4 2xl:mt-7.5`}>
         <TaskGrid />
       </div>
-      <div
-        className={`fixed bottom-0 right-0 z-[1000] w-full lg:w-[calc(100%-var(--sidebar-width,0px))] lg:ml-[var(--sidebar-width,0px)]
-    px-6 py-5 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 shadow-2xl backdrop-blur-sm transition-all duration-300`}
-      >
-        {/* MOBILE & TABLET: Up to md screens */}
-        <div className="flex flex-col gap-3 md:hidden">
-          {/* Show More Toggle */}
-          <div
-            onClick={() => setShowMore(!showMore)}
-            className="flex justify-center mb-1 cursor-pointer"
-          >
-            <p className="text-sm font-medium text-blue-600 dark:text-blue-300">
-              {showMore ? "Show Less" : "Show More"}
-            </p>
-          </div>
-
-          {/* Conditionally Shown Extra Info */}
-          {showMore && (
-            <>
-              {/* Notifications */}
-              <div className="rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-4 mb-3">
-                <div className="flex justify-between items-center">
-                  <h3
-                    className={`text-sm font-semibold ${notificationMessages[notificationMessages.length - 1]?.isPositive
-                        ? "text-green-600 dark:text-green-400"
-                        : "text-red-600 dark:text-red-400"
-                      }`}
-                  >
-                    {notificationMessages[notificationMessages.length - 1]?.message || "No notifications"}
-                  </h3>
-                  <button
-                    onClick={() => setShowNotificationModal(true)}
-                    className="flex items-center gap-1.5 text-xs font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 transition-colors"
-                  >
-                    <span>Show</span>
-                    <Bell className="h-4 w-4" />
-                  </button>
-                </div>
-              </div>
-              
-              {/* Bugs and Funds */}
-              <div className="flex justify-between gap-4">
-                <div className="flex-1 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-3">
-                  <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">{t("dashboard.bugs")}</p>
-                  <div className={`flex items-center gap-2 
-               ${elonStep === 6 ? "ring-2 ring-blue-500 p-2 rounded-lg animate-pulse" : ''}`}>
-                    <span className="text-lg font-bold text-gray-900 dark:text-white">{user?.bugPercentage}%</span>
-                    <button
-                      onClick={() => setShowSkipBugModal(true)}
-                      className={`
-                  text-xs px-3 py-1.5 rounded-lg font-medium
-                  bg-gray-900 text-white hover:bg-gray-800 
-                  dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600 transition-colors
-
-                  ${elonStep === 5 ? "ring-2 ring-blue-500 animate-pulse" : ""}
-                `}
-                    >
-                      {t("dashboard.manageBug")}
-                    </button>
-                  </div>
-                </div>
-                <div className="flex-1 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-3">
-                  <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">{t("dashboard.funds")}</p>
-                  <p className="text-lg font-bold text-gray-900 dark:text-white">${user?.finances}</p>
-                </div>
-              </div>
-            </>
-          )}
-
-          {/* Always Visible Turn Button */}
-          <button
-            onClick={() => makeTurn(turnAmount)}
-            className={`w-full flex flex-col items-center rounded-lg bg-gray-900 dark:bg-gray-700 px-5 py-4 hover:bg-gray-800 dark:hover:bg-gray-600 transition-all duration-200 shadow-lg hover:shadow-xl
-         ${elonStep === 7 ? 'ring-2 ring-blue-500 animate-pulse' : ''}
-        `}
-          >
-            <span className="font-bold text-white text-lg mb-2">{t("dashboard.makeTurn")}</span>
-            <div className="flex justify-between items-center w-full px-2 pt-2 border-t border-white/10">
-              <span className="text-white text-sm font-medium">{t("dashboard.income")}</span>
-              <span className={`text-lg font-bold ${Number(turnAmount) >= 0 ? 'text-green-300' : 'text-red-300'}`}>${turnAmount}</span>
-            </div>
-          </button>
-        </div>
-
-        {/* TABLET & DESKTOP: md and above */}
-        <div className="hidden md:flex flex-col xl:flex-row xl:items-center items-start justify-between w-full gap-4">
-          {/* Notifications */}
-          <div className="flex flex-col gap-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-5 py-4 w-full max-w-full xl:max-w-[500px]">
-            <div className="flex justify-between items-start gap-3">
-              <p
-                className={`text-sm font-semibold leading-relaxed ${notificationMessages[notificationMessages.length - 1]?.isPositive
-                    ? "text-green-600 dark:text-green-400"
-                    : "text-red-600 dark:text-red-400"
-                  }`}
-              >
-                {notificationMessages[notificationMessages.length - 1]?.message || t("dashboard.welcomeToGame")}
-              </p>
-              <button
-                onClick={() => setShowNotificationModal(true)}
-                className="flex items-center gap-1.5 text-xs font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 transition-colors flex-shrink-0"
-              >
-                <span>{t("dashboard.show")}</span>
-                <Bell className="h-4 w-4" />
-              </button>
-            </div>
-          </div>
-
-          {/* Bugs + Funds + Turn */}
-          <div className="flex flex-col xl:flex-row xl:items-center gap-4 w-full justify-end">
-            {/* Bugs and Funds */}
-            <div className="flex gap-4">
-              <div className="rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-4 py-3 min-w-[140px]">
-                <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">{t("dashboard.bugs")}</p>
-                <div className="flex items-center gap-2">
-                  <span className="text-xl font-bold text-gray-900 dark:text-white joyride-step-4">{user?.bugPercentage}%</span>
-                  <button
-                    onClick={() => setShowSkipBugModal(true)}
-                    className={`
-                text-xs px-3 py-1.5 rounded-lg font-medium
-                bg-gray-900 text-white hover:bg-gray-800 
-                dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600 transition-colors
-
-                ${elonStep === 5 ? "ring-2 ring-blue-500 animate-pulse" : ""}
-              `}
-                  >
-                    {t("dashboard.manageBug")}
-                  </button>
-                </div>
-              </div>
-
-              <div className="rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-4 py-3 min-w-[140px]">
-                <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">{t("dashboard.funds")}</p>
-                <p className="text-xl font-bold text-gray-900 dark:text-white">${user?.finances}</p>
-              </div>
-            </div>
-
-            {/* Make Turn Button */}
-            <button
-              onClick={() => makeTurn(turnAmount)}
-              className={`w-full xl:w-80 rounded-lg bg-gray-900 dark:bg-gray-700 px-6 py-4 flex flex-col items-center justify-center hover:bg-gray-800 dark:hover:bg-gray-600 transition-all duration-200 shadow-lg hover:shadow-xl
+      {/* Floating Make Turn Button */}
+      <button
+        onClick={() => makeTurn(turnAmount)}
+        style={{
+          position: 'fixed',
+          bottom: '24px',
+          right: '24px',
+        }}
+        className={`z-[1000] rounded-xl bg-gray-900/95 dark:bg-gray-700/95 backdrop-blur-md border border-gray-200/20 dark:border-gray-600/20 flex items-center justify-center transition-all duration-300 shadow-2xl
+          hover:bg-gray-800/95 dark:hover:bg-gray-600/95 
+          hover:scale-105 hover:-translate-y-1
+          hover:shadow-[0_20px_50px_rgba(0,0,0,0.4)] hover:shadow-gray-900/60
+          active:scale-100 active:translate-y-0
+          group relative overflow-hidden
+          ${isScrolling 
+            ? 'px-4 py-3 min-w-[60px] md:min-w-[200px] rounded-full' 
+            : 'px-6 py-4 min-w-[180px] md:min-w-[200px] flex-col'
+          }
           ${elonStep === 7 ? 'ring-2 ring-blue-500 animate-pulse' : ''}
         `}
-            >
-              <span className="font-bold text-white text-lg mb-2">{t("dashboard.makeTurn")}</span>
-              <div className="flex justify-between items-center w-full px-2 pt-2 border-t border-white/10">
-                <span className="font-medium text-white text-sm">{t("dashboard.income")}</span>
-                <span className={`text-lg font-bold ${Number(turnAmount) >= 0 ? 'text-green-300' : 'text-red-300'}`}>${turnAmount}</span>
-              </div>
-            </button>
-          </div>
-        </div>
-      </div>
+      >
+        {/* Animated gradient shimmer effect on hover */}
+        <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 ease-in-out"></span>
+        
+        {isScrolling ? (
+          <span className="font-bold text-white text-lg relative z-10 group-hover:scale-110 transition-transform duration-300">{t("dashboard.makeTurn")}</span>
+        ) : (
+          <>
+            <span className="font-bold text-white text-lg mb-2 relative z-10 group-hover:scale-105 transition-transform duration-300">{t("dashboard.makeTurn")}</span>
+            <div className="flex justify-between items-center w-full px-2 pt-2 border-t border-white/10 relative z-10 group-hover:border-white/20 transition-colors duration-300">
+              <span className="font-medium text-white text-sm">{t("dashboard.income")}</span>
+              <span className={`text-lg font-bold transition-all duration-300 group-hover:scale-110 ${Number(turnAmount) >= 0 ? 'text-green-300 group-hover:text-green-200' : 'text-red-300 group-hover:text-red-200'}`}>${turnAmount}</span>
+            </div>
+          </>
+        )}
+      </button>
 
 
 
@@ -1406,17 +1498,17 @@ const ECommerce: React.FC = () => {
 
 
       {/* Notification Modal */}
-      {showNotificationModal && (
+      {isNotificationModalOpen && (
         <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4">
           <div
             className="absolute inset-0 bg-black/60 backdrop-blur-md"
-            onClick={() => setShowNotificationModal(false)}
+            onClick={closeNotificationModal}
           />
           <div className="relative w-full max-w-2xl rounded-2xl bg-white dark:bg-gray-800 p-6 shadow-2xl border border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">
               <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t("modals.notifications.title")}</h2>
               <button
-                onClick={() => setShowNotificationModal(false)}
+                onClick={closeNotificationModal}
                 className="rounded-lg p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:hover:bg-gray-700 dark:hover:text-gray-200 transition-colors"
               >
                 <X className="h-5 w-5" />
@@ -1730,7 +1822,37 @@ const ECommerce: React.FC = () => {
         </div>
       )}
 
+      {/* Stage Upgrade Modal */}
+      {stageUpgradeData && (
+        <StageUpgradeModal
+          isOpen={showStageUpgradeModal}
+          onClose={() => {
+            setShowStageUpgradeModal(false);
+            setStageUpgradeData(null);
+            // Show turn progress modal after stage upgrade modal closes
+            if (pendingTurnProgress) {
+              setPendingTurnProgress(false);
+              setShowTurnProgressModal(true);
+            }
+          }}
+          previousStage={stageUpgradeData.previousStage}
+          currentStage={stageUpgradeData.currentStage}
+          nextGoal={stageUpgradeData.nextGoal}
+        />
+      )}
 
+      {/* Turn Progress Modal */}
+      <TurnProgressModal
+        isOpen={showTurnProgressModal}
+        onClose={() => {
+          setShowTurnProgressModal(false);
+          setPreviousUserState(null);
+          setTurnNotifications([]);
+        }}
+        previousState={previousUserState}
+        currentState={user}
+        notifications={turnNotifications}
+      />
 
       {/* </div> */}
     </>

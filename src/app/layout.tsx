@@ -8,6 +8,7 @@ import React, { useEffect, useState } from "react";
 import Loader from "@/components/common/Loader";
 import { UserProvider } from "@/context/UserContext";
 import { LanguageProvider } from "@/context/LanguageContext";
+import { NotificationProvider } from "@/context/NotificationContext";
 import { Bounce, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Head from 'next/head';
@@ -40,9 +41,10 @@ export default function RootLayout({
         <div className="dark:bg-boxdark-2 dark:text-bodydark">
           <LanguageProvider>
             <UserProvider>
-              <SessionProvider>
-                <AuthSyncHandler />
-                {loading ? <Loader /> : children}
+              <NotificationProvider>
+                <SessionProvider>
+                  <AuthSyncHandler />
+                  {loading ? <Loader /> : children}
                 <ToastContainer
                   position="top-right"
                   autoClose={5000}
@@ -55,8 +57,11 @@ export default function RootLayout({
                   pauseOnHover
                   theme="light"
                   transition={Bounce}
+                  style={{ zIndex: 999999 }}
+                  toastClassName="toast-high-z-index"
                 />
-              </SessionProvider>
+                </SessionProvider>
+              </NotificationProvider>
             </UserProvider>
           </LanguageProvider>
         </div>

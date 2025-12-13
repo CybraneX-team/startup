@@ -455,6 +455,26 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, sidebarCollapsed = false, setSid
             </div>
           </div>
 
+          {/* Bugs Section - Above Team */}
+          <div className="mb-5">
+            <div className="flex items-center justify-between rounded-lg bg-gray-50 dark:bg-boxdark-2 border border-stroke dark:border-strokedark px-3 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors" onClick={() => {
+              // Open bug modal - we'll need to pass this handler from parent
+              if (typeof window !== 'undefined') {
+                window.dispatchEvent(new CustomEvent('openBugModal'));
+              }
+            }}>
+              <span className="text-xs font-medium text-gray-800 dark:text-gray-200">{t("dashboard.bugs")}</span>
+              <div className="flex items-center gap-1.5">
+                <span className={`text-xs font-semibold ${user?.bugPercentage && user.bugPercentage > 50 ? 'text-red-600 dark:text-red-400' : user?.bugPercentage && user.bugPercentage > 25 ? 'text-orange-600 dark:text-orange-400' : 'text-black dark:text-white'}`}>
+                  {user?.bugPercentage || 0}%
+                </span>
+                <Info 
+                  className="h-3.5 w-3.5 text-gray-700 dark:text-gray-300 cursor-pointer hover:text-primary transition-colors" 
+                />
+              </div>
+            </div>
+          </div>
+
           {/* Team Section - Restructured layout */}
           <div>
             <div className="mb-3 flex items-center justify-between">

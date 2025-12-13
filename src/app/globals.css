@@ -190,3 +190,16 @@ html{
     }
   }
 }
+
+/* Toast notifications should appear above modals */
+.Toastify__toast-container {
+  z-index: 999999 !important;
+}
+
+.Toastify__toast {
+  z-index: 999999 !important;
+}
+
+.toast-high-z-index {
+  z-index: 999999 !important;
+}

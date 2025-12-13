@@ -234,6 +234,23 @@
       "noRankingsYet": "No simulations have been ranked yet.",
       "you": "You",
       "unknown": "Unknown"
+    },
+    "turnProgress": {
+      "title": "Turn Summary",
+      "subtitle": "Here's what changed in this turn",
+      "metricsChanges": "Metrics Changes",
+      "financialChanges": "Financial Changes",
+      "activities": "Activities & Events",
+      "stageUpgraded": "Stage Upgraded!",
+      "noChanges": "No significant changes detected in this turn.",
+      "continue": "Continue"
+    },
+    "stageUpgrade": {
+      "congratulations": "Congratulations!",
+      "madeItTo": "You've made it to",
+      "round": "round",
+      "yourNextGoal": "Your next goal",
+      "letsGrow": "Let's Grow!"
     }
   }
 }

@@ -8,7 +8,8 @@ import { translateTaskName, translateTaskNameSync } from "@/utils/taskTranslator
 import { toast, ToastContainer, Bounce } from "react-toastify";
 import { Sparkles } from "lucide-react"; // Optional icon
 import Sparkle from "react-sparkle"; // ✅ Add this import
-import { aiSkinnedEmployees } from "@/context/interface.types";
+import { aiSkinnedEmployees, UserData } from "@/context/interface.types";
+import TurnProgressModal from "@/components/TurnProgressModal";
 
 // import { FixedSizeList as List } from 'react-window';
 
@@ -617,6 +618,9 @@ const TaskGrid: React.FC = () => {
   const [brainstormModalOpen, setBrainstormModalOpen] = useState(false);
   const [powerBoost, setPowerBoost] = useState(false);
   const [detailModalTask, setDetailModalTask] = useState<TaskData | null>(null);
+  const [showTurnProgressModal, setShowTurnProgressModal] = useState(false);
+  const [previousUserState, setPreviousUserState] = useState<UserData | null>(null);
+  const [turnNotifications, setTurnNotifications] = useState<Array<{ message: string; isPositive: boolean }>>([]);
 
   const [activeFilters, setActiveFilters] = useState<Set<string>>(
     new Set(["all"]),
@@ -779,6 +783,9 @@ useEffect(() => {
       return;
     }
 
+    // Store previous state before making the turn
+    const previousState = user ? { ...user } : null;
+
     setloader(true);
     try {
       const bugIds = task.isBug ? [task._id] : [];
@@ -793,7 +800,10 @@ useEffect(() => {
         preventBug: user.preventBug,
       };
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/turn`, {
+      // Construct API URL - handle both cases where NEXT_PUBLIC_API_URL includes /api or not
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, ''); // Remove trailing slash
+      const apiUrl = baseUrl?.endsWith('/api') ? `${baseUrl}/turn` : `${baseUrl}/api/turn`;
+      const response = await fetch(apiUrl, {
         method: "POST",
         credentials: "include",
         headers: {
@@ -807,9 +817,41 @@ useEffect(() => {
 
       if (response.ok) {
         setUser(data);
-        setnotificationMessages([...notificationMessages, ...(data.message || [])]);
-        toast.success("Turn completed");
+        const updatedNotifications = [...notificationMessages, ...(data.message || [])];
+        setnotificationMessages(updatedNotifications);
+        // Persist notifications
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('gameNotifications', JSON.stringify(updatedNotifications));
+        }
         setDetailModalTask(null);
+
+        // Show turn progress modal
+        if (previousState) {
+          setPreviousUserState(previousState);
+          setTurnNotifications(data.message || []);
+          setShowTurnProgressModal(true);
+        }
+
+        // Show toast notification for the last notification
+        if (data.message && data.message.length > 0) {
+          const lastNotification = data.message[data.message.length - 1];
+          if (lastNotification.isPositive) {
+            toast.success(lastNotification.message, {
+              position: "top-right",
+              autoClose: 4000,
+            });
+          } else {
+            toast.error(lastNotification.message, {
+              position: "top-right",
+              autoClose: 4000,
+            });
+          }
+        } else {
+          toast.success("Turn completed", {
+            position: "top-right",
+            autoClose: 3000,
+          });
+        }
       } else {
         toast.error(data.message || "Unable to make turn");
       }
@@ -962,7 +1004,12 @@ const makeBrainstrom = async (turnAmount: string) => {
     if (makeReq.ok) {
       const response = await makeReq.json();
       setUser(response);
-      setnotificationMessages([...notificationMessages, ...response.message]);
+      const updatedNotifications = [...notificationMessages, ...response.message];
+      setnotificationMessages(updatedNotifications);
+      // Persist notifications
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('gameNotifications', JSON.stringify(updatedNotifications));
+      }
       setPowerBoost(false);
     } else {
       const errorResponse = await makeReq.json();
@@ -1087,6 +1134,19 @@ const makeBrainstrom = async (turnAmount: string) => {
         </div>
 
       </div>
+
+      {/* Turn Progress Modal */}
+      <TurnProgressModal
+        isOpen={showTurnProgressModal}
+        onClose={() => {
+          setShowTurnProgressModal(false);
+          setPreviousUserState(null);
+          setTurnNotifications([]);
+        }}
+        previousState={previousUserState}
+        currentState={user}
+        notifications={turnNotifications}
+      />
     </>
   );
 };
