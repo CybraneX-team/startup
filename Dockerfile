@@ -2,7 +2,6 @@ FROM node:18-slim
 
 WORKDIR /app
 
-# Build-time environment variables
 ARG NEXT_PUBLIC_API_URL
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 
@@ -22,6 +21,7 @@ ENV RAZORPAY_KEY_ID=$RAZORPAY_KEY_ID
 ENV RAZORPAY_KEY_SECRET=$RAZORPAY_KEY_SECRET
 ENV LOGOUT_URL=$LOGOUT_URL
 
+# 🔥 FIX IS HERE
 RUN apt-get update && apt-get install -y \
   build-essential \
   libcairo2-dev \
@@ -29,12 +29,12 @@ RUN apt-get update && apt-get install -y \
   libpango1.0-dev \
   libgif-dev \
   librsvg2-dev \
+  libvips-dev \
   python3 \
   curl \
   gnupg \
   && rm -rf /var/lib/apt/lists/*
 
-# ✅ THIS FIXES THE FAILURE
 RUN corepack enable
 
 COPY package.json yarn.lock ./
