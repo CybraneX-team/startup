@@ -1,20 +1,26 @@
-FROM node:18-slim
+FROM node:18-slim AS base
 
-# 1. Install necessary build tools for native modules (sharp, etc.)
 RUN apt-get update && apt-get install -y \
-    python3 \
-    make \
-    g++ \
-    gcc \
-    libc6-dev \
+    python3 make g++ gcc libc6-dev \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
-# 2. Enable Corepack and force Yarn Berry/Stable
-RUN corepack enable && corepack prepare yarn@stable --activate
+# 1. Enable Corepack and let it auto-detect the version from your package.json
+RUN corepack enable
 
-# --- Build Args (Necessary for Next.js Build) ---
+# 2. Copy all configuration files for Yarn 4
+COPY package.json yarn.lock* .yarnrc.yml* ./
+COPY .yarn ./.yarn 
+
+# 3. Install dependencies
+# We don't use --frozen-lockfile here to let Yarn 4 self-correct if needed
+RUN yarn install
+
+# 4. Copy source code
+COPY . .
+
+# --- Build Args ---
 ARG NEXT_PUBLIC_API_URL
 ARG GOOGLE_CLIENT_ID
 ARG GOOGLE_CLIENT_SECRET
@@ -32,17 +38,10 @@ ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL \
     RAZORPAY_KEY_ID=$RAZORPAY_KEY_ID \
     RAZORPAY_KEY_SECRET=$RAZORPAY_KEY_SECRET \
     LOGOUT_URL=$LOGOUT_URL \
-    NEXT_TELEMETRY_DISABLED=1
+    NEXT_TELEMETRY_DISABLED=1 \
+    NODE_ENV=production
 
-# 3. Copy manifest files
-COPY package.json yarn.lock* ./
-
-# 4. FIX: Install without frozen-lockfile to allow Docker to resolve mismatches
-# This will bypass the error you are seeing in the logs.
-RUN yarn install
-
-# 5. Copy source and build
-COPY . .
+# 5. Build
 RUN yarn build
 
 EXPOSE 3000
