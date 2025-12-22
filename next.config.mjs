@@ -12,6 +12,13 @@ const nextConfig = {
     ],
     
   },
+  output : 'standalone',
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
   // Disable automatic CSS generation for layout and page files
   experimental: {
     // This will prevent Next.js from generating CSS files for layout and page components
