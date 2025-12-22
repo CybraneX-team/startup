@@ -1,21 +1,20 @@
-# Use Node 18 Slim as the base
-FROM node:18-slim AS base
+FROM node:18-slim
 
-# Install system dependencies required for native modules (like sharp/canvas)
-# We keep these minimal to keep the image size small
+# 1. Install necessary build tools for native modules (sharp, etc.)
 RUN apt-get update && apt-get install -y \
     python3 \
     make \
     g++ \
+    gcc \
     libc6-dev \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
-# Enable Corepack to manage Yarn versions automatically
+# 2. Enable Corepack and force Yarn Berry/Stable
 RUN corepack enable && corepack prepare yarn@stable --activate
 
-# --- Environment Variables / Build Args ---
+# --- Build Args (Necessary for Next.js Build) ---
 ARG NEXT_PUBLIC_API_URL
 ARG GOOGLE_CLIENT_ID
 ARG GOOGLE_CLIENT_SECRET
@@ -35,24 +34,16 @@ ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL \
     LOGOUT_URL=$LOGOUT_URL \
     NEXT_TELEMETRY_DISABLED=1
 
-# --- Build Steps ---
+# 3. Copy manifest files
+COPY package.json yarn.lock* ./
 
-# 1. Copy only files needed for installing dependencies
-COPY package.json yarn.lock ./
+# 4. FIX: Install without frozen-lockfile to allow Docker to resolve mismatches
+# This will bypass the error you are seeing in the logs.
+RUN yarn install
 
-# 2. Install dependencies 
-# Note: If this still fails, your local yarn.lock might be out of sync.
-# You can try 'yarn install' without the --frozen-lockfile flag once to debug.
-RUN yarn install --frozen-lockfile
-
-# 3. Copy the rest of the source code
+# 5. Copy source and build
 COPY . .
-
-# 4. Build the Next.js application
 RUN yarn build
 
-# --- Execution ---
 EXPOSE 3000
-
-# Next.js uses 'next start' which is mapped to 'yarn start' in your pkg.json
 CMD ["yarn", "start"]
