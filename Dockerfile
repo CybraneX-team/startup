@@ -7,21 +7,22 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /app
 
-# 1. MUST enable corepack so Docker uses Yarn 4.12.0 from package.json
+# 1. Enable Corepack to use the version in package.json
 RUN corepack enable
 
-# 2. Copy Yarn 4 specific config files (CRITICAL)
+# 2. Copy Yarn 4 configuration (Wildcards prevent "not found" errors)
 COPY package.json yarn.lock* .yarnrc.yml* ./
-COPY .yarn ./.yarn 
+# Only copy the .yarn folder if it exists locally
+COPY .yarn* ./.yarn 
 
 # 3. Install dependencies
-# We remove --frozen-lockfile to allow the container to finalize the lockfile
+# We allow Yarn to fix any lockfile mismatches inside the container
 RUN yarn install
 
 # 4. Copy source code
 COPY . .
 
-# --- Build Args (Must be here for Next.js build) ---
+# --- Build Args ---
 ARG NEXT_PUBLIC_API_URL
 ARG GOOGLE_CLIENT_ID
 ARG GOOGLE_CLIENT_SECRET
@@ -42,7 +43,7 @@ ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL \
     NEXT_TELEMETRY_DISABLED=1 \
     NODE_ENV=production
 
-# 5. Build the app
+# 5. Build
 RUN yarn build
 
 EXPOSE 3000
