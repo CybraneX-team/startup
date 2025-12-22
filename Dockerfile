@@ -1,26 +1,27 @@
 FROM node:18-slim AS base
 
+# Install system tools for native builds (sharp, etc.)
 RUN apt-get update && apt-get install -y \
     python3 make g++ gcc libc6-dev \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
-# 1. Enable Corepack and let it auto-detect the version from your package.json
+# 1. MUST enable corepack so Docker uses Yarn 4.12.0 from package.json
 RUN corepack enable
 
-# 2. Copy all configuration files for Yarn 4
+# 2. Copy Yarn 4 specific config files (CRITICAL)
 COPY package.json yarn.lock* .yarnrc.yml* ./
 COPY .yarn ./.yarn 
 
 # 3. Install dependencies
-# We don't use --frozen-lockfile here to let Yarn 4 self-correct if needed
+# We remove --frozen-lockfile to allow the container to finalize the lockfile
 RUN yarn install
 
 # 4. Copy source code
 COPY . .
 
-# --- Build Args ---
+# --- Build Args (Must be here for Next.js build) ---
 ARG NEXT_PUBLIC_API_URL
 ARG GOOGLE_CLIENT_ID
 ARG GOOGLE_CLIENT_SECRET
@@ -41,7 +42,7 @@ ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL \
     NEXT_TELEMETRY_DISABLED=1 \
     NODE_ENV=production
 
-# 5. Build
+# 5. Build the app
 RUN yarn build
 
 EXPOSE 3000
