@@ -22,7 +22,6 @@ ENV RAZORPAY_KEY_ID=$RAZORPAY_KEY_ID
 ENV RAZORPAY_KEY_SECRET=$RAZORPAY_KEY_SECRET
 ENV LOGOUT_URL=$LOGOUT_URL
 
-# Install dependencies for sharp
 RUN apt-get update && apt-get install -y \
   build-essential \
   libcairo2-dev \
@@ -30,25 +29,19 @@ RUN apt-get update && apt-get install -y \
   libpango1.0-dev \
   libgif-dev \
   librsvg2-dev \
+  python3 \
   curl \
   gnupg \
   && rm -rf /var/lib/apt/lists/*
 
-# Install Yarn
-RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
-    echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list && \
-    apt-get update && apt-get install -y yarn
+# ✅ THIS FIXES THE FAILURE
+RUN corepack enable
 
 COPY package.json yarn.lock ./
-
 RUN yarn install --frozen-lockfile
 
 COPY . .
-
-# ❌ DO NOT DELETE .next BUILD
-# ❌ DO NOT REBUILD TWICE
-RUN yarn build    # <-- Next.js now builds with CORRECT env vars
+RUN yarn build
 
 EXPOSE 3000
-
 CMD ["yarn", "start"]
