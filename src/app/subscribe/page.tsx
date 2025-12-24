@@ -107,7 +107,7 @@ const SubscriptionPlansPage = () => {
           const verifyData = await verify.json();
           if (verify.ok) {
             toast.success("Subscription Active! 🚀");
-            setUser(verifyData.user);
+            setUser(verifyData.objToReturn);
             setTimeout(() => router.push("/"), 1500);
           }
         },
