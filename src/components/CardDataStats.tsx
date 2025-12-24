@@ -1055,7 +1055,7 @@ const makeBrainstrom = async (turnAmount: string) => {
           </button>
         </div>
         <div className="columns-1 gap-4 space-y-4 sm:columns-2 xl:columns-3 pb-10">
-          {user.tasks.map((task: any, index: number) => (
+          {user?.tasks.map((task: any, index: number) => (
             <div key={index} className="mb-4 break-inside-avoid">
               <TaskCard
                 {...task}
