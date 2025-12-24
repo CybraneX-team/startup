@@ -66,6 +66,7 @@ const SubscriptionPlansPage = () => {
   }, []);
 
   const handleSubscribe = async (planId: string) => {
+    console.log("user", user)
     const token = localStorage.getItem("userToken");
     try {
       const response = await fetch(

@@ -10,6 +10,10 @@ const page = () => {
         <ul>cicd test</ul>
         <ul>cicd test</ul>
         <ul>cicd test</ul>
+        <ul>tesr</ul>
+        <ul>tesr</ul>
+        <ul>tesr</ul>
+        <ul>tesr</ul>
     </div>
   )
 }
