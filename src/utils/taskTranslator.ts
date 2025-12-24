@@ -150,7 +150,6 @@ export async function translateTaskName(
     }
   } catch (error) {
     // Backend not available or failed, try free API
-    console.log('Backend translation not available, using free API');
   }
 
   // Fallback to free MyMemory API

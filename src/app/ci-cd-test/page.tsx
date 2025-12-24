@@ -7,6 +7,9 @@ const page = () => {
         <ul>cicd test</ul>
         <ul>cicd test</ul>
         <ul>cicd test</ul>
+        <ul>cicd test</ul>
+        <ul>cicd test</ul>
+        <ul>cicd test</ul>
     </div>
   )
 }

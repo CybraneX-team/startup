@@ -78,8 +78,9 @@ const CancelTaskModal: React.FC<CancelTaskModalProps> = ({
   onConfirm,
   onCancel,
 }) => {
-  const { setHeaderDark, setloader } = useUser();
   const { language, t } = useLanguage();
+  const { setHeaderDark, setloader} = useUser();
+
   const [translatedTaskName, setTranslatedTaskName] = useState(
     translateTaskNameSync(taskName, language)
   );
@@ -177,6 +178,7 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
   const [translatedTaskName, setTranslatedTaskName] = useState(
     task ? translateTaskNameSync(task.name, language) : ''
   );
+  const { setHeaderDark, setloader, user} = useUser();
 
   useEffect(() => {
     if (task && language !== 'en') {
@@ -186,7 +188,6 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
     }
   }, [task, language]);
 
-  const { setHeaderDark } = useUser();
 
   useEffect(() => {
     setHeaderDark(isOpen);
@@ -194,7 +195,6 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
   }, [isOpen, setHeaderDark]);
 
   if (!isOpen || !task) return null;
-
   return (
     <div className="fixed inset-0 z-[3002] flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
       <div className="w-full max-w-2xl rounded-[32px] bg-white/95 p-8 shadow-[0_25px_70px_rgba(15,23,42,0.15)] backdrop-blur-md dark:bg-gray-900/90 dark:text-white">
@@ -242,9 +242,9 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
             {t("modals.taskDetail.effects")}
           </p>
           <div className="flex flex-wrap gap-2">
-            {task.metricsImpact &&
+            {task.metricsImpact  && user?.difficultyMode === "basic" &&
               Object.entries(task.metricsImpact)
-                .filter(([, value]) => value !== undefined && value !== 0)
+              .filter(([, value]) => value !== undefined && value !== 0)
                 .map(([key, value]) => (
                   <span
                     key={key}
@@ -384,6 +384,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
   onShowDetails,
 }) => {
   const [showDescription, setShowDescription] = useState(false);
+  const { setHeaderDark, setloader, user } = useUser();
   const { language } = useLanguage();
   const [translatedName, setTranslatedName] = useState(translateTaskNameSync(name, language));
 
@@ -453,7 +454,7 @@ return (
       <span className="inline-flex items-center rounded-full border border-gray-200 px-3 py-1 font-semibold text-gray-700 dark:border-gray-700 dark:text-gray-200">
         Turns {turnsRequired}
       </span>
-      {metricsImpact &&
+      {metricsImpact && user?.difficultyMode !== "intermediate" && 
         Object.entries(metricsImpact)
           .filter(([, value]) => value !== undefined && value !== 0)
           .map(([key, value], idx) => (
@@ -905,74 +906,7 @@ useEffect(() => {
     return metricMap[metricName] || metricName;
   }
 
-const filteredTasks = useMemo(() => {
-    // Safety checks - only require tasks, aiSkinnedEmployees is optional
-    if (!user?.tasks) return [];
 
-    // ---------------------------------------------------------
-    // STEP 1: Build the Lookup Map (Fast Setup)
-    // Complexity: O(Skins) -> Very small, negligible
-    // ---------------------------------------------------------
-    // Use empty array as fallback if aiSkinnedEmployees is missing
-    const aiSkinnedEmployees = user.aiSkinnedEmployees || [];
-    const roleMap = aiSkinnedEmployees.reduce((acc: any, skin: any) => {
-      acc[skin.actualName] = skin.roleName;
-      return acc;
-    }, {});
-
-    // FIX: Handle the "dev" vs "developer" mismatch manually
-    // If we have a role for "dev", assign the same role to "developer"
-    if (roleMap["dev"]) {
-      roleMap["developer"] = roleMap["dev"];
-    }
-
-    // ---------------------------------------------------------
-    // STEP 2: Filter AND Transform in ONE pass
-    // Complexity: O(Tasks) -> The most efficient way possible
-    // ---------------------------------------------------------
-    return user.tasks.reduce((acc: any[], task: any) => {
-
-      // --- A. FILTERING LOGIC (From your original code) ---
-      let isMatch = false;
-
-      if (activeFilters.has("all")) {
-        isMatch = true;
-      } else if (activeFilters.has("in_progress")) {
-        isMatch = selectedTasks.has(task._id);
-      } else if (task.metricsImpact) {
-        isMatch = Object.entries(task.metricsImpact).some(([metric, value]) => {
-          const shortMetric = getShortName(metric);
-          // Cast value to number to ensure safe comparison
-          return activeFilters.has(shortMetric) && (value as number) !== 0;
-        });
-      }
-
-      // --- B. TRANSFORMATION LOGIC (Only runs if filter passed) ---
-      // If the task matches, we transform it immediately and push it.
-      if (isMatch) {
-        const transformedRequirements: any = {};
-
-        // Fast object iteration
-        for (const key in task.requiredTeamMembers) {
-          const quantity = task.requiredTeamMembers[key];
-
-          // O(1) LOOKUP: Get the fancy name (e.g., "Trainer") or keep "developer"
-          const newRoleName = roleMap[key] || key;
-          
-          transformedRequirements[newRoleName] = quantity;
-        }
-
-        // Push the new object with replaced team members
-        acc.push({
-          ...task,
-          requiredTeamMembers: transformedRequirements
-        });
-      }
-
-      return acc;
-    }, []);
-
-  }, [user?.tasks, user?.aiSkinnedEmployees, activeFilters, selectedTasks]);
 
   const metrics = ["UA", "C1", "AOV", "COGS", "APC", "CPA", "bugs"];
 const makeBrainstrom = async (turnAmount: string) => {
@@ -1121,7 +1055,7 @@ const makeBrainstrom = async (turnAmount: string) => {
           </button>
         </div>
         <div className="columns-1 gap-4 space-y-4 sm:columns-2 xl:columns-3 pb-10">
-          {filteredTasks.map((task: any, index: number) => (
+          {user.tasks.map((task: any, index: number) => (
             <div key={index} className="mb-4 break-inside-avoid">
               <TaskCard
                 {...task}

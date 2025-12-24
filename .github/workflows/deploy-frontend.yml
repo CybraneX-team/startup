@@ -38,3 +38,12 @@ jobs:
             RAZORPAY_KEY_ID=${{ secrets.RAZORPAY_KEY_ID }}
             RAZORPAY_KEY_SECRET=${{ secrets.RAZORPAY_KEY_SECRET }}
             LOGOUT_URL=${{ secrets.LOGOUT_URL }}
+
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: 'startup-frontend-app'
+          slot-name: 'production'
+          # Note: Ensure you created this specific secret for the frontend app!
+          publish-profile: ${{ secrets.AZURE_FRONTEND_PUBLISH_PROFILE }}
+          images: '${{ secrets.ACR_LOGIN_SERVER }}/frontend:latest'

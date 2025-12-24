@@ -7,12 +7,14 @@ import {
   useState,
   useEffect,
   ReactNode,
+  useCallback,
 } from "react";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { notificationMessagesType, selectedTasksType, UserContextType, UserData } from "./interface.types";
 
-
+// Add refreshUser to the context type definition if it's not already there in interface.types.ts
+// If you can't edit interface.types, you can cast it here, but ideally add it there.
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
@@ -21,16 +23,9 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [task, setTask] = useState("");
   const [tasks, setTasks] = useState([]);
   const [loader, setloader] = useState(false);
-  const [selectedTaskIds, setSelectedTaskIds] = useState<selectedTasksType[]>(
-    [],
-  );
-  const [notificationMessages, setnotificationMessages] = useState<
-    notificationMessagesType[]
-  >([
-    {
-      message: "Welcome to the game",
-      isPositive: true,
-    },
+  const [selectedTaskIds, setSelectedTaskIds] = useState<selectedTasksType[]>([]);
+  const [notificationMessages, setnotificationMessages] = useState<notificationMessagesType[]>([
+    { message: "Welcome to the game", isPositive: true },
   ]);
   const [elonStep, setElonStep] = useState<number | null>(0);
   const [turnAmount, setTurnAmount] = useState<string>("");
@@ -38,15 +33,36 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [userLoaded, setUserLoaded] = useState(false);
   const [HeaderDark, setHeaderDark] = useState(false);
   const [loaderMessage, setLoaderMessage] = useState("");
+  // const [loaderMessage, setLoaderMessage] = useState("");
 
   const router = useRouter();
 
+  // ✅ NEW: Function to fetch fresh user data from DB
+  const refreshUser = useCallback(async () => {
+    const token = localStorage.getItem("userToken");
+    if (!token) return;
+    
+    try {
+
+       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/me`, { 
+         headers: { token } 
+       });
+       if(res.ok) {
+         const data = await res.json();
+         setUser(data);
+       }
+    } catch (error) {
+      console.error("Failed to refresh user", error);
+    }
+  }, []);
+
+
+  
   useEffect(() => {
     const storedToken = localStorage.getItem("userToken");
     const storedUser = localStorage.getItem("userData");
 
     if (storedToken && isTokenExpired(storedToken)) {
-      // Auto logout if token expired
       localStorage.removeItem("userToken");
       localStorage.removeItem("userData");
       setUserState(null);
@@ -59,43 +75,21 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     setUserLoaded(true);
   }, [router]);
 
-  // const [selectedTasks, setSelectedTasks] = useState<Set<number>>(new Set());
-
   useEffect(() => {
-    if (
-      !user ||
-      user.salaries === undefined ||
-      user.rent === undefined ||
-      user.metrics?.contributionMargin === undefined
-    ) {
+    if (!user || user.salaries === undefined || user.rent === undefined || user.metrics?.contributionMargin === undefined) {
       setTurnAmount("");
       return;
     }
-
-    // Always subtract absolute value of contribution margin
-    const value = Math.floor(
-      -user.salaries +
-        -user.rent +
-        Math.floor(Math.abs(user.metrics.contributionMargin)),
-    );
+    const value = Math.floor(-user.salaries + -user.rent + Math.floor(Math.abs(user.metrics.contributionMargin)));
     const sign = value < 0 ? "-" : "+";
     setTurnAmount(`${sign}${Math.abs(value)}`);
   }, [user]);
 
-  // useEffect(() => {
-  //   const storedUser = localStorage.getItem("userData");
-  //   if (storedUser) {
-  //     setUserState(JSON.parse(storedUser));
-  //   }
-  // }, []);
-
-  // Custom setUser function to store in localStorage
   const setUser = (userData: UserData | null) => {
     if (userData) {
       localStorage.setItem("userData", JSON.stringify(userData));
       setUserState(userData);
     } else {
-      // If resetting, retrieve user from localStorage
       const storedUser = localStorage.getItem("userData");
       if (storedUser) {
         setUserState(JSON.parse(storedUser));
@@ -137,6 +131,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         setLoaderMessage,
         elonStep,
         setElonStep,
+        refreshUser, // ✅ Expose this
       }}
     >
       {children}

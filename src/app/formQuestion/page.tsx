@@ -42,8 +42,8 @@ export default function StartupBasicsForm() {
     if (!userLoaded) return;
     if (!user) {
       router.push("/auth/signin");
-    } else if (user.isAiCustomizationDone) {
-      router.push("/");
+    } else if (user.isAiCustomizationDone && ! user.difficultyMode) {
+      router.push("/modeSelect");
     }
   }, [user, router, userLoaded]);
   
@@ -82,11 +82,10 @@ export default function StartupBasicsForm() {
       });
   
       const data = await res.json();
-  
       if (res.ok) {
         setUser(data);
         setUserState(data);
-        router.push("/")
+        router.push("/modeSelect")
       } else {
         console.error("API Error:", data);
       }
@@ -277,18 +276,6 @@ export default function StartupBasicsForm() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                     <label className="font-normal flex items-center gap-2 text-sm">
-                    <DollarSign className="w-4 h-4" /> Starting Funding ($)
-                    </label>
-                    <input
-                    type="number"
-                    value={formData.startingFunding}
-                    onChange={(e) => handleChange("startingFunding", e.target.value)}
-                    className="w-full p-3 rounded-xl bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 focus:outline-none"
-                    placeholder="100000"
-                    />
-                </div>
-                <div className="space-y-2">
-                    <label className="font-normal flex items-center gap-2 text-sm">
                     <TrendingUp className="w-4 h-4" /> Current Monthly Revenue ($)
                     </label>
                     <input
@@ -311,24 +298,7 @@ export default function StartupBasicsForm() {
                     placeholder="0"
                     />
                 </div>
-                <div className="space-y-2">
-                    <label className="font-normal flex items-center gap-2 text-sm">
-                    <BarChart3 className="w-4 h-4" /> North Star Metric
-                    </label>
-                    <select
-                    value={formData.northStarMetric}
-                    onChange={(e) => handleChange("northStarMetric", e.target.value)}
-                    className="w-full p-3 rounded-xl bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 focus:outline-none"
-                    >
-                    <option value="userAcquisition">User Volume (B2C)</option>
-                    <option value="revenue">Revenue (B2B/SaaS)</option>
-                    <option value="techStability">R&D / Tech (DeepTech)</option>
-                    </select>
-                </div>
             </div>
-            <p className="text-xs text-gray-500 italic mt-2">
-                *Entering $500,000+ funding will automatically promote you to Seed/Series A stages with harder investor expectations.
-            </p>
         </div>
 
         <button

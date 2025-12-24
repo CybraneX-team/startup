@@ -44,6 +44,7 @@ export interface  userGameType {
 export  interface  UserData {
   finances: number;
   metrics: Metrics;
+  activePlan : any;
   startupStage: string;
   completedTasks: any[];
   token: string;
@@ -51,6 +52,7 @@ export  interface  UserData {
   revenue: number;
   marketing: number;
   salaries: number;
+  activePlanId?: string;
   costOfSales: number;
   rent: number;
   teamMembers: Employee[];
@@ -75,6 +77,7 @@ export  interface  UserData {
   notEnoughCredits: boolean;
   isPurchaseDone: boolean;
   aiSkinnedEmployees : aiSkinnedEmployees[];
+  difficultyMode : string;
 }
 export interface  notificationMessagesType {
   message: string;
@@ -111,4 +114,5 @@ export interface  UserContextType {
   setLoaderMessage: (msg: string) => void;
   elonStep: number | null;
   setElonStep: (step: number | null) => void;
+  refreshUser : any
 }

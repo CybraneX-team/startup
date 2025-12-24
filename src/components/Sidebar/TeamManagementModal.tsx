@@ -24,7 +24,6 @@ const TeamManagementModal = ({ isOpen, onClose }: TeamManagementModalProps) => {
   const [team, setTeam] = useState<Employee[]>([]);
   const [maxEmployees, setMaxEmployees] = useState<number>(0);
   const [totalCount, setTotalCount] = useState<number>(0);
-  console.log(user?.aiSkinnedEmployees)
   useEffect(() => {
     if (user?.employeesAvailable?.[0]?.availableEmployes) {
       const availableEmployees = user.employeesAvailable[0].availableEmployes;
@@ -41,12 +40,10 @@ const TeamManagementModal = ({ isOpen, onClose }: TeamManagementModalProps) => {
       });
 
       setTeam(newTeam);
-      console.log("newTeam", newTeam)
       setMaxEmployees(user.employeesAvailable[0].maximum_allowed_employess || 0);
       setTotalCount(newTeam.reduce((sum, emp) => sum + emp.quantity, 0));
     }
   }, [user]);
-  console.log("Team", team)
   const increaseCount = (roleName: string) => {
     if (totalCount < maxEmployees) {
       setTeam((prevTeam) =>
@@ -114,8 +111,8 @@ const TeamManagementModal = ({ isOpen, onClose }: TeamManagementModalProps) => {
                 </div>
                 <div>
                   <p className="text-sm font-medium dark:text-white">{ 
-                  user?.aiSkinnedEmployees[index].roleName ? 
-                  user?.aiSkinnedEmployees[index].roleName :
+                  user?.aiSkinnedEmployees[index].actualName ? 
+                  user?.aiSkinnedEmployees[index].actualName :
                   ""
                    }</p>
                   {member.roleName === "ceo" && (

@@ -44,7 +44,6 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, sidebarCollapsed = false, setSid
   const [showFullDesc, setShowFullDesc] = useState(false);
   const [translatedBusinessDesc, setTranslatedBusinessDesc] = useState<string>("");
   const [isTranslatingDesc, setIsTranslatingDesc] = useState(false);
-  console.log("user?.aiSkinnedEmployees" , user?.aiSkinnedEmployees)
   const { t, language } = useLanguage();
 
   const finances = user?.finances || 0;
@@ -504,7 +503,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, sidebarCollapsed = false, setSid
                     {roleIcons[item.roleName.toLowerCase()] || <span>No Icon</span>}
                   </div>
                   <span className="text-xs font-medium text-gray-800 dark:text-gray-200 capitalize mb-0.5">
-                    {member?.roleName ? member.roleName :  "" }
+                    {member?.actualName ? member.actualName :  "" }
                   </span>
                   <span className="text-sm font-bold text-black dark:text-white tabular-nums">{
                   item.quantity
