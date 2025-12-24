@@ -79,7 +79,7 @@ const SubscriptionPlansPage = () => {
 
       const data = await response.json();
       if (!data.subscriptionId) throw new Error(data.message || "Init failed");
-
+      // const token = localStorage.getItem("userToken")
       const options = {
         key: data.keyId,
         name: "Unicorn Simulator",
@@ -89,12 +89,17 @@ const SubscriptionPlansPage = () => {
             `${process.env.NEXT_PUBLIC_API_URL}/razorpay/verify-subscription`,
             {
               method: "POST",
-              headers: { "Content-Type": "application/json" },
+              credentials: "include",
+              headers: {
+                "Content-Type": "application/json",
+                 token: token || "",
+              },
               body: JSON.stringify({
                 razorpay_subscription_id: res.razorpay_subscription_id,
                 razorpay_payment_id: res.razorpay_payment_id,
                 razorpay_signature: res.razorpay_signature,
                 selectedPlanId: planId,
+                gameId : user?.gameId,
               }),
             }
           );
