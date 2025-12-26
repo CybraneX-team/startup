@@ -1283,7 +1283,11 @@ const ECommerce: React.FC = () => {
 
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
           {stages.map((stage, index) => {
+            console.log("user", user)
+            console.log("user?.isPurchaseDone", user?.isPurchaseDone)
+            console.log("index > 1 && !user?.isPurchaseDone" , index > 1 && !user?.isPurchaseDone) 
             const isLocked = index > 1 && !user?.isPurchaseDone ;
+            console.log("isLocked" ,  isLocked) 
             const isActive = user?.startupStage === stage;
             return (
               <button
@@ -1432,7 +1436,7 @@ const ECommerce: React.FC = () => {
           bottom: '24px',
           right: '24px',
         }}
-        className={`z-[1000] rounded-xl bg-gray-900/95 dark:bg-gray-700/95 backdrop-blur-md border border-gray-200/20 dark:border-gray-600/20 flex items-center justify-center transition-all duration-300 shadow-2xl
+        className={` rounded-xl bg-gray-900/95 dark:bg-gray-700/95 backdrop-blur-md border border-gray-200/20 dark:border-gray-600/20 flex items-center justify-center transition-all duration-300 shadow-2xl
           hover:bg-gray-800/95 dark:hover:bg-gray-600/95 
           hover:scale-105 hover:-translate-y-1
           hover:shadow-[0_20px_50px_rgba(0,0,0,0.4)] hover:shadow-gray-900/60

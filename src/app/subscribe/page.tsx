@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useEffect } from "react";
-import { CheckCircle2, Zap, Rocket, Crown } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { CheckCircle2, Zap, Rocket, Crown, Loader2 } from "lucide-react";
 import { toast } from "react-toastify";
 import { useUser } from "@/context/UserContext";
 import { useRouter } from "next/navigation";
@@ -54,6 +54,8 @@ const plans = [
 const SubscriptionPlansPage = () => {
   const router = useRouter();
   const { user, setUser } = useUser();
+  // State to track which plan is currently loading
+  const [loadingPlanId, setLoadingPlanId] = useState<string | null>(null);
 
   useEffect(() => {
     const script = document.createElement("script");
@@ -66,8 +68,12 @@ const SubscriptionPlansPage = () => {
   }, []);
 
   const handleSubscribe = async (planId: string) => {
-    console.log("user", user)
+    // Prevent multiple clicks if already loading
+    if (loadingPlanId) return;
+
+    setLoadingPlanId(planId); // Start loading
     const token = localStorage.getItem("userToken");
+
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/razorpay/create-subscription`,
@@ -79,54 +85,81 @@ const SubscriptionPlansPage = () => {
       );
 
       const data = await response.json();
-      if (!data.subscriptionId) throw new Error(data.message || "Init failed");
-      // const token = localStorage.getItem("userToken")
+      
+      if (!data.subscriptionId) {
+        toast.error(data.message || "Network error");
+        setLoadingPlanId(null); // Stop loading on specific error
+        return;
+      }
+
       const options = {
         key: data.keyId,
         name: "Unicorn Simulator",
         subscription_id: data.subscriptionId,
+        // Handler for successful payment
         handler: async (res: any) => {
-          const verify = await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/razorpay/verify-subscription`,
-            {
-              method: "POST",
-              credentials: "include",
-              headers: {
-                "Content-Type": "application/json",
-                 token: token || "",
-              },
-              body: JSON.stringify({
-                razorpay_subscription_id: res.razorpay_subscription_id,
-                razorpay_payment_id: res.razorpay_payment_id,
-                razorpay_signature: res.razorpay_signature,
-                selectedPlanId: planId,
-                gameId : user?.gameId,
-              }),
+          // Note: The payment wizard is closed now, but we are verifying.
+          // You could optionally set a global "verifying" loader here if you want.
+          try {
+            const verify = await fetch(
+              `${process.env.NEXT_PUBLIC_API_URL}/razorpay/verify-subscription`,
+              {
+                method: "POST",
+                credentials: "include",
+                headers: {
+                  "Content-Type": "application/json",
+                  token: token || "",
+                },
+                body: JSON.stringify({
+                  razorpay_subscription_id: res.razorpay_subscription_id,
+                  razorpay_payment_id: res.razorpay_payment_id,
+                  razorpay_signature: res.razorpay_signature,
+                  selectedPlanId: planId,
+                  gameId: user?.gameId,
+                }),
+              }
+            );
+            const verifyData = await verify.json();
+            if (verify.ok) {
+              console.log("verifyData", verifyData);
+              toast.success("Subscription Active! 🚀");
+              setUser(verifyData.objToReturn);
+              setTimeout(() => router.push("/"), 1500);
+            } else {
+               toast.error("Verification failed");
             }
-          );
-          const verifyData = await verify.json();
-          if (verify.ok) {
-            toast.success("Subscription Active! 🚀");
-            setUser(verifyData.objToReturn);
-            setTimeout(() => router.push("/"), 1500);
+          } catch (verifyErr) {
+             toast.error("Verification error");
           }
         },
         theme: { color: "#6366f1" },
+        // IMPORTANT: Reset loading state if user closes the modal without paying
+        modal: {
+            ondismiss: function() {
+                setLoadingPlanId(null);
+            }
+        }
       };
+
       const rzp = new (window as any).Razorpay(options);
+      
+      // Open the modal
       rzp.open();
+      
+      // Stop the button loader once the modal is successfully triggered
+      setLoadingPlanId(null);
+
     } catch (error: any) {
-      toast.error(error.message || "Network error");
+      console.error(error);
+      toast.error(typeof error === 'string' ? error : "Network error");
+      setLoadingPlanId(null); // Stop loading on crash
     }
   };
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-[#0F172A] text-gray-900 dark:text-white transition-colors duration-300">
       <Header sidebarOpen={false} setSidebarOpen={() => {}} />
-      
-      {/* FIX: Changed py-20 to 'pt-32 pb-20 md:pt-28' 
-         This pushes the content down so it clears the fixed header on mobile 
-      */}
+
       <main className="mx-auto max-w-7xl px-4 pt-32 pb-20 md:pt-28">
         <div className="mb-12 md:mb-16 text-center">
           <h1 className="text-4xl font-extrabold sm:text-6xl">
@@ -141,6 +174,7 @@ const SubscriptionPlansPage = () => {
           {plans.map((plan) => {
             const isActive = user?.isPurchaseDone && user?.activePlanId === plan.id;
             const isLocked = user?.isPurchaseDone && !isActive;
+            const isLoading = loadingPlanId === plan.id;
 
             return (
               <div
@@ -162,9 +196,9 @@ const SubscriptionPlansPage = () => {
                     </span>
                   )}
                 </div>
-                
+
                 <h3 className="text-2xl font-bold">{plan.name}</h3>
-                
+
                 <div className="mt-4 flex items-baseline gap-1">
                   <span className="text-4xl font-bold">₹{plan.price}</span>
                   <span className="text-gray-500 dark:text-slate-400">
@@ -174,29 +208,45 @@ const SubscriptionPlansPage = () => {
 
                 <ul className="mt-8 flex-1 space-y-4">
                   {plan.features.map((f, i) => (
-                    <li key={i} className="flex gap-3 text-sm text-gray-600 dark:text-slate-300">
-                      <CheckCircle2 className="text-indigo-500 flex-shrink-0" size={18} /> {f}
+                    <li
+                      key={i}
+                      className="flex gap-3 text-sm text-gray-600 dark:text-slate-300"
+                    >
+                      <CheckCircle2
+                        className="text-indigo-500 flex-shrink-0"
+                        size={18}
+                      />{" "}
+                      {f}
                     </li>
                   ))}
                 </ul>
 
                 <button
-                  disabled={user?.isPurchaseDone}
+                  disabled={user?.isPurchaseDone || (loadingPlanId !== null)}
                   onClick={() => handleSubscribe(plan.id)}
-                  className={`mt-10 w-full rounded-xl py-4 font-bold transition-all 
+                  className={`mt-10 w-full rounded-xl py-4 font-bold transition-all flex justify-center items-center gap-2
                     ${
                       isActive
                         ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-500 cursor-default"
                         : isLocked
                         ? "bg-gray-200 dark:bg-slate-800 text-gray-500 dark:text-slate-500 cursor-not-allowed"
                         : "bg-indigo-600 hover:bg-indigo-500 text-white"
-                    }`}
+                    }
+                    ${isLoading ? "opacity-80 cursor-wait" : ""}
+                    `}
                 >
-                  {isActive
-                    ? "Current Plan"
-                    : isLocked
-                    ? "Plan Locked"
-                    : "Get Started"}
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="animate-spin" size={20} />
+                      Processing...
+                    </>
+                  ) : isActive ? (
+                    "Current Plan"
+                  ) : isLocked ? (
+                    "Plan Locked"
+                  ) : (
+                    "Get Started"
+                  )}
                 </button>
               </div>
             );

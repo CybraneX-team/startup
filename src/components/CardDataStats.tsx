@@ -615,6 +615,13 @@ const BrainstormModal = ({
 
 const TaskGrid: React.FC = () => {
   // const [selectedTasks, setSelectedTasks] = useState<Set<number>>(new Set());
+  // ... inside TaskGrid component ...
+
+  // ✅ ADD THIS: Filter logic to process tasks based on activeFilters
+  
+
+// ... rest of the component
+
   const [selectedTasks, setSelectedTasks] = useState<Set<string>>(new Set());
   const [brainstormModalOpen, setBrainstormModalOpen] = useState(false);
   const [powerBoost, setPowerBoost] = useState(false);
@@ -638,6 +645,41 @@ const TaskGrid: React.FC = () => {
     turnAmount,
     setloader
   } = useUser();
+  const filteredTasks = useMemo(() => {
+    if (!user?.tasks) return [];
+
+    // If "all" is active, return everything immediately
+    if (activeFilters.has("all")) {
+      return user.tasks;
+    }
+
+    return user.tasks.filter((task: any) => {
+      // 1. Check "in_progress" filter
+      if (activeFilters.has("in_progress")) {
+        if (selectedTasks.has(task._id)) return true;
+      }
+
+      // 2. Check "bugs" filter (Note: "Bugs" button maps to "bugs" string in toggleFilter)
+      if (activeFilters.has("bugs")) {
+        if (task.isBug) return true;
+      }
+
+      // 3. Check Metric filters (UA, C1, etc.)
+      if (task.metricsImpact) {
+        // Check if any of the task's metrics match the active filters
+        const affectsActiveMetric = Object.entries(task.metricsImpact).some(
+          ([key, value]) => {
+            const shortName = getShortName(key); // e.g. converts 'userAcquisition' to 'UA'
+            return activeFilters.has(shortName) && value !== 0;
+          }
+        );
+        if (affectsActiveMetric) return true;
+      }
+
+      return false;
+    });
+  }, [user?.tasks, activeFilters, selectedTasks]);
+
   const { t } = useLanguage();
 
   // const [Tasks, setTasks] = useState([]);
@@ -1019,6 +1061,7 @@ const makeBrainstrom = async (turnAmount: string) => {
 
     <div className="flex flex-col space-y-4 px-4 pb-40 lg:pb-48">
         <div className="flex flex-wrap justify-between gap-2">
+          {user?.difficultyMode !== "intermediate" ?
           <div className="flex flex-wrap gap-2">
             <FilterButton
               label={t("dashboard.allTasks")}
@@ -1046,7 +1089,7 @@ const makeBrainstrom = async (turnAmount: string) => {
             >
               {t("dashboard.resetFilters")}
             </button>
-          </div>
+          </div> : <></>}
           <button
             className="flex self-end rounded-lg bg-gray-900 dark:bg-gray-700 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 dark:hover:bg-gray-600 transition-colors shadow-sm"
             onClick={() => setBrainstormModalOpen(true)}
@@ -1055,7 +1098,7 @@ const makeBrainstrom = async (turnAmount: string) => {
           </button>
         </div>
         <div className="columns-1 gap-4 space-y-4 sm:columns-2 xl:columns-3 pb-10">
-          {user?.tasks.map((task: any, index: number) => (
+          {filteredTasks.map((task: any, index: number) => (
             <div key={index} className="mb-4 break-inside-avoid">
               <TaskCard
                 {...task}

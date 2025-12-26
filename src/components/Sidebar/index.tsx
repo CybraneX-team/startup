@@ -204,7 +204,8 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, sidebarCollapsed = false, setSid
         method : "POST",
         credentials: "include",
         body: JSON.stringify({
-          gameId : user?.gameId
+          gameId : user?.gameId,
+          currentLevel : user?.startupStage
         }),
         headers: {
           "Content-Type": "application/json",
@@ -491,6 +492,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, sidebarCollapsed = false, setSid
             <div className="grid grid-cols-3 gap-2.5">
               
               {user.teamMembers?.map((item, idx) =>{
+                  console.log("item is : ", item)
                   const member = user.aiSkinnedEmployees?.find(
                   e  => e?.actualName?.toLowerCase() === item.roleName.toLowerCase()
                 );
@@ -503,7 +505,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, sidebarCollapsed = false, setSid
                     {roleIcons[item.roleName.toLowerCase()] || <span>No Icon</span>}
                   </div>
                   <span className="text-xs font-medium text-gray-800 dark:text-gray-200 capitalize mb-0.5">
-                    {member?.actualName ? member.actualName :  "" }
+                    {member?.actualName ? member.actualName :  item.roleName }
                   </span>
                   <span className="text-sm font-bold text-black dark:text-white tabular-nums">{
                   item.quantity

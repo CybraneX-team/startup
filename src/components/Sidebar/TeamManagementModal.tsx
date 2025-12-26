@@ -28,12 +28,13 @@ const TeamManagementModal = ({ isOpen, onClose }: TeamManagementModalProps) => {
     if (user?.employeesAvailable?.[0]?.availableEmployes) {
       const availableEmployees = user.employeesAvailable[0].availableEmployes;
       const aiSkinnedEmployees = user.aiSkinnedEmployees;
+      console.log("aiSkinnedEmployees", aiSkinnedEmployees) 
       const newTeam = availableEmployees.map((emp, idx) => {
         const existingMember = user.teamMembers.find((tm) => tm.roleName === emp.roleName);
         return {
           _id: emp._id,
           roleName: emp.roleName,
-          skinnedRolename : aiSkinnedEmployees[idx].roleName,
+          skinnedRolename : aiSkinnedEmployees.length  > 0 && aiSkinnedEmployees[idx].roleName ? aiSkinnedEmployees[idx].roleName : ""   ,
           salary: emp.salary,
           quantity: existingMember ? existingMember.quantity : 0, 
         };
@@ -103,7 +104,8 @@ const TeamManagementModal = ({ isOpen, onClose }: TeamManagementModalProps) => {
         <p className="mb-4 text-sm text-gray-600 dark:text-white">{t("modals.teamManagement.description")}</p>
 
         <div className="space-y-4">
-          {team.map((member, index) => (
+          {team.map((member, index) =>{ 
+            return (
             <div key={index} className="flex items-center justify-between">
               <div className="flex items-center">
                 <div className="mr-3 rounded-full bg-gray-100 dark:bg-[#1C2E5B] p-2">
@@ -111,9 +113,9 @@ const TeamManagementModal = ({ isOpen, onClose }: TeamManagementModalProps) => {
                 </div>
                 <div>
                   <p className="text-sm font-medium dark:text-white">{ 
-                  user?.aiSkinnedEmployees[index].actualName ? 
+                  user?.aiSkinnedEmployees[index] && user?.aiSkinnedEmployees[index].actualName ? 
                   user?.aiSkinnedEmployees[index].actualName :
-                  ""
+                  member.roleName
                    }</p>
                   {member.roleName === "ceo" && (
                     <p className="text-xs text-gray-500 dark:text-white">{t("modals.teamManagement.canReplace")}</p>
@@ -151,7 +153,7 @@ const TeamManagementModal = ({ isOpen, onClose }: TeamManagementModalProps) => {
                 <span className="ml-4 text-sm font-medium">${member.salary}</span>
               </div>
             </div>
-          ))}
+          )})}
         </div>
 
         <div className="mt-6 space-y-3">
