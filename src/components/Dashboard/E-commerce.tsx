@@ -1476,6 +1476,16 @@ const ECommerce: React.FC = () => {
         {/* Animated gradient shimmer effect on hover */}
         <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 ease-in-out"></span>
         
+        {/* Bug count badge */}
+        {(() => {
+          const bugCount = user?.tasks?.filter((task: any) => task.isBug === true).length || 0;
+          return bugCount > 0 ? (
+            <span className="absolute -top-2 -right-2 flex h-7 w-7 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white shadow-lg ring-2 ring-white dark:ring-gray-900 z-20">
+              {bugCount > 9 ? '9+' : bugCount}
+            </span>
+          ) : null;
+        })()}
+        
         {isScrolling ? (
           <span className="font-bold text-white text-lg relative z-10 group-hover:scale-110 transition-transform duration-300">{t("dashboard.makeTurn")}</span>
         ) : (

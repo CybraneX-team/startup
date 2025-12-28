@@ -34,7 +34,7 @@ const TeamManagementModal = ({ isOpen, onClose }: TeamManagementModalProps) => {
         return {
           _id: emp._id,
           roleName: emp.roleName,
-          skinnedRolename : aiSkinnedEmployees.length  > 0 && aiSkinnedEmployees[idx].roleName ? aiSkinnedEmployees[idx].roleName : ""   ,
+          skinnedRolename : aiSkinnedEmployees && aiSkinnedEmployees.length > idx && aiSkinnedEmployees[idx]?.roleName ? aiSkinnedEmployees[idx].roleName : ""   ,
           salary: emp.salary,
           quantity: existingMember ? existingMember.quantity : 0, 
         };
@@ -112,8 +112,8 @@ const TeamManagementModal = ({ isOpen, onClose }: TeamManagementModalProps) => {
                   {roleIcons[member.roleName.toLowerCase()] || <span>No Icon</span>}
                 </div>
                 <div>
-                  <p className="text-sm font-medium dark:text-white">{ 
-                  user?.aiSkinnedEmployees[index] && user?.aiSkinnedEmployees[index].actualName ? 
+                  <p className="text-sm font-medium dark:text-white capitalize">{ 
+                  user?.aiSkinnedEmployees && user?.aiSkinnedEmployees[index]?.actualName ? 
                   user?.aiSkinnedEmployees[index].actualName :
                   member.roleName
                    }</p>

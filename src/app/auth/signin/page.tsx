@@ -86,7 +86,7 @@ const SignIn: React.FC = () => {
       setUser(response);
       localStorage.setItem("userToken", response.token);
       localStorage.setItem("userData", JSON.stringify(response));
-      router.push( response.isAiCustomizationDone ? "/" : "/formQuestion");
+      router.replace( response.isAiCustomizationDone ? "/" : "/formQuestion");
     } else {
       alert("Invalid credentials or server error.");
     }
