@@ -6,8 +6,8 @@ import React from 'react'
 const NotEnoughCredits = () => {
     const {user} = useUser();
   return (
-<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-  <div className="w-full max-w-md rounded-2xl bg-white dark:bg-[#1e1e2f] text-center shadow-xl transition-all">
+<div className="fixed inset-0 z-[10001] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+  <div className="w-full max-w-md rounded-2xl bg-white dark:bg-[#1e1e2f] text-center shadow-xl transition-all relative z-[10001]">
     
     {/* Close Button */}
     <div className="flex justify-end p-4"> 

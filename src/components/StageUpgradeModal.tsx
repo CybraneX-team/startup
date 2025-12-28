@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { X, Rocket, ArrowRight } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import { translateTaskName } from "@/utils/taskTranslator";
+import { useSound } from "@/context/SoundContext";
 
 interface StageUpgradeModalProps {
   isOpen: boolean;
@@ -21,8 +22,15 @@ const StageUpgradeModal: React.FC<StageUpgradeModalProps> = ({
   nextGoal,
 }) => {
   const { t, language } = useLanguage();
+  const { playSound } = useSound();
   const [translatedGoal, setTranslatedGoal] = useState(nextGoal);
   const [isTranslating, setIsTranslating] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      playSound("stageUpgrade");
+    }
+  }, [isOpen, playSound]);
 
   useEffect(() => {
     if (!isOpen || !nextGoal) {
@@ -88,17 +96,17 @@ const StageUpgradeModal: React.FC<StageUpgradeModalProps> = ({
           <div className="mb-6 flex justify-center">
             <div className="relative">
               {/* Brain/Sparkle Icon */}
-              <div className="w-24 h-24 rounded-full bg-gradient-to-br from-orange-400 to-red-500 flex items-center justify-center relative overflow-hidden">
+              {/* <div className="w-24 h-24 rounded-full bg-gradient-to-br from-orange-400 to-red-500 flex items-center justify-center relative overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-br from-yellow-300/30 to-orange-500/30"></div>
                 <div className="relative z-10">
                   <div className="text-4xl">🧠</div>
                 </div>
-                {/* Sparkles around */}
+
                 <div className="absolute -top-2 -left-2 w-4 h-4 bg-yellow-400 rounded-full animate-pulse"></div>
                 <div className="absolute -top-1 -right-3 w-3 h-3 bg-orange-400 rounded-full animate-pulse delay-75"></div>
                 <div className="absolute -bottom-2 -left-1 w-3 h-3 bg-yellow-300 rounded-full animate-pulse delay-150"></div>
                 <div className="absolute -bottom-1 -right-2 w-4 h-4 bg-orange-300 rounded-full animate-pulse delay-200"></div>
-              </div>
+              </div> */}
             </div>
           </div>
 
@@ -144,7 +152,10 @@ const StageUpgradeModal: React.FC<StageUpgradeModalProps> = ({
 
           {/* CTA Button */}
           <button
-            onClick={onClose}
+            onClick={() => {
+              playSound("click");
+              onClose();
+            }}
             className="w-full py-4 px-6 rounded-xl bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 font-semibold hover:bg-gray-800 dark:hover:bg-gray-200 transition-all duration-300 flex items-center justify-center gap-2 group shadow-lg hover:shadow-xl"
           >
             <span>{t("modals.stageUpgrade.letsGrow") || "Let's Grow!"}</span>

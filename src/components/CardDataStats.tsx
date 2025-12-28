@@ -3,6 +3,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Users, CheckSquare, Square, ChevronDown, Info, X } from "lucide-react";
 import { useUser } from "@/context/UserContext";
 import { useLanguage } from "@/context/LanguageContext";
+import { useSound } from "@/context/SoundContext";
 import { useRouter } from "next/navigation";
 import { translateTaskName, translateTaskNameSync } from "@/utils/taskTranslator";
 import { toast, ToastContainer, Bounce } from "react-toastify";
@@ -10,6 +11,7 @@ import { Sparkles } from "lucide-react"; // Optional icon
 import Sparkle from "react-sparkle"; // ✅ Add this import
 import { aiSkinnedEmployees, UserData } from "@/context/interface.types";
 import TurnProgressModal from "@/components/TurnProgressModal";
+import BrainstormTutorial from "@/components/BrainstormTutorial";
 
 // import { FixedSizeList as List } from 'react-window';
 
@@ -518,11 +520,15 @@ const BrainstormModal = ({
 }: BrainstormModalProps) => {
   const { setHeaderDark } = useUser();
   const { t } = useLanguage();
+  const { playSound } = useSound();
 
   useEffect(() => {
     setHeaderDark(isOpen);
+    if (isOpen) {
+      playSound("modalOpen");
+    }
     return () => setHeaderDark(false);
-  }, [isOpen, setHeaderDark]);
+  }, [isOpen, setHeaderDark, playSound]);
 
   if (!isOpen) return null;
 
@@ -629,6 +635,15 @@ const TaskGrid: React.FC = () => {
   const [showTurnProgressModal, setShowTurnProgressModal] = useState(false);
   const [previousUserState, setPreviousUserState] = useState<UserData | null>(null);
   const [turnNotifications, setTurnNotifications] = useState<Array<{ message: string; isPositive: boolean }>>([]);
+  const [showBrainstormTutorial, setShowBrainstormTutorial] = useState(false);
+  const brainstormButtonRef = React.useRef<HTMLButtonElement>(null);
+
+  // Close tutorial when brainstorm modal opens
+  useEffect(() => {
+    if (brainstormModalOpen && showBrainstormTutorial) {
+      setShowBrainstormTutorial(false);
+    }
+  }, [brainstormModalOpen, showBrainstormTutorial]);
 
   const [activeFilters, setActiveFilters] = useState<Set<string>>(
     new Set(["all"]),
@@ -681,6 +696,7 @@ const TaskGrid: React.FC = () => {
   }, [user?.tasks, activeFilters, selectedTasks]);
 
   const { t } = useLanguage();
+  const { playSound } = useSound();
 
   // const [Tasks, setTasks] = useState([]);
   const router = useRouter();
@@ -708,6 +724,20 @@ const TaskGrid: React.FC = () => {
       return;
     }
   }, [user, router, userLoaded]);
+
+  // Show tutorial when there are no tasks
+  useEffect(() => {
+    if (user?.tasks && user.tasks.length === 0 && !showBrainstormTutorial) {
+      // Small delay to ensure button is rendered
+      const timer = setTimeout(() => {
+        setShowBrainstormTutorial(true);
+      }, 500);
+      return () => clearTimeout(timer);
+    } else if (user?.tasks && user.tasks.length > 0 && showBrainstormTutorial) {
+      // Hide tutorial if tasks become available
+      setShowBrainstormTutorial(false);
+    }
+  }, [user?.tasks, showBrainstormTutorial]);
   // inside TaskGrid component, after other useEffects that depend on `user`
 useEffect(() => {
   if (!user?.tasks) return;
@@ -746,9 +776,15 @@ useEffect(() => {
   const handleTaskToggle = (task: any) => {
     const newSelected = new Set(selectedTasks);
     const taskId = task._id;
+    const isSelected = newSelected.has(taskId);
 
-    if (newSelected.has(taskId)) {
+    if (isSelected) {
       setCancelModal({ isOpen: true, taskId, task });
+      try {
+        playSound("taskDeselect");
+      } catch (e) {
+        // Silently fail if sound fails
+      }
     } else {
       newSelected.add(taskId);
       setSelectedTasks(newSelected);
@@ -763,6 +799,11 @@ useEffect(() => {
           ? [...prev, { bugId: task._id }]
           : [...prev, { taskId: task.taskId }];
       });
+      try {
+        playSound("taskSelect");
+      } catch (e) {
+        // Silently fail if sound fails
+      }
     }
   };
 
@@ -982,6 +1023,8 @@ const makeBrainstrom = async (turnAmount: string) => {
       setUser(response);
       const updatedNotifications = [...notificationMessages, ...response.message];
       setnotificationMessages(updatedNotifications);
+      // Play success sound
+      playSound("success");
       // Persist notifications
       if (typeof window !== 'undefined') {
         localStorage.setItem('gameNotifications', JSON.stringify(updatedNotifications));
@@ -1051,10 +1094,14 @@ const makeBrainstrom = async (turnAmount: string) => {
             : 15
         }
         onConfirm={async () => {
+          playSound("click");
           await makeBrainstrom(turnAmount);
           setBrainstormModalOpen(false);
         }}
-        onCancel={() => setBrainstormModalOpen(false)}
+        onCancel={() => {
+          playSound("modalClose");
+          setBrainstormModalOpen(false);
+        }}
         powerBoost={powerBoost}
         setPowerBoost={setPowerBoost}
       />
@@ -1091,8 +1138,22 @@ const makeBrainstrom = async (turnAmount: string) => {
             </button>
           </div> : <></>}
           <button
-            className="flex self-end rounded-lg bg-gray-900 dark:bg-gray-700 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 dark:hover:bg-gray-600 transition-colors shadow-sm"
-            onClick={() => setBrainstormModalOpen(true)}
+            ref={brainstormButtonRef}
+            className={`flex self-end rounded-lg bg-gray-900 dark:bg-gray-700 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 dark:hover:bg-gray-600 transition-colors shadow-sm ${
+              showBrainstormTutorial 
+                ? 'ring-2 ring-gray-300 dark:ring-gray-500 ring-offset-2 ring-offset-transparent relative z-[99999]' 
+                : ''
+            }`}
+            onClick={(e) => {
+              e.stopPropagation();
+              playSound("brainstorm");
+              // Close tutorial first
+              if (showBrainstormTutorial) {
+                setShowBrainstormTutorial(false);
+              }
+              // Then open brainstorm modal
+              setBrainstormModalOpen(true);
+            }}
           >
             {t("dashboard.brainstorm")}
           </button>
@@ -1123,6 +1184,15 @@ const makeBrainstrom = async (turnAmount: string) => {
         previousState={previousUserState}
         currentState={user}
         notifications={turnNotifications}
+      />
+
+      {/* Brainstorm Tutorial */}
+      <BrainstormTutorial
+        isOpen={showBrainstormTutorial}
+        onClose={() => {
+          setShowBrainstormTutorial(false);
+        }}
+        brainstormButtonRef={brainstormButtonRef}
       />
     </>
   );

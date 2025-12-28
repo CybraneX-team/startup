@@ -252,6 +252,19 @@
       "yourNextGoal": "Your next goal",
       "letsGrow": "Let's Grow!"
     }
+  },
+  "tutorial": {
+    "brainstorm": {
+      "title": "No Tasks Available",
+      "description": "You've completed all available tasks. To continue progressing, you need to generate new tasks.",
+      "step1Title": "Click the Brainstorm button",
+      "step1Description": "The Brainstorm button is located in the task filters section. Click it to start a brainstorming session.",
+      "step2Title": "Review the brainstorming session",
+      "step2Description": "A modal will appear showing how many turns are required and how many new tasks will be generated.",
+      "step3Title": "Confirm to generate tasks",
+      "step3Description": "Click 'Start Brainstorming' to generate new tasks. These tasks will appear in your task list and you can select them for your next turn.",
+      "gotIt": "Got it"
+    }
   }
 }
 

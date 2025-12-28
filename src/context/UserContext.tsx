@@ -23,17 +23,39 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [task, setTask] = useState("");
   const [tasks, setTasks] = useState([]);
   const [loader, setloader] = useState(false);
-  const [selectedTaskIds, setSelectedTaskIds] = useState<selectedTasksType[]>([]);
-  const [notificationMessages, setnotificationMessages] = useState<notificationMessagesType[]>([
-    { message: "Welcome to the game", isPositive: true },
-  ]);
+  const [selectedTaskIds, setSelectedTaskIds] = useState<selectedTasksType[]>(
+    [],
+  );
+  // Initialize notifications from localStorage or default
+  const [notificationMessages, setnotificationMessages] = useState<
+    notificationMessagesType[]
+  >(() => {
+    if (typeof window !== 'undefined') {
+      const savedNotifications = localStorage.getItem('gameNotifications');
+      if (savedNotifications) {
+        try {
+          const parsed = JSON.parse(savedNotifications);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            return parsed;
+          }
+        } catch (e) {
+          console.warn('Failed to parse saved notifications:', e);
+        }
+      }
+    }
+    return [
+      {
+        message: "Welcome to the game",
+        isPositive: true,
+      },
+    ];
+  });
   const [elonStep, setElonStep] = useState<number | null>(0);
   const [turnAmount, setTurnAmount] = useState<string>("");
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [userLoaded, setUserLoaded] = useState(false);
   const [HeaderDark, setHeaderDark] = useState(false);
   const [loaderMessage, setLoaderMessage] = useState("");
-  // const [loaderMessage, setLoaderMessage] = useState("");
 
   const router = useRouter();
 
@@ -63,6 +85,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     const storedUser = localStorage.getItem("userData");
 
     if (storedToken && isTokenExpired(storedToken)) {
+      // Auto logout if token expired
       localStorage.removeItem("userToken");
       localStorage.removeItem("userData");
       setUserState(null);
@@ -75,21 +98,50 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     setUserLoaded(true);
   }, [router]);
 
+  // Persist notifications to localStorage whenever they change
   useEffect(() => {
-    if (!user || user.salaries === undefined || user.rent === undefined || user.metrics?.contributionMargin === undefined) {
+    if (typeof window !== 'undefined' && notificationMessages.length > 0) {
+      localStorage.setItem('gameNotifications', JSON.stringify(notificationMessages));
+    }
+  }, [notificationMessages]);
+
+  // const [selectedTasks, setSelectedTasks] = useState<Set<number>>(new Set());
+
+  useEffect(() => {
+    if (
+      !user ||
+      user.salaries === undefined ||
+      user.rent === undefined ||
+      user.metrics?.contributionMargin === undefined
+    ) {
       setTurnAmount("");
       return;
     }
-    const value = Math.floor(-user.salaries + -user.rent + Math.floor(Math.abs(user.metrics.contributionMargin)));
+
+    // Always subtract absolute value of contribution margin
+    const value = Math.floor(
+      -user.salaries +
+        -user.rent +
+        Math.floor(Math.abs(user.metrics.contributionMargin)),
+    );
     const sign = value < 0 ? "-" : "+";
     setTurnAmount(`${sign}${Math.abs(value)}`);
   }, [user]);
 
+  // useEffect(() => {
+  //   const storedUser = localStorage.getItem("userData");
+  //   if (storedUser) {
+  //     setUserState(JSON.parse(storedUser));
+  //   }
+  // }, []);
+
+  // Custom setUser function to store in localStorage
   const setUser = (userData: UserData | null) => {
     if (userData) {
       localStorage.setItem("userData", JSON.stringify(userData));
       setUserState(userData);
     } else {
+      // If resetting, retrieve user from localStorage
       const storedUser = localStorage.getItem("userData");
       if (storedUser) {
         setUserState(JSON.parse(storedUser));

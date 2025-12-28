@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { X, Trophy, Medal, Award, TrendingUp } from "lucide-react";
 import { useUser } from "@/context/UserContext";
 import { useLanguage } from "@/context/LanguageContext";
+import { useSound } from "@/context/SoundContext";
 
 // Interface matching the structure returned by your API
 interface LeaderboardEntry {
@@ -29,7 +30,14 @@ const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
 }) => {
   const { user } = useUser();
   const { t } = useLanguage();
+  const { playSound } = useSound();
   const [leaderboardData, setLeaderboardData] = useState<LeaderboardEntry[]>([]);
+
+  useEffect(() => {
+    if (isOpen) {
+      playSound("modalOpen");
+    }
+  }, [isOpen, playSound]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -110,7 +118,10 @@ const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
     <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4">
       <div
         className="absolute inset-0 bg-black/60 backdrop-blur-md transition-opacity"
-        onClick={onClose}
+        onClick={() => {
+          playSound("modalClose");
+          onClose();
+        }}
       />
       <div className="relative w-full max-w-5xl rounded-3xl bg-white/95 backdrop-blur-xl p-8 shadow-2xl dark:bg-boxdark/95 border border-gray-200/50 dark:border-gray-700/50">
         
@@ -122,7 +133,10 @@ const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
             </h2>
           </div>
           <button
-            onClick={onClose}
+            onClick={() => {
+              playSound("modalClose");
+              onClose();
+            }}
             className="rounded-xl p-2.5 text-gray-500 transition-all hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-gray-700 dark:hover:text-gray-100 hover:scale-110"
           >
             <X className="h-5 w-5" />

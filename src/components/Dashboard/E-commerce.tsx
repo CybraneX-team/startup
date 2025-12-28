@@ -13,6 +13,7 @@ import { useUser } from "@/context/UserContext";
 import { useLanguage } from "@/context/LanguageContext";
 import { UserData } from "@/context/interface.types";
 import { useNotification } from "@/context/NotificationContext";
+import { useSound } from "@/context/SoundContext";
 import { useRouter } from "next/navigation";
 import { translateTaskName } from "@/utils/taskTranslator";
 import { Bounce, toast, ToastContainer } from "react-toastify";
@@ -565,6 +566,7 @@ const ECommerce: React.FC = () => {
   } = useUser();
   const { t, language } = useLanguage();
   const { isNotificationModalOpen, closeNotificationModal } = useNotification();
+  const { playSound } = useSound();
 
   const router = useRouter();
 
@@ -573,10 +575,8 @@ const ECommerce: React.FC = () => {
     // console.log("User state changed:", user);
     forceRender((prev) => prev + 1);
     
-    // Initialize previous metrics on first load if not set
-    if (user?.metrics && !previousMetrics) {
-      setPreviousMetrics(user.metrics);
-    }
+    // Don't initialize previous metrics from current metrics on first load
+    // This would prevent showing changes. Only load from localStorage or set after a turn.
   }, [user]);
 
   useEffect(() => {
@@ -1076,6 +1076,7 @@ const ECommerce: React.FC = () => {
           nextGoal: nextGoal,
         });
         setShowStageUpgradeModal(true);
+        playSound("stageUpgrade");
         // Mark that we need to show turn progress modal after stage upgrade modal closes
         setPendingTurnProgress(true);
         setPreviousUserState(previousState);
@@ -1086,6 +1087,7 @@ const ECommerce: React.FC = () => {
           setPreviousUserState(previousState);
           setTurnNotifications(response.message || []);
           setShowTurnProgressModal(true);
+          playSound("turnComplete");
         }
       }
 
@@ -1100,12 +1102,15 @@ const ECommerce: React.FC = () => {
       // Show toast notification for the last notification
       if (response.message && response.message.length > 0) {
         const lastNotification = response.message[response.message.length - 1];
+        playSound("notification");
         if (lastNotification.isPositive) {
+          playSound("success");
           toast.success(lastNotification.message, {
             position: "top-right",
             autoClose: 4000,
           });
         } else {
+          playSound("error");
           toast.error(lastNotification.message, {
             position: "top-right",
             autoClose: 4000,
@@ -1353,7 +1358,7 @@ const ECommerce: React.FC = () => {
                 <p className="mt-2 text-xl font-semibold text-gray-900 dark:text-white">
                   {(() => {
                     const shortName = getShortName(metric);
-                    const value = user.metrics[metric];
+                    const value = user?.metrics?.[metric] ?? 0;
 
                     let displayValue;
                     if (shortName === "UA" || shortName === "B") {
@@ -1366,30 +1371,43 @@ const ECommerce: React.FC = () => {
 
                     // Calculate percentage change from previous turn
                     let percentageChange: number | null = null;
-                    if (previousMetrics && previousMetrics[metric] !== undefined) {
+                    if (previousMetrics && previousMetrics[metric] !== undefined && user?.metrics) {
                       const prevValue = previousMetrics[metric];
-                      if (prevValue !== 0 && Math.abs(prevValue) > 0.01) {
-                        percentageChange = ((value - prevValue) / Math.abs(prevValue)) * 100;
-                      } else if (value !== 0) {
-                        percentageChange = value > 0 ? 100 : -100;
+                      const currentValue = user.metrics[metric];
+                      const change = currentValue - prevValue;
+                      
+                      // Show percentage if there's any change (even small ones)
+                      if (Math.abs(change) > 0.0001) {
+                        if (Math.abs(prevValue) > 0.0001) {
+                          // Calculate percentage change
+                          percentageChange = (change / Math.abs(prevValue)) * 100;
+                        } else if (Math.abs(currentValue) > 0.0001) {
+                          // Previous was near zero, show as 100% change
+                          percentageChange = currentValue > 0 ? 100 : -100;
+                        } else {
+                          // Both are near zero, no change
+                          percentageChange = null;
+                        }
                       }
                     }
 
                     return (
-                      <>
-                        {displayValue}
-                        {shortName === "C1" ? "%" : ""}
-                        {dollarMetrics.includes(shortName) ? "$" : ""}
-                        {percentageChange !== null && Math.abs(percentageChange) > 0.01 && (
-                          <span className={`ml-2 text-xs font-medium ${
+                      <div className="flex flex-col">
+                        <span>
+                          {displayValue}
+                          {shortName === "C1" ? "%" : ""}
+                          {dollarMetrics.includes(shortName) ? "$" : ""}
+                        </span>
+                        {percentageChange !== null && Math.abs(percentageChange) >= 0.01 && (
+                          <span className={`mt-1 text-xs font-semibold ${
                             percentageChange > 0 
                               ? "text-green-600 dark:text-green-400" 
                               : "text-red-600 dark:text-red-400"
                           }`}>
-                            ({percentageChange > 0 ? "+" : ""}{percentageChange.toFixed(2)}%)
+                            {percentageChange > 0 ? "+" : ""}{percentageChange.toFixed(2)}%
                           </span>
                         )}
-                      </>
+                      </div>
                     );
                   })()}
                 </p>
@@ -1399,7 +1417,10 @@ const ECommerce: React.FC = () => {
       </div>
       <div className="mt-6 mb-6 flex flex-col sm:flex-row gap-3 justify-end w-full">
         <button
-          onClick={() => setChatModalOpen(true)}
+          onClick={() => {
+            playSound("click");
+            setChatModalOpen(true);
+          }}
           className="flex items-center justify-center gap-2 text-sm font-medium bg-gray-900 dark:bg-gray-700 text-white dark:text-white px-5 py-2.5 rounded-lg shadow-sm hover:bg-gray-800 dark:hover:bg-gray-600 transition duration-200 w-full sm:w-auto sm:min-w-[160px]"
         >
           <InfoIcon className="w-4 h-4" />
@@ -1430,7 +1451,10 @@ const ECommerce: React.FC = () => {
       </div>
       {/* Floating Make Turn Button */}
       <button
-        onClick={() => makeTurn(turnAmount)}
+        onClick={() => {
+          playSound("click");
+          makeTurn(turnAmount);
+        }}
         style={{
           position: 'fixed',
           bottom: '24px',

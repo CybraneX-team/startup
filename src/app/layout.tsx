@@ -9,6 +9,7 @@ import Loader from "@/components/common/Loader";
 import { UserProvider } from "@/context/UserContext";
 import { LanguageProvider } from "@/context/LanguageContext";
 import { NotificationProvider } from "@/context/NotificationContext";
+import { SoundProvider } from "@/context/SoundContext";
 import { Bounce, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Head from 'next/head';
@@ -41,10 +42,11 @@ export default function RootLayout({
         <div className="dark:bg-boxdark-2 dark:text-bodydark">
           <LanguageProvider>
             <UserProvider>
-              <NotificationProvider>
-                <SessionProvider>
-                  <AuthSyncHandler />
-                  {loading ? <Loader /> : children}
+              <SoundProvider>
+                <NotificationProvider>
+                  <SessionProvider>
+                    <AuthSyncHandler />
+                    {loading ? <Loader /> : children}
                 <ToastContainer
                   position="top-right"
                   autoClose={5000}
@@ -62,9 +64,10 @@ export default function RootLayout({
                 />
                 </SessionProvider>
               </NotificationProvider>
-            </UserProvider>
-          </LanguageProvider>
-        </div>
+            </SoundProvider>
+          </UserProvider>
+        </LanguageProvider>
+      </div>
         <Script
           src="https://checkout.razorpay.com/v1/checkout.js"
           strategy="beforeInteractive"

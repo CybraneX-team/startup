@@ -17,6 +17,7 @@ import {
 import { useLanguage } from "@/context/LanguageContext";
 import { UserData, Metrics } from "@/context/interface.types";
 import { translateTaskName } from "@/utils/taskTranslator";
+import { useSound } from "@/context/SoundContext";
 
 interface TurnProgressModalProps {
   isOpen: boolean;
@@ -53,8 +54,15 @@ const TurnProgressModal: React.FC<TurnProgressModalProps> = ({
   notifications,
 }) => {
   const { t, language } = useLanguage();
+  const { playSound } = useSound();
   const [translatedNotifications, setTranslatedNotifications] = useState<Array<{ message: string; isPositive: boolean }>>([]);
   const [isTranslating, setIsTranslating] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      playSound("modalOpen");
+    }
+  }, [isOpen, playSound]);
 
   useEffect(() => {
     if (!isOpen || !notifications.length) {
@@ -469,7 +477,10 @@ const TurnProgressModal: React.FC<TurnProgressModalProps> = ({
         {/* Footer */}
         <div className="p-5 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-[#1A232F]">
           <button
-            onClick={onClose}
+            onClick={() => {
+              playSound("click");
+              onClose();
+            }}
             className="w-full py-3 px-6 rounded-xl bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 font-semibold hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors border border-gray-300 dark:border-gray-600"
           >
             {t("modals.turnProgress.continue")}

@@ -368,7 +368,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, sidebarCollapsed = false, setSid
             </h2>
 
             {/* Funds Chart - New compact layout */}
-            <div className="mb-4 rounded-lg bg-gray-50 dark:bg-boxdark-2 border border-stroke dark:border-strokedark p-4">
+            <div className="mb-4 rounded-lg p-4">
               <div className="flex items-center justify-between mb-3">
                 <span className="text-xs font-medium text-gray-800 dark:text-gray-200">{t("sidebar.fundDistribution")}</span>
                 <span className="text-sm font-bold text-black dark:text-white">${user.finances.toLocaleString() || "0"}</span>
