@@ -10,6 +10,7 @@
 !.yarn/patches
 !.yarn/sdks
 .yarn/cache
+.env.example
 .yarn/unplugged
 .yarn/build-state.yml
 .yarn/install-state.gz

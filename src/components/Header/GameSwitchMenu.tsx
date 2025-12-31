@@ -1,10 +1,11 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState} from "react";
 import { ChevronDown, Pencil, Check, Rocket, Search, Gamepad2 } from "lucide-react";
 import { useUser } from "@/context/UserContext";
 import { useLanguage } from "@/context/LanguageContext";
 import { startNewSimulation as startNewSimulationAction } from "@/utils/gameActions";
 import { toast } from "react-toastify";
+import { useRouter } from "next/navigation";
 
 interface userGameType {
   gameId: string;
@@ -12,6 +13,7 @@ interface userGameType {
 }
 
 const GameSwitchMenu = () => {
+  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [editIndex, setEditIndex] = useState<number | null>(null);
   const [editedName, setEditedName] = useState<string>("");
@@ -53,6 +55,7 @@ const GameSwitchMenu = () => {
         setUser(response);
         setUserState(response);
         setIsOpen(false);
+        router.replace("/")
       } else {
         console.error(`Request failed with status ${makeReq.status}: ${makeReq.statusText}`);
       }
