@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { CheckCircle2, Zap, Rocket, Crown, Loader2 } from "lucide-react";
+import { CheckCircle2, Zap, Rocket, Crown, Loader2, ShieldCheck, AlertCircle, Mail, MessageCircle } from "lucide-react";
 import { toast } from "react-toastify";
 import { useUser } from "@/context/UserContext";
 import { useRouter } from "next/navigation";
@@ -12,7 +12,7 @@ const plans = [
     id: "1_month",
     name: "Starter Plan",
     icon: <Zap className="text-blue-500 dark:text-blue-400" size={24} />,
-    price: "1",
+    price: "10,000",
     duration: "Monthly",
     description: "Perfect for exploring the simulator mechanics.",
     features: [
@@ -25,7 +25,7 @@ const plans = [
     id: "12_months",
     name: "Founder Pro",
     icon: <Crown className="text-amber-500 dark:text-amber-400" size={24} />,
-    price: "3",
+    price: "30,000",
     duration: "Annually",
     description: "The ultimate edge for serious startup founders.",
     features: [
@@ -40,7 +40,7 @@ const plans = [
     id: "6_months",
     name: "Growth Plan",
     icon: <Rocket className="text-emerald-500 dark:text-emerald-400" size={24} />,
-    price: "2",
+    price: "20,000",
     duration: "Semi-Annually",
     description: "Scale your experience with better coin value.",
     features: [
@@ -168,6 +168,9 @@ const SubscriptionPlansPage = () => {
               path to glory.
             </span>
           </h1>
+          <p className="mt-4 text-gray-500 dark:text-slate-400 max-w-2xl mx-auto">
+            Upgrade your experience and dominate the ecosystem with premium tools.
+          </p>
         </div>
 
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
@@ -182,7 +185,7 @@ const SubscriptionPlansPage = () => {
                 className={`relative flex flex-col rounded-3xl border p-8 transition-all hover:translate-y-[-4px] 
                   ${
                     plan.popular
-                      ? "border-indigo-500 bg-white dark:bg-slate-800/50 shadow-xl"
+                      ? "border-indigo-500 bg-white dark:bg-slate-800/50 shadow-xl ring-1 ring-indigo-500/20"
                       : "border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 shadow-lg"
                   }`}
               >
@@ -221,36 +224,95 @@ const SubscriptionPlansPage = () => {
                   ))}
                 </ul>
 
-                <button
-                  disabled={user?.isPurchaseDone || (loadingPlanId !== null)}
-                  onClick={() => handleSubscribe(plan.id)}
-                  className={`mt-10 w-full rounded-xl py-4 font-bold transition-all flex justify-center items-center gap-2
-                    ${
-                      isActive
-                        ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-500 cursor-default"
-                        : isLocked
-                        ? "bg-gray-200 dark:bg-slate-800 text-gray-500 dark:text-slate-500 cursor-not-allowed"
-                        : "bg-indigo-600 hover:bg-indigo-500 text-white"
-                    }
-                    ${isLoading ? "opacity-80 cursor-wait" : ""}
-                    `}
-                >
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="animate-spin" size={20} />
-                      Processing...
-                    </>
-                  ) : isActive ? (
-                    "Current Plan"
-                  ) : isLocked ? (
-                    "Plan Locked"
-                  ) : (
-                    "Get Started"
+                <div className="mt-10">
+                  <button
+                    disabled={user?.isPurchaseDone || (loadingPlanId !== null)}
+                    onClick={() => handleSubscribe(plan.id)}
+                    className={`w-full rounded-xl py-4 font-bold transition-all flex justify-center items-center gap-2
+                      ${
+                        isActive
+                          ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-500 cursor-default"
+                          : isLocked
+                          ? "bg-gray-200 dark:bg-slate-800 text-gray-500 dark:text-slate-500 cursor-not-allowed"
+                          : "bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-500/25"
+                      }
+                      ${isLoading ? "opacity-80 cursor-wait" : ""}
+                      `}
+                  >
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="animate-spin" size={20} />
+                        Processing...
+                      </>
+                    ) : isActive ? (
+                      "Current Plan"
+                    ) : isLocked ? (
+                      "Plan Locked"
+                    ) : (
+                      "Get Started"
+                    )}
+                  </button>
+                  
+                  {/* Non-refundable notice under button */}
+                  {!user?.isPurchaseDone && (
+                    <p className="mt-3 text-center text-[10px] font-bold uppercase tracking-widest text-gray-400 dark:text-slate-500">
+                      Non-Refundable
+                    </p>
                   )}
-                </button>
+                </div>
               </div>
             );
           })}
+        </div>
+
+        {/* Footer Info Section */}
+        <div className="mt-20 border-t border-gray-200 dark:border-slate-800 pt-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
+            
+            {/* Left: Support Info */}
+            <div className="space-y-4 text-center md:text-left">
+              <h4 className="text-lg font-bold flex items-center justify-center md:justify-start gap-2">
+                <MessageCircle size={20} className="text-indigo-500" />
+                Need help with your purchase?
+              </h4>
+              <p className="text-gray-500 dark:text-slate-400 text-sm max-w-md">
+                If you encountered an issue during payment or haven&apos;t received your coins, contact our support team. We&apos;re here to help!
+              </p>
+              <div className="flex flex-col sm:flex-row items-center gap-4 pt-2">
+                <a 
+                  href="mailto:support@unicornsimgame.com" 
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 hover:border-indigo-500 transition-colors text-sm font-medium shadow-sm"
+                >
+                  <Mail size={16} className="text-indigo-500" />
+                  support@unicornsimgame.com
+                </a>
+              </div>
+            </div>
+
+            {/* Right: Policy & Trust */}
+            <div className="space-y-6 bg-gray-100/50 dark:bg-slate-800/30 p-6 rounded-2xl border border-gray-200 dark:border-slate-800">
+              <div className="flex items-start gap-3">
+                <AlertCircle size={20} className="text-amber-500 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-sm font-bold">Refund Policy</p>
+                  <p className="text-xs text-gray-500 dark:text-slate-400 leading-relaxed">
+                    All transactions are final. Once Venture Coins are credited to your account, they cannot be refunded or exchanged for cash.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <ShieldCheck size={20} className="text-emerald-500 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-sm font-bold">Secure Transactions</p>
+                  <p className="text-xs text-gray-500 dark:text-slate-400 leading-relaxed">
+                    Payments are processed via Razorpay with industry-standard encryption. Your financial data is never stored on our servers.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+          </div>
         </div>
       </main>
     </div>
