@@ -284,7 +284,7 @@ const SubscriptionPlansPage = () => {
                   className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 hover:border-indigo-500 transition-colors text-sm font-medium shadow-sm"
                 >
                   <Mail size={16} className="text-indigo-500" />
-                  support@unicornsimgame.com
+                  simulatorunicorn@gmail.com
                 </a>
               </div>
             </div>
