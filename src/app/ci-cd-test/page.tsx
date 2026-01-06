@@ -7,6 +7,8 @@ const page = () => {
         <li>test ${Date()} testt</li>
         <li>test ${Date()} testt</li>
         <li>test ${Date()} testt</li>
+        <li>test 2 ${Date()} testt</li>
+        <li>test 2 ${Date()} testt</li>
     </div>
   )
 }

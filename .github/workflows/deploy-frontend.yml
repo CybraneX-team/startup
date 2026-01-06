@@ -5,16 +5,19 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build-and-push:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
+      # 1️⃣ Checkout code
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      # 2️⃣ Setup Docker Buildx
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
+      # 3️⃣ Login to Azure Container Registry
       - name: Login to Azure Container Registry
         uses: docker/login-action@v3
         with:
@@ -22,13 +25,16 @@ jobs:
           username: ${{ secrets.ACR_USERNAME }}
           password: ${{ secrets.ACR_PASSWORD }}
 
+      # 4️⃣ Build & Push Image (SHA + latest)
       - name: Build and Push Frontend Image
         uses: docker/build-push-action@v5
         with:
           context: .
           push: true
-          tags: ${{ secrets.ACR_LOGIN_SERVER }}/frontend:latest
           no-cache: true
+          tags: |
+            ${{ secrets.ACR_LOGIN_SERVER }}/frontend:${{ github.sha }}
+            ${{ secrets.ACR_LOGIN_SERVER }}/frontend:latest
           build-args: |
             NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }}
             GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
@@ -39,11 +45,10 @@ jobs:
             RAZORPAY_KEY_SECRET=${{ secrets.RAZORPAY_KEY_SECRET }}
             LOGOUT_URL=${{ secrets.LOGOUT_URL }}
 
+      # 5️⃣ Deploy EXACT image tag (forces restart)
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'startup-frontend-app'
-          slot-name: 'production'
-          # Note: Ensure you created this specific secret for the frontend app!
+          app-name: startup-frontend-app
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-          images: '${{ secrets.ACR_LOGIN_SERVER }}/frontend:latest'
+          images: ${{ secrets.ACR_LOGIN_SERVER }}/frontend:${{ github.sha }}

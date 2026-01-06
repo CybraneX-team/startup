@@ -12,7 +12,7 @@ const plans = [
     id: "1_month",
     name: "Starter Plan",
     icon: <Zap className="text-blue-500 dark:text-blue-400" size={24} />,
-    price: "10,000",
+    price: "5,000",
     duration: "Monthly",
     description: "Perfect for exploring the simulator mechanics.",
     features: [
@@ -25,7 +25,7 @@ const plans = [
     id: "12_months",
     name: "Founder Pro",
     icon: <Crown className="text-amber-500 dark:text-amber-400" size={24} />,
-    price: "30,000",
+    price: "15,000",
     duration: "Annually",
     description: "The ultimate edge for serious startup founders.",
     features: [
@@ -40,7 +40,7 @@ const plans = [
     id: "6_months",
     name: "Growth Plan",
     icon: <Rocket className="text-emerald-500 dark:text-emerald-400" size={24} />,
-    price: "20,000",
+    price: "10,000",
     duration: "Semi-Annually",
     description: "Scale your experience with better coin value.",
     features: [
