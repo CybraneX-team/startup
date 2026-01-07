@@ -28,7 +28,7 @@ const TeamManagementModal = ({ isOpen, onClose }: TeamManagementModalProps) => {
     if (user?.employeesAvailable?.[0]?.availableEmployes) {
       const availableEmployees = user.employeesAvailable[0].availableEmployes;
       const aiSkinnedEmployees = user.aiSkinnedEmployees;
-      console.log("aiSkinnedEmployees", aiSkinnedEmployees) 
+    
       const newTeam = availableEmployees.map((emp, idx) => {
         const existingMember = user.teamMembers.find((tm) => tm.roleName === emp.roleName);
         return {

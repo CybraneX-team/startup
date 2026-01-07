@@ -492,7 +492,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, sidebarCollapsed = false, setSid
             <div className="grid grid-cols-3 gap-2.5">
               
               {user.teamMembers?.map((item, idx) =>{
-                  console.log("item is : ", item)
+                 
                   const member = user.aiSkinnedEmployees?.find(
                   e  => e?.actualName?.toLowerCase() === item.roleName.toLowerCase()
                 );
