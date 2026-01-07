@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState} from "react";
+import { useEffect, useRef, useState } from "react";
 import { ChevronDown, Pencil, Check, Rocket, Search, Gamepad2 } from "lucide-react";
 import { useUser } from "@/context/UserContext";
 import { useLanguage } from "@/context/LanguageContext";
@@ -18,6 +18,7 @@ const GameSwitchMenu = () => {
   const [editIndex, setEditIndex] = useState<number | null>(null);
   const [editedName, setEditedName] = useState<string>("");
   const [searchTerm, setSearchTerm] = useState("");
+  const [isUniAc, setisUniAc] = useState<boolean>(false);
   const dropdownRef = useRef(null);
   const { user, setUser, setUserState, setloader } = useUser();
   const { t } = useLanguage();
@@ -108,10 +109,21 @@ const GameSwitchMenu = () => {
       setloader,
     });
 
+    
+
     if (result.insufficientCredits) {
       toast.error("You don't have enough Venture Coins!", { autoClose: 5000 });
       return;
     }
+
+    if (result.uniAcLimit) {
+      toast.error(
+        "You can only run 2 simulations on a Uni account. Upgrade to continue.",
+        { autoClose: 5000 }
+      );
+      return;
+    }
+
 
     if (result.success) {
       setIsOpen(false);
@@ -128,7 +140,7 @@ const GameSwitchMenu = () => {
         <span className="flex items-center gap-2">
           <Gamepad2 size={16} className="text-primary" />
           <span className="truncate max-w-[100px] sm:max-w-[140px] text-left">
-             {user?.gameName || "Select Game"}
+            {user?.gameName || "Select Game"}
           </span>
         </span>
         <ChevronDown
@@ -139,14 +151,14 @@ const GameSwitchMenu = () => {
 
       {isOpen && (
         <div className="absolute left-0 sm:right-0 mt-2 w-72 origin-top-right rounded-xl border border-gray-200 bg-white dark:border-strokedark dark:bg-boxdark shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-100">
-          
+
           {/* 1. Search Bar Header */}
           <div className="p-3 border-b border-gray-100 dark:border-strokedark bg-gray-50 dark:bg-boxdark-2">
             <div className="relative">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-400" />
-              <input 
-                type="text" 
-                placeholder="Find game..." 
+              <input
+                type="text"
+                placeholder="Find game..."
                 className="w-full pl-9 pr-3 py-2 text-sm bg-white dark:bg-boxdark border border-gray-200 dark:border-strokedark rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -159,21 +171,21 @@ const GameSwitchMenu = () => {
           <ul className="overflow-y-auto max-h-[250px] custom-scrollbar p-1">
             {filteredGames && filteredGames.length > 0 ? (
               filteredGames.map((gameObject: userGameType, index: number) => {
-                 const originalIndex = user?.userGames.findIndex((g:userGameType) => g.gameId === gameObject.gameId) || 0
-                 const displayName = gameObject.gameName !== "Game" ? gameObject.gameName : `Game ${originalIndex + 1}`;
+                const originalIndex = user?.userGames.findIndex((g: userGameType) => g.gameId === gameObject.gameId) || 0
+                const displayName = gameObject.gameName !== "Game" ? gameObject.gameName : `Game ${originalIndex + 1}`;
 
-                 return (
+                return (
                   <li
                     key={gameObject.gameId}
                     className={`group flex items-center justify-between px-3 py-2.5 rounded-md text-sm transition-all mb-1
-                      ${user?.lastRequestMade === gameObject.gameId 
-                        ? "bg-primary/10 text-primary dark:text-white font-medium" 
+                      ${user?.lastRequestMade === gameObject.gameId
+                        ? "bg-primary/10 text-primary dark:text-white font-medium"
                         : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-strokedark"
                       }`}
                   >
                     <div className="flex items-center gap-3 flex-grow min-w-0" onClick={() => getGameFromId(gameObject.gameId)}>
                       <span className={`h-2 w-2 rounded-full flex-shrink-0 ${user?.lastRequestMade === gameObject.gameId ? 'bg-green-500' : 'bg-gray-300 dark:bg-gray-600 group-hover:bg-primary/50'}`} />
-                      
+
                       {editIndex === originalIndex ? (
                         <input
                           type="text"
@@ -182,7 +194,7 @@ const GameSwitchMenu = () => {
                           className="w-full rounded border border-primary px-2 py-0.5 text-sm dark:bg-boxdark dark:text-white focus:outline-none"
                           onClick={(e) => e.stopPropagation()}
                           onKeyDown={(e) => {
-                            if(e.key === 'Enter') handleSaveClick(index, originalIndex);
+                            if (e.key === 'Enter') handleSaveClick(index, originalIndex);
                           }}
                           autoFocus
                         />
@@ -196,12 +208,12 @@ const GameSwitchMenu = () => {
                     <div className="flex items-center ml-2">
                       {editIndex === originalIndex ? (
                         <div className="flex gap-1">
-                           <button onClick={(e) => { e.stopPropagation(); handleSaveClick(index, originalIndex); }} className="p-1 hover:bg-green-100 rounded text-green-600">
-                             <Check size={14} />
-                           </button>
+                          <button onClick={(e) => { e.stopPropagation(); handleSaveClick(index, originalIndex); }} className="p-1 hover:bg-green-100 rounded text-green-600">
+                            <Check size={14} />
+                          </button>
                         </div>
                       ) : (
-                        <button 
+                        <button
                           onClick={(e) => { e.stopPropagation(); handleEditClick(originalIndex, displayName); }}
                           className="opacity-0 group-hover:opacity-100 p-1 hover:bg-gray-200 dark:hover:bg-gray-600 rounded text-gray-400 hover:text-primary transition-all"
                         >
@@ -218,7 +230,7 @@ const GameSwitchMenu = () => {
               </li>
             )}
           </ul>
-          
+
           {/* 3. Footer */}
           <div className="border-t border-gray-100 dark:border-strokedark p-3 bg-gray-50 dark:bg-boxdark-2 z-10">
             <button
@@ -229,10 +241,10 @@ const GameSwitchMenu = () => {
               {t("modals.gameOptions.startNewSimulation")}
             </button>
             <div className="mt-2 flex justify-center items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400">
-               <span>Cost:</span>
-               <span className="font-bold text-orange-500 flex items-center gap-1">
-                 2,000 Coins
-               </span>
+              <span>Cost:</span>
+              <span className="font-bold text-orange-500 flex items-center gap-1">
+                2,000 Coins
+              </span>
             </div>
           </div>
         </div>

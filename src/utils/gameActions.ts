@@ -9,6 +9,9 @@ export interface StartNewSimulationResult {
   success: boolean;
   response?: any;
   insufficientCredits?: boolean;
+  isUniAc?: boolean;
+  setisUniAc?: boolean;
+  uniAcLimit ?: boolean
 }
 
 // Shared helper to start a new simulation game for the current user/game
@@ -45,12 +48,25 @@ export async function startNewSimulation({
       const hasInsufficientCredits = response.message?.some(
         (msg: any) => msg.isPositive === false && msg.message?.toLowerCase().includes("credits")
       );
+
+      const uniAcLimit = response.message?.some(
+        (msg: any) => msg.isPositive === false && msg.message?.toLowerCase().includes("2 simulations")
+      );
       
       if (hasInsufficientCredits) {
         return {
           success: false,
           response,
           insufficientCredits: true,
+        };
+      }
+
+       if (uniAcLimit) {
+        return {
+          success: false,
+          response,
+          insufficientCredits: false,
+          uniAcLimit : true
         };
       }
       
