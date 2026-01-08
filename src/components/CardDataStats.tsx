@@ -81,7 +81,7 @@ const CancelTaskModal: React.FC<CancelTaskModalProps> = ({
   onCancel,
 }) => {
   const { language, t } = useLanguage();
-  const { setHeaderDark, setloader} = useUser();
+  const { setHeaderDark, setloader } = useUser();
 
   const [translatedTaskName, setTranslatedTaskName] = useState(
     translateTaskNameSync(taskName, language)
@@ -180,7 +180,7 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
   const [translatedTaskName, setTranslatedTaskName] = useState(
     task ? translateTaskNameSync(task.name, language) : ''
   );
-  const { setHeaderDark, setloader, user} = useUser();
+  const { setHeaderDark, setloader, user } = useUser();
 
   useEffect(() => {
     if (task && language !== 'en') {
@@ -244,9 +244,9 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
             {t("modals.taskDetail.effects")}
           </p>
           <div className="flex flex-wrap gap-2">
-            {task.metricsImpact  && user?.difficultyMode === "basic" &&
+            {task.metricsImpact && user?.difficultyMode === "basic" &&
               Object.entries(task.metricsImpact)
-              .filter(([, value]) => value !== undefined && value !== 0)
+                .filter(([, value]) => value !== undefined && value !== 0)
                 .map(([key, value]) => (
                   <span
                     key={key}
@@ -310,19 +310,17 @@ const FilterButton: React.FC<FilterButtonProps> = ({
   <button
     onClick={onClick}
     className={`flex items-center rounded-lg px-4 py-2 text-sm font-medium capitalize transition-all duration-200
-      ${
-        isActive
-          ? "bg-gray-900 text-white dark:bg-gray-700 dark:text-white shadow-sm"
-          : "bg-white text-gray-700 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-750 border border-gray-200 dark:border-gray-700"
+      ${isActive
+        ? "bg-gray-900 text-white dark:bg-gray-700 dark:text-white shadow-sm"
+        : "bg-white text-gray-700 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-750 border border-gray-200 dark:border-gray-700"
       }`}
   >
     <span>{label}</span>
     {count !== undefined && (
-      <span className={`ml-2 rounded px-2 py-0.5 text-xs font-semibold ${
-        isActive
-          ? "bg-white/20 text-white"
-          : "bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300"
-      }`}>
+      <span className={`ml-2 rounded px-2 py-0.5 text-xs font-semibold ${isActive
+        ? "bg-white/20 text-white"
+        : "bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300"
+        }`}>
         {count}
       </span>
     )}
@@ -398,98 +396,96 @@ const TaskCard: React.FC<TaskCardProps> = ({
       setTranslatedName(name);
     }
   }, [name, language]);
-return (
-  <div
-    onClick={onToggle}
-    className={`relative w-full cursor-pointer overflow-hidden rounded-2xl border border-gray-200 bg-white px-5 py-4 shadow-[0_10px_30px_rgba(15,23,42,0.06)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_40px_rgba(15,23,42,0.09)] dark:border-gray-800 dark:bg-gray-900 ${
-      isSelected ? "ring-2 ring-gray-900/50 dark:ring-gray-100/50" : ""
-    }`}
-  >
-    <div className="flex items-start justify-between gap-3">
-      <div className="flex flex-col gap-2">
-        <div className="inline-flex items-center gap-2">
-          <span className="inline-flex w-fit items-center rounded-full bg-gray-100 px-3 py-1 text-[11px] font-semibold tracking-[0.3em] text-gray-500 dark:bg-gray-800 dark:text-gray-300">
-            {isBug ? "BUG" : "TASK"}
-          </span>
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              onShowDetails?.({
-                _id,
-                taskId,
-                name,
-                description,
-                turnsRequired,
-                requiredTeamMembers,
-                metricsImpact,
-                requiredTeam,
-                isBug,
-              });
-            }}
-            className="flex h-6 w-6 items-center justify-center rounded-full border border-gray-200 text-gray-500 hover:border-gray-400 hover:text-gray-700 dark:border-gray-700 dark:text-gray-300"
-          >
-            <Info className="h-3.5 w-3.5" />
-          </button>
+  return (
+    <div
+      onClick={onToggle}
+      className={`relative w-full cursor-pointer overflow-hidden rounded-2xl border border-gray-200 bg-white px-5 py-4 shadow-[0_10px_30px_rgba(15,23,42,0.06)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_40px_rgba(15,23,42,0.09)] dark:border-gray-800 dark:bg-gray-900 ${isSelected ? "ring-2 ring-gray-900/50 dark:ring-gray-100/50" : ""
+        }`}
+    >
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex flex-col gap-2">
+          <div className="inline-flex items-center gap-2">
+            <span className="inline-flex w-fit items-center rounded-full bg-gray-100 px-3 py-1 text-[11px] font-semibold tracking-[0.3em] text-gray-500 dark:bg-gray-800 dark:text-gray-300">
+              {isBug ? "BUG" : "TASK"}
+            </span>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onShowDetails?.({
+                  _id,
+                  taskId,
+                  name,
+                  description,
+                  turnsRequired,
+                  requiredTeamMembers,
+                  metricsImpact,
+                  requiredTeam,
+                  isBug,
+                });
+              }}
+              className="flex h-6 w-6 items-center justify-center rounded-full border border-gray-200 text-gray-500 hover:border-gray-400 hover:text-gray-700 dark:border-gray-700 dark:text-gray-300"
+            >
+              <Info className="h-3.5 w-3.5" />
+            </button>
+          </div>
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white leading-snug">
+            {translatedName}
+          </h3>
         </div>
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white leading-snug">
-          {translatedName}
-        </h3>
-      </div>
-      <button
-        type="button"
-        onClick={(e) => {
-          e.stopPropagation();
-          onToggle();
-        }}
-        className={`flex h-6 w-10 items-center justify-center rounded-full transition-all ${
-          isSelected
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            onToggle();
+          }}
+          className={`flex h-6 w-10 items-center justify-center rounded-full transition-all ${isSelected
             ? "border-gray-900 bg-gray-900 text-white dark:border-gray-100 dark:bg-gray-100 dark:text-gray-900"
             : "border-gray-300 text-gray-400 hover:border-gray-500 dark:border-gray-700 dark:text-gray-400"
-        }`}
-      >
-        {isSelected ? <CheckSquare className="h-3.5 w-3.5" /> : <Square className="h-3.5 w-3.5" />}
-      </button>
-    </div>
+            }`}
+        >
+          {isSelected ? <CheckSquare className="h-3.5 w-3.5" /> : <Square className="h-3.5 w-3.5" />}
+        </button>
+      </div>
 
-    <div className="mt-4 flex flex-wrap items-center gap-2 text-sm">
-      <span className="inline-flex items-center rounded-full border border-gray-200 px-3 py-1 font-semibold text-gray-700 dark:border-gray-700 dark:text-gray-200">
-        Turns {turnsRequired}
-      </span>
-      {metricsImpact && user?.difficultyMode !== "intermediate" && 
-        Object.entries(metricsImpact)
-          .filter(([, value]) => value !== undefined && value !== 0)
-          .map(([key, value], idx) => (
-            <span
-              key={idx}
-              className="inline-flex items-center rounded-full border border-gray-200 px-3 py-1 text-xs font-semibold text-gray-600 dark:border-gray-700 dark:text-gray-200"
-            >
-              {getShortName(key)}: {signTeller(key)}
-              {showDollarSign(key)}
-              {value}
-              {symbolToShow(key) ? "%" : ""}
-            </span>
-          ))}
-      {requiredTeamMembers &&
-        Object.entries(requiredTeamMembers).map(([member, count], index) =>
-          count > 0 ? (
-            <span
-              key={index}
-              className="inline-flex items-center gap-1 rounded-full border border-gray-200 px-3 py-1 text-xs font-semibold text-gray-600 dark:border-gray-700 dark:text-gray-200"
-            >
-              <Users className="h-3.5 w-3.5" />
-              <span className="capitalize">{member}</span>
-              <span>{count}</span>
-            </span>
-          ) : null,
-        )}
-    </div>
+      <div className="mt-4 flex flex-wrap items-center gap-2 text-sm">
+        <span className="inline-flex items-center rounded-full border border-gray-200 px-3 py-1 font-semibold text-gray-700 dark:border-gray-700 dark:text-gray-200">
+          Turns {turnsRequired}
+        </span>
+        {metricsImpact && user?.difficultyMode !== "intermediate" &&
+          Object.entries(metricsImpact)
+            .filter(([, value]) => value !== undefined && value !== 0)
+            .map(([key, value], idx) => (
+              <span
+                key={idx}
+                className="inline-flex items-center rounded-full border border-gray-200 px-3 py-1 text-xs font-semibold text-gray-600 dark:border-gray-700 dark:text-gray-200"
+              >
+                {getShortName(key)}: {signTeller(key)}
+                {showDollarSign(key)}
+                {value}
+                {symbolToShow(key) ? "%" : ""}
+              </span>
+            ))}
+        {requiredTeamMembers &&
+          Object.entries(requiredTeamMembers).map(([member, count], index) =>
+            count > 0 ? (
+              <span
+                key={index}
+                className="inline-flex items-center gap-1 rounded-full border border-gray-200 px-3 py-1 text-xs font-semibold text-gray-600 dark:border-gray-700 dark:text-gray-200"
+              >
+                <Users className="h-3.5 w-3.5" />
+                <span className="capitalize">{member}</span>
+                <span>{count}</span>
+              </span>
+            ) : null,
+          )}
+      </div>
 
-    {showDescription && (
-      <p className="mt-4 text-sm text-gray-600 dark:text-gray-300">{description}</p>
-    )}
-  </div>
-);
+      {showDescription && (
+        <p className="mt-4 text-sm text-gray-600 dark:text-gray-300">{description}</p>
+      )}
+    </div>
+  );
 };
 interface BrainstormModalProps {
   isOpen: boolean;
@@ -624,9 +620,9 @@ const TaskGrid: React.FC = () => {
   // ... inside TaskGrid component ...
 
   // ✅ ADD THIS: Filter logic to process tasks based on activeFilters
-  
 
-// ... rest of the component
+
+  // ... rest of the component
 
   const [selectedTasks, setSelectedTasks] = useState<Set<string>>(new Set());
   const [brainstormModalOpen, setBrainstormModalOpen] = useState(false);
@@ -739,39 +735,39 @@ const TaskGrid: React.FC = () => {
     }
   }, [user?.tasks, showBrainstormTutorial]);
   // inside TaskGrid component, after other useEffects that depend on `user`
-useEffect(() => {
-  if (!user?.tasks) return;
+  useEffect(() => {
+    if (!user?.tasks) return;
 
-  // Build sets for quick existence checks:
-  const existingObjectIdSet = new Set(user.tasks.map((t: any) => t._id)); // _id (bugs + tasks)
-  const existingTaskIdSet = new Set(
-    user.tasks
-      .filter((t: any) => !t.isBug && t.taskId)
-      .map((t: any) => t.taskId)
-  );
+    // Build sets for quick existence checks:
+    const existingObjectIdSet = new Set(user.tasks.map((t: any) => t._id)); // _id (bugs + tasks)
+    const existingTaskIdSet = new Set(
+      user.tasks
+        .filter((t: any) => !t.isBug && t.taskId)
+        .map((t: any) => t.taskId)
+    );
 
-  // Clean selectedTasks (a Set of task._id)
-  setSelectedTasks((prev) => {
-    const newSet = new Set<string>();
-    for (const id of Array.from(prev)) {
-      if (existingObjectIdSet.has(id)) newSet.add(id);
-    }
-    return newSet;
-  });
-
-  // Clean selectedTaskIds (array of { taskId } or { bugId })
-  setSelectedTaskIds((prevArr: any[]) => {
-    return prevArr.filter((idObj) => {
-      if (idObj.bugId) {
-        return existingObjectIdSet.has(idObj.bugId);
+    // Clean selectedTasks (a Set of task._id)
+    setSelectedTasks((prev) => {
+      const newSet = new Set<string>();
+      for (const id of Array.from(prev)) {
+        if (existingObjectIdSet.has(id)) newSet.add(id);
       }
-      if (idObj.taskId) {
-        return existingTaskIdSet.has(idObj.taskId);
-      }
-      return false;
+      return newSet;
     });
-  });
-}, [user?.tasks, setSelectedTaskIds]);
+
+    // Clean selectedTaskIds (array of { taskId } or { bugId })
+    setSelectedTaskIds((prevArr: any[]) => {
+      return prevArr.filter((idObj) => {
+        if (idObj.bugId) {
+          return existingObjectIdSet.has(idObj.bugId);
+        }
+        if (idObj.taskId) {
+          return existingTaskIdSet.has(idObj.taskId);
+        }
+        return false;
+      });
+    });
+  }, [user?.tasks, setSelectedTaskIds]);
 
   const handleTaskToggle = (task: any) => {
     const newSelected = new Set(selectedTasks);
@@ -796,8 +792,9 @@ useEffect(() => {
         if (alreadyExists) return prev;
 
         return task.isBug
-          ? [...prev, { bugId: task._id }]
-          : [...prev, { taskId: task.taskId }];
+          ? [...prev, { bugId: task._id, isBug: true }]
+          : [...prev, { taskId: task.taskId, isBug: false }];
+
       });
       try {
         playSound("taskSelect");
@@ -992,56 +989,56 @@ useEffect(() => {
 
 
   const metrics = ["UA", "C1", "AOV", "COGS", "APC", "CPA", "bugs"];
-const makeBrainstrom = async (turnAmount: string) => {
-  setloader(true);
-  try {
-    const token = localStorage.getItem("userToken");
-    if (!token) {
-      alert("User is not authenticated. Please log in.");
-      return;
-    }
-
-    const makeReq = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/brainstrom`,
-      {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-          token: token,
-        },
-        body: JSON.stringify({
-          turnAmount: turnAmount,
-          gameId: user?.gameId,
-          brainstromBoost: powerBoost,
-        }),
+  const makeBrainstrom = async (turnAmount: string) => {
+    setloader(true);
+    try {
+      const token = localStorage.getItem("userToken");
+      if (!token) {
+        alert("User is not authenticated. Please log in.");
+        return;
       }
-    );
 
-    if (makeReq.ok) {
-      const response = await makeReq.json();
-      setUser(response);
-      const updatedNotifications = [...notificationMessages, ...response.message];
-      setnotificationMessages(updatedNotifications);
-      // Play success sound
-      playSound("success");
-      // Persist notifications
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('gameNotifications', JSON.stringify(updatedNotifications));
+      const makeReq = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/brainstrom`,
+        {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+            token: token,
+          },
+          body: JSON.stringify({
+            turnAmount: turnAmount,
+            gameId: user?.gameId,
+            brainstromBoost: powerBoost,
+          }),
+        }
+      );
+
+      if (makeReq.ok) {
+        const response = await makeReq.json();
+        setUser(response);
+        const updatedNotifications = [...notificationMessages, ...response.message];
+        setnotificationMessages(updatedNotifications);
+        // Play success sound
+        playSound("success");
+        // Persist notifications
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('gameNotifications', JSON.stringify(updatedNotifications));
+        }
+        setPowerBoost(false);
+      } else {
+        const errorResponse = await makeReq.json();
+        console.error("Failed to make brainstrom request:", errorResponse);
+        alert(errorResponse.message || "Something went wrong.");
       }
-      setPowerBoost(false);
-    } else {
-      const errorResponse = await makeReq.json();
-      console.error("Failed to make brainstrom request:", errorResponse);
-      alert(errorResponse.message || "Something went wrong.");
+    } catch (error) {
+      console.error("Error in makeBrainstrom:", error);
+      alert("An error occurred while making the request.");
+    } finally {
+      setloader(false);
     }
-  } catch (error) {
-    console.error("Error in makeBrainstrom:", error);
-    alert("An error occurred while making the request.");
-  } finally {
-    setloader(false);
-  }
-};
+  };
 
   return (
     <>
@@ -1066,11 +1063,11 @@ const makeBrainstrom = async (turnAmount: string) => {
         metrics={
           cancelModal.task
             ? Object.entries(cancelModal.task.metricsImpact)
-                .filter(([, value]) => value !== undefined && value !== 0)
-                .map(([key, value]) => ({
-                  name: getShortName(key),
-                  value: value as number,
-                }))
+              .filter(([, value]) => value !== undefined && value !== 0)
+              .map(([key, value]) => ({
+                name: getShortName(key),
+                value: value as number,
+              }))
             : []
         }
         onConfirm={handleCancelConfirm}
@@ -1090,7 +1087,7 @@ const makeBrainstrom = async (turnAmount: string) => {
           brainstromTaskAmountMap[(user?.startupStage as Stage) || "FFF"]
             .taskToGenerate
             ? brainstromTaskAmountMap[(user?.startupStage as Stage) || "FFF"]
-                .taskToGenerate
+              .taskToGenerate
             : 15
         }
         onConfirm={async () => {
@@ -1106,44 +1103,43 @@ const makeBrainstrom = async (turnAmount: string) => {
         setPowerBoost={setPowerBoost}
       />
 
-    <div className="flex flex-col space-y-4 px-4 pb-40 lg:pb-48">
+      <div className="flex flex-col space-y-4 px-4 pb-40 lg:pb-48">
         <div className="flex flex-wrap justify-between gap-2">
           {user?.difficultyMode !== "intermediate" ?
-          <div className="flex flex-wrap gap-2">
-            <FilterButton
-              label={t("dashboard.allTasks")}
-              count={user?.tasks?.length}
-              isActive={activeFilters.has("all")}
-              onClick={() => toggleFilter("all")}
-            />
-            <FilterButton
-              label={t("dashboard.inProgress")}
-              count={selectedTasks.size}
-              isActive={activeFilters.has("in_progress")}
-              onClick={() => toggleFilter("in_progress")}
-            />
-            {metrics.map((metric) => (
+            <div className="flex flex-wrap gap-2">
               <FilterButton
-                key={metric}
-                label={metric}
-                isActive={activeFilters.has(metric)}
-                onClick={() => toggleFilter(metric)}
+                label={t("dashboard.allTasks")}
+                count={user?.tasks?.length}
+                isActive={activeFilters.has("all")}
+                onClick={() => toggleFilter("all")}
               />
-            ))}
-            <button
-              onClick={() => setActiveFilters(new Set(["all"]))}
-              className="text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
-            >
-              {t("dashboard.resetFilters")}
-            </button>
-          </div> : <></>}
+              <FilterButton
+                label={t("dashboard.inProgress")}
+                count={selectedTasks.size}
+                isActive={activeFilters.has("in_progress")}
+                onClick={() => toggleFilter("in_progress")}
+              />
+              {metrics.map((metric) => (
+                <FilterButton
+                  key={metric}
+                  label={metric}
+                  isActive={activeFilters.has(metric)}
+                  onClick={() => toggleFilter(metric)}
+                />
+              ))}
+              <button
+                onClick={() => setActiveFilters(new Set(["all"]))}
+                className="text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
+              >
+                {t("dashboard.resetFilters")}
+              </button>
+            </div> : <></>}
           <button
             ref={brainstormButtonRef}
-            className={`flex self-end rounded-lg bg-gray-900 dark:bg-gray-700 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 dark:hover:bg-gray-600 transition-colors shadow-sm ${
-              showBrainstormTutorial 
-                ? 'ring-2 ring-gray-300 dark:ring-gray-500 ring-offset-2 ring-offset-transparent relative z-[99999]' 
-                : ''
-            }`}
+            className={`flex self-end rounded-lg bg-gray-900 dark:bg-gray-700 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 dark:hover:bg-gray-600 transition-colors shadow-sm ${showBrainstormTutorial
+              ? 'ring-2 ring-gray-300 dark:ring-gray-500 ring-offset-2 ring-offset-transparent relative z-[99999]'
+              : ''
+              }`}
             onClick={(e) => {
               e.stopPropagation();
               playSound("brainstorm");

@@ -574,7 +574,7 @@ const ECommerce: React.FC = () => {
   useEffect(() => {
     // console.log("User state changed:", user);
     forceRender((prev) => prev + 1);
-    
+
     // Don't initialize previous metrics from current metrics on first load
     // This would prevent showing changes. Only load from localStorage or set after a turn.
   }, [user]);
@@ -638,7 +638,9 @@ const ECommerce: React.FC = () => {
       (prev) => {
         return prev.filter((elem: any) => {
           return user?.tasks.some((e) => {
-            return e.taskId === elem.taskId && e.isBug === elem.isBug
+            if (elem.bugId) return e._id === elem.bugId && e.isBug
+            if (elem.taskId) return e.taskId === elem.taskId && !e.isBug
+
           })
         })
       }
@@ -953,13 +955,13 @@ const ECommerce: React.FC = () => {
   // Scroll detection for Make Turn button
   useEffect(() => {
     let scrollTimeout: NodeJS.Timeout;
-    
+
     const handleScroll = () => {
       setIsScrolling(true);
-      
+
       // Clear existing timeout
       clearTimeout(scrollTimeout);
-      
+
       // Set timeout to detect when scrolling stops
       scrollTimeout = setTimeout(() => {
         setIsScrolling(false);
@@ -974,7 +976,7 @@ const ECommerce: React.FC = () => {
       };
     }
   }, []);
-  
+
   async function makeTurn(turnAmount: string) {
     setloader(true);
     const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -1038,7 +1040,7 @@ const ECommerce: React.FC = () => {
       setUserState(response);
       const updatedNotifications = [...notificationMessages, ...response.message];
       setnotificationMessages(updatedNotifications);
-      
+
       // Persist updated notifications
       if (typeof window !== 'undefined') {
         localStorage.setItem('gameNotifications', JSON.stringify(updatedNotifications));
@@ -1046,7 +1048,7 @@ const ECommerce: React.FC = () => {
 
       // Check for stage upgrade
       const stageChanged = previousState && previousState.startupStage !== response.startupStage;
-      
+
       if (stageChanged && previousState) {
         // Get next goal from stagesInfo
         const getNextGoal = (stage: string): string => {
@@ -1068,7 +1070,7 @@ const ECommerce: React.FC = () => {
         };
 
         const nextGoal = getNextGoal(response.startupStage);
-        
+
         // Set stage upgrade data and show modal
         setStageUpgradeData({
           previousStage: previousState.startupStage,
@@ -1172,7 +1174,7 @@ const ECommerce: React.FC = () => {
     const info = metricsInfo[metricKey];
     if (info) {
       setSelectedMetric(metricKey);
-      
+
       // Translate title if not English
       let translatedTitle = info.title;
       if (language !== 'en') {
@@ -1182,12 +1184,12 @@ const ECommerce: React.FC = () => {
           console.warn('Failed to translate metric title:', error);
         }
       }
-      
+
       setModalInfo({
         isOpen: true,
         title: translatedTitle,
         content: (
-          <MetricModalContent 
+          <MetricModalContent
             title={info.title}
             content={info.content}
           />
@@ -1206,7 +1208,7 @@ const ECommerce: React.FC = () => {
         title: info.title,
         anchorEl: event.currentTarget,
         content: (
-          <StageModalContent 
+          <StageModalContent
             info={info}
           />
         ),
@@ -1254,9 +1256,8 @@ const ECommerce: React.FC = () => {
         notEnoughCredits ? <NotEnoughCredits /> : null
       }
       <div
-        className={`mb-8 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900/40 p-5 shadow-sm transition-all duration-300 ${
-          elonStep === 1 ? "ring-2 ring-blue-500 animate-pulse" : ""
-        }`}
+        className={`mb-8 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900/40 p-5 shadow-sm transition-all duration-300 ${elonStep === 1 ? "ring-2 ring-blue-500 animate-pulse" : ""
+          }`}
       >
         <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between mb-4">
           <div>
@@ -1288,9 +1289,9 @@ const ECommerce: React.FC = () => {
 
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
           {stages.map((stage, index) => {
-            
-            const isLocked = index > 1 && !user?.isPurchaseDone ;
-          
+
+            const isLocked = index > 1 && !user?.isPurchaseDone;
+
             const isActive = user?.startupStage === stage;
             return (
               <button
@@ -1298,11 +1299,10 @@ const ECommerce: React.FC = () => {
                 onClick={(e) => handleStageClick(stage, e)}
                 onMouseEnter={() => setHoveredStage(stage)}
                 onMouseLeave={() => setHoveredStage(null)}
-                className={`flex items-center justify-between rounded-xl border px-4 py-3 text-left transition-all ${
-                  isActive
+                className={`flex items-center justify-between rounded-xl border px-4 py-3 text-left transition-all ${isActive
                     ? "border-gray-900 bg-gray-900 text-white shadow-md dark:border-gray-100 dark:bg-gray-100 dark:text-gray-900"
                     : "border-gray-200 bg-gray-50 text-gray-700 hover:border-gray-400 dark:border-gray-800 dark:bg-gray-800/40 dark:text-gray-200 dark:hover:border-gray-600"
-                }`}
+                  }`}
                 data-tooltip-id="my-tooltip"
                 data-tooltip-content={
                   isLocked ? t("dashboard.purchasePlanToPlay") : ""
@@ -1321,9 +1321,8 @@ const ECommerce: React.FC = () => {
 
 
       <div
-        className={`mb-8 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900/40 p-5 shadow-sm transition-all duration-300 ${
-          elonStep === 2 ? "ring-2 ring-blue-500 animate-pulse" : ""
-        }`}
+        className={`mb-8 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900/40 p-5 shadow-sm transition-all duration-300 ${elonStep === 2 ? "ring-2 ring-blue-500 animate-pulse" : ""
+          }`}
       >
         <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between mb-4">
           <div>
@@ -1373,7 +1372,7 @@ const ECommerce: React.FC = () => {
                       const prevValue = previousMetrics[metric];
                       const currentValue = user.metrics[metric];
                       const change = currentValue - prevValue;
-                      
+
                       // Show percentage if there's any change (even small ones)
                       if (Math.abs(change) > 0.0001) {
                         if (Math.abs(prevValue) > 0.0001) {
@@ -1397,11 +1396,10 @@ const ECommerce: React.FC = () => {
                           {dollarMetrics.includes(shortName) ? "$" : ""}
                         </span>
                         {percentageChange !== null && Math.abs(percentageChange) >= 0.01 && (
-                          <span className={`mt-1 text-xs font-semibold ${
-                            percentageChange > 0 
-                              ? "text-green-600 dark:text-green-400" 
+                          <span className={`mt-1 text-xs font-semibold ${percentageChange > 0
+                              ? "text-green-600 dark:text-green-400"
                               : "text-red-600 dark:text-red-400"
-                          }`}>
+                            }`}>
                             {percentageChange > 0 ? "+" : ""}{percentageChange.toFixed(2)}%
                           </span>
                         )}
@@ -1464,8 +1462,8 @@ const ECommerce: React.FC = () => {
           hover:shadow-[0_20px_50px_rgba(0,0,0,0.4)] hover:shadow-gray-900/60
           active:scale-100 active:translate-y-0
           group relative overflow-hidden
-          ${isScrolling 
-            ? 'px-4 py-3 min-w-[60px] md:min-w-[200px] rounded-full' 
+          ${isScrolling
+            ? 'px-4 py-3 min-w-[60px] md:min-w-[200px] rounded-full'
             : 'px-6 py-4 min-w-[180px] md:min-w-[200px] flex-col'
           }
           ${elonStep === 7 ? 'ring-2 ring-blue-500 animate-pulse' : ''}
@@ -1473,7 +1471,7 @@ const ECommerce: React.FC = () => {
       >
         {/* Animated gradient shimmer effect on hover */}
         <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 ease-in-out"></span>
-        
+
         {/* Bug count badge */}
         {(() => {
           const bugCount = user?.tasks?.filter((task: any) => task.isBug === true).length || 0;
@@ -1483,7 +1481,7 @@ const ECommerce: React.FC = () => {
             </span>
           ) : null;
         })()}
-        
+
         {isScrolling ? (
           <span className="font-bold text-white text-lg relative z-10 group-hover:scale-110 transition-transform duration-300">{t("dashboard.makeTurn")}</span>
         ) : (
@@ -1563,14 +1561,14 @@ const ECommerce: React.FC = () => {
                     <div
                       key={idx}
                       className={`rounded-lg p-4 border ${msg.isPositive
-                          ? "bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800"
-                          : "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800"
+                        ? "bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800"
+                        : "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800"
                         }`}
                     >
                       <p
                         className={`text-sm font-medium ${msg.isPositive
-                            ? "text-green-700 dark:text-green-400"
-                            : "text-red-700 dark:text-red-400"
+                          ? "text-green-700 dark:text-green-400"
+                          : "text-red-700 dark:text-red-400"
                           }`}
                       >
                         {msg.message}
@@ -1694,8 +1692,8 @@ const ECommerce: React.FC = () => {
                         />
                       )}
                       <div className={`whitespace-pre-wrap break-words px-4 py-3 rounded-2xl text-sm shadow-md ${isUser
-                          ? "bg-blue-600 text-white"
-                          : "bg-gray-100 dark:bg-[#2d3746]/70 text-gray-900 dark:text-white"
+                        ? "bg-blue-600 text-white"
+                        : "bg-gray-100 dark:bg-[#2d3746]/70 text-gray-900 dark:text-white"
                         }`}>
                         {idx === 0 && !isUser
                           ? <TypewriterText text={msg.text} speed={20} />
