@@ -47,21 +47,21 @@ export default function RootLayout({
                   <SessionProvider>
                     <AuthSyncHandler />
                     {loading ? <Loader /> : children}
-                <ToastContainer
-                  position="top-right"
-                  autoClose={5000}
-                  hideProgressBar={false}
-                  newestOnTop={false}
-                  closeOnClick
-                  rtl={false}
-                  pauseOnFocusLoss
-                  draggable
-                  pauseOnHover
-                  theme="light"
-                  transition={Bounce}
-                  style={{ zIndex: 999999 }}
-                  toastClassName="toast-high-z-index"
-                />
+                    <ToastContainer
+                      position="top-right"
+                      autoClose={5000}
+                      hideProgressBar={false}
+                      newestOnTop={false}
+                      closeOnClick
+                      rtl={false}
+                      pauseOnFocusLoss
+                      draggable
+                      pauseOnHover
+                      theme="light"
+                      transition={Bounce}
+                      style={{ zIndex: 999999 }}
+                      toastClassName="toast-high-z-index"
+                    />
                 </SessionProvider>
               </NotificationProvider>
             </SoundProvider>
