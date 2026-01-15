@@ -1802,7 +1802,7 @@ const ECommerce: React.FC = () => {
                         {getShortName(metric)}
                       </span>
                     </div>
-                    <p className="mt-2 text-3xl font-semibold text-white mt-16">
+                    <p className="mt-2 text-3xl font-semibold text-white mt-14">
                       {(() => {
                         const shortName = getShortName(metric);
                         const value = user?.metrics?.[metric] ?? 0;
