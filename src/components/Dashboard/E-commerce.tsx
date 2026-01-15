@@ -31,6 +31,7 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { Lock } from "lucide-react";
 import NotEnoughCredits from "../Sidebar/notEnoughCredits";
+import TeamManagementModal from "../Sidebar/TeamManagementModal";
 // import notEnoughVenture coins from "../Sidebar/notEnoughVenture coins";
 
 const MapOne = dynamic(() => import("@/components/Maps/MapOne"), {
@@ -104,6 +105,70 @@ interface Metric {
   title: string;
   value: string;
 }
+
+const StageStar: React.FC<{
+  isActive: boolean;
+  isCompleted: boolean;
+  isLocked: boolean;
+}> = ({ isActive, isCompleted, isLocked }) => {
+  const baseGlow =
+    "absolute inset-0 rounded-full blur-lg bg-gradient-to-r from-[#FAA2FF] via-[#FF8EEE] to-[#7A38FF]";
+
+  return (
+    <div className="relative flex items-center justify-center">
+      {(isActive || isCompleted) && (
+        <span
+          className={`${baseGlow} opacity-70`}
+          aria-hidden="true"
+        />
+      )}
+      <svg
+        width="35"
+        height="35"
+        viewBox="0 0 35 35"
+        xmlns="http://www.w3.org/2000/svg"
+        className={`relative h-7 w-7 drop-shadow-md ${isLocked ? "opacity-40" : "opacity-100"
+          }`}
+      >
+        <defs>
+          <linearGradient
+            id="stage-star-gradient"
+            x1="9.55709"
+            y1="32.0524"
+            x2="38.4765"
+            y2="-0.153282"
+            gradientUnits="userSpaceOnUse"
+          >
+            <stop stopColor="#FAA2FF" />
+            <stop offset="1" stopColor="#7A38FF" />
+          </linearGradient>
+        </defs>
+        <path
+          d="M3.39462 22.5879C-1.1314 20.406 -1.1314 13.9602 3.39462 11.7783L7.16262 9.9619C8.38553 9.37237 9.37236 8.38553 9.9619 7.16262L11.7783 3.39462C13.9602 -1.1314 20.406 -1.1314 22.5879 3.39462L24.4043 7.16262C24.9938 8.38553 25.9807 9.37237 27.2036 9.9619L30.9716 11.7783C35.4976 13.9602 35.4976 20.406 30.9716 22.5879L27.2036 24.4043C25.9807 24.9938 24.9938 25.9807 24.4043 27.2036L22.5879 30.9716C20.406 35.4976 13.9602 35.4976 11.7783 30.9716L9.9619 27.2036C9.37236 25.9807 8.38553 24.9938 7.16262 24.4043L3.39462 22.5879Z"
+          fill="url(#stage-star-gradient)"
+        />
+      </svg>
+    </div>
+  );
+};
+
+const DevIcon = () => (
+  <svg width="33" height="33" viewBox="0 0 33 33" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M13.4446 27.419L19.5554 5.58076M24.9 11.2318L30.2446 16.8829L24.5936 22.2276M8.09997 21.7679L2.75532 16.1168L8.40641 10.7722" stroke="#FFAAEA" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+
+const CeoIcon = () => (
+  <svg width="22" height="27" viewBox="0 0 22 27" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M16.125 6.5C16.125 7.95869 15.5455 9.35764 14.5141 10.3891C13.4826 11.4205 12.0837 12 10.625 12C9.16631 12 7.76736 11.4205 6.73591 10.3891C5.70446 9.35764 5.125 7.95869 5.125 6.5C5.125 5.04131 5.70446 3.64236 6.73591 2.61091C7.76736 1.57946 9.16631 1 10.625 1C12.0837 1 13.4826 1.57946 14.5141 2.61091C15.5455 3.64236 16.125 5.04131 16.125 6.5ZM10.625 16.125C8.07229 16.125 5.62413 17.1391 3.8191 18.9441C2.01406 20.7491 1 23.1973 1 25.75H20.25C20.25 23.1973 19.2359 20.7491 17.4309 18.9441C15.6259 17.1391 13.1777 16.125 10.625 16.125Z" stroke="#FFAAEA" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+
+const SalesIcon = () => (
+  <svg width="33" height="33" viewBox="0 0 33 33" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M23.375 27.5H30.25V24.75C30.2499 23.8927 29.9828 23.0568 29.4857 22.3584C28.9886 21.6599 28.2862 21.1337 27.4763 20.8529C26.6663 20.5721 25.789 20.5506 24.9662 20.7914C24.1435 21.0322 23.4162 21.5234 22.8855 22.1966M23.375 27.5H9.625M23.375 27.5V24.75C23.375 23.848 23.2017 22.9859 22.8855 22.1966M22.8855 22.1966C22.3749 20.9206 21.4937 19.8268 20.3555 19.0563C19.2173 18.2858 17.8744 17.874 16.5 17.874C15.1256 17.874 13.7827 18.2858 12.6445 19.0563C11.5063 19.8268 10.6251 20.9206 10.1145 22.1966M9.625 27.5H2.75V24.75C2.75006 23.8927 3.01721 23.0568 3.51431 22.3584C4.01141 21.6599 4.71376 21.1337 5.52372 20.8529C6.33368 20.5721 7.21102 20.5506 8.03376 20.7914C8.85651 21.0322 9.58379 21.5234 10.1145 22.1966M9.625 27.5V24.75C9.625 23.848 9.79825 22.9859 10.1145 22.1966M20.625 9.625C20.625 10.719 20.1904 11.7682 19.4168 12.5418C18.6432 13.3154 17.594 13.75 16.5 13.75C15.406 13.75 14.3568 13.3154 13.5832 12.5418C12.8096 11.7682 12.375 10.719 12.375 9.625C12.375 8.53098 12.8096 7.48177 13.5832 6.70818C14.3568 5.9346 15.406 5.5 16.5 5.5C17.594 5.5 18.6432 5.9346 19.4168 6.70818C20.1904 7.48177 20.625 8.53098 20.625 9.625ZM28.875 13.75C28.875 14.4793 28.5853 15.1788 28.0695 15.6945C27.5538 16.2103 26.8543 16.5 26.125 16.5C25.3957 16.5 24.6962 16.2103 24.1805 15.6945C23.6647 15.1788 23.375 14.4793 23.375 13.75C23.375 13.0207 23.6647 12.3212 24.1805 11.8055C24.6962 11.2897 25.3957 11 26.125 11C26.8543 11 27.5538 11.2897 28.0695 11.8055C28.5853 12.3212 28.875 13.0207 28.875 13.75ZM9.625 13.75C9.625 14.4793 9.33527 15.1788 8.81954 15.6945C8.30382 16.2103 7.60435 16.5 6.875 16.5C6.14565 16.5 5.44618 16.2103 4.93046 15.6945C4.41473 15.1788 4.125 14.4793 4.125 13.75C4.125 13.0207 4.41473 12.3212 4.93046 11.8055C5.44618 11.2897 6.14565 11 6.875 11C7.60435 11 8.30382 11.2897 8.81954 11.8055C9.33527 12.3212 9.625 13.0207 9.625 13.75Z" stroke="#FFAAEA" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
 
 const InfoModal: React.FC<ModalProps> = ({
   isOpen,
@@ -575,6 +640,7 @@ const ECommerce: React.FC = () => {
     // console.log("User state changed:", user);
     forceRender((prev) => prev + 1);
 
+
     // Don't initialize previous metrics from current metrics on first load
     // This would prevent showing changes. Only load from localStorage or set after a turn.
   }, [user]);
@@ -894,6 +960,7 @@ const ECommerce: React.FC = () => {
     nextGoal: string;
   } | null>(null);
   const [pendingTurnProgress, setPendingTurnProgress] = useState(false);
+  const [showTeamModal, setShowTeamModal] = useState(false);
 
   // Load persisted data on mount
   useEffect(() => {
@@ -956,11 +1023,14 @@ const ECommerce: React.FC = () => {
   useEffect(() => {
     let scrollTimeout: NodeJS.Timeout;
 
+
     const handleScroll = () => {
       setIsScrolling(true);
 
+
       // Clear existing timeout
       clearTimeout(scrollTimeout);
+
 
       // Set timeout to detect when scrolling stops
       scrollTimeout = setTimeout(() => {
@@ -976,6 +1046,7 @@ const ECommerce: React.FC = () => {
       };
     }
   }, []);
+
 
   async function makeTurn(turnAmount: string) {
     setloader(true);
@@ -1041,6 +1112,7 @@ const ECommerce: React.FC = () => {
       const updatedNotifications = [...notificationMessages, ...response.message];
       setnotificationMessages(updatedNotifications);
 
+
       // Persist updated notifications
       if (typeof window !== 'undefined') {
         localStorage.setItem('gameNotifications', JSON.stringify(updatedNotifications));
@@ -1048,6 +1120,7 @@ const ECommerce: React.FC = () => {
 
       // Check for stage upgrade
       const stageChanged = previousState && previousState.startupStage !== response.startupStage;
+
 
       if (stageChanged && previousState) {
         // Get next goal from stagesInfo
@@ -1070,6 +1143,7 @@ const ECommerce: React.FC = () => {
         };
 
         const nextGoal = getNextGoal(response.startupStage);
+
 
         // Set stage upgrade data and show modal
         setStageUpgradeData({
@@ -1167,6 +1241,18 @@ const ECommerce: React.FC = () => {
     "pre-IPO",
     "IPO",
   ];
+  const activeStageIndex =
+    user && user.startupStage
+      ? stages.findIndex((s) => s === user.startupStage)
+      : -1;
+
+  const getRoleCount = (role: string) => {
+    return (
+      user?.teamMembers?.find(
+        (m: any) => m.roleName?.toLowerCase() === role.toLowerCase(),
+      )?.quantity || 0
+    );
+  };
   const handleMetricClick = async (
     metricKey: string,
     event: React.MouseEvent<HTMLElement>,
@@ -1174,6 +1260,7 @@ const ECommerce: React.FC = () => {
     const info = metricsInfo[metricKey];
     if (info) {
       setSelectedMetric(metricKey);
+
 
       // Translate title if not English
       let translatedTitle = info.title;
@@ -1184,6 +1271,7 @@ const ECommerce: React.FC = () => {
           console.warn('Failed to translate metric title:', error);
         }
       }
+
 
       setModalInfo({
         isOpen: true,
@@ -1233,217 +1321,862 @@ const ECommerce: React.FC = () => {
 
 
   return (
-    <>
+    <div className="relative w-full bg-[#050509] text-gray-100">
       <Tooltip id="my-tooltip" />
       {showElon && <ElonAssistant onStepChange={setElonStep} />}
       {loader && (
         <div className="fixed inset-0 z-[99999] flex flex-col items-center justify-center bg-black/50 backdrop-blur-sm">
-          <div className="flex gap-2 mb-4">
-            <div className="h-4 w-4 animate-bounce rounded-full bg-blue-700 [animation-delay:.1s]"></div>
-            <div className="h-4 w-4 animate-bounce rounded-full bg-blue-700 [animation-delay:.3s]"></div>
-            <div className="h-4 w-4 animate-bounce rounded-full bg-blue-700 [animation-delay:.5s]"></div>
+          <div className="mb-4 flex gap-2">
+            <div className="h-4 w-4 animate-bounce rounded-full bg-blue-700 [animation-delay:.1s]" />
+            <div className="h-4 w-4 animate-bounce rounded-full bg-blue-700 [animation-delay:.3s]" />
+            <div className="h-4 w-4 animate-bounce rounded-full bg-blue-700 [animation-delay:.5s]" />
           </div>
-          <p className="text-white text-sm font-medium mt-2">{loaderMessage}</p>
+          <p className="mt-2 text-sm font-medium text-white">{loaderMessage}</p>
         </div>
       )}
 
-      {
-        gameOverModal ? <GameOverModal /> : null
-      }
+      {gameOverModal ? <GameOverModal /> : null}
 
+      {notEnoughCredits ? <NotEnoughCredits /> : null}
 
-      {
-        notEnoughCredits ? <NotEnoughCredits /> : null
-      }
-      <div
-        className={`mb-8 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900/40 p-5 shadow-sm transition-all duration-300 ${elonStep === 1 ? "ring-2 ring-blue-500 animate-pulse" : ""
-          }`}
-      >
-        <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between mb-4">
-          <div>
-            <p className="text-xs uppercase tracking-[0.2em] text-gray-500 dark:text-gray-400">
-              {t("dashboard.startupStages")}
-            </p>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-              {t("dashboard.chooseStage")}
-            </h3>
-          </div>
-          <div className="text-sm text-gray-500 dark:text-gray-400">
-            {user?.startupStage === "FFF"
-              ? `${t("dashboard.goal")}: ${t("dashboard.reachBuyers", { count: 10 })}`
-              : user?.startupStage === "Angels"
-                ? `${t("dashboard.goal")}: ${t("dashboard.reachBuyers", { count: 100 })}`
-                : user?.startupStage === "pre_seed"
-                  ? `${t("dashboard.goal")}: ${t("dashboard.reachBuyers", { count: 500 })}`
-                  : user?.startupStage === "Seed"
-                    ? `${t("dashboard.goal")}: ${t("dashboard.reachBuyersWithCM", { count: "2,500" })}`
-                    : user?.startupStage === "a"
-                      ? `${t("dashboard.goal")}: ${t("dashboard.reachBuyersWithCMAndRevenue", { count: "10,000", cm: "100k", revenue: "0" })}`
-                      : user?.startupStage === "b"
-                        ? `${t("dashboard.goal")}: ${t("dashboard.reachBuyersWithCMAndRevenue", { count: "50,000", cm: "500k", revenue: "100k" })}`
-                        : user?.startupStage === "c"
-                          ? `${t("dashboard.goal")}: ${t("dashboard.reachBuyersWithCMAndRevenue", { count: "100,000", cm: "1M", revenue: "500k" })}`
-                          : t("dashboard.highestStageUnlocked")}
-          </div>
-        </div>
+      {/* Dashboard background + centered content column */}
+      <div className="mx-auto flex min-h-[calc(100vh-5rem)] w-full flex-col gap-6 px-2 pt-4 pb-10 md:px-0 md:pt-6">
+        {/* Startup stages card */}
+        <div
+          className={`rounded-3xl border border-gray-800 bg-[#151516] px-6 py-5 shadow-[0_24px_80px_rgba(0,0,0,0.6)] transition-all duration-300 ${elonStep === 1 ? "ring-2 ring-blue-500 animate-pulse" : ""
+            }`}
+        >
+          <div className="flex items-start justify-between gap-4">
+            {/* Business idea */}
+            <div className="min-w-[180px]">
+              <p className="text-xs font-medium uppercase tracking-[0.18em] text-gray-500">
+                Business Idea
+              </p>
+              <p className="mt-1 text-sm font-semibold text-white">
+                {user?.gameName || "Your Startup"}
+              </p>
+            </div>
 
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
-          {stages.map((stage, index) => {
+            {/* Progress track + stages */}
+            <div className="flex-1">
+              <div className="flex items-center justify-between mb-1">
+                <p className="text-xs uppercase tracking-[0.18em] text-gray-500">
+                  {t("dashboard.startupStages")}
+                </p>
+              </div>
 
-            const isLocked = index > 1 && !user?.isPurchaseDone;
+              <div className="relative mt-3">
+                {/* Base track */}
+                <div className="absolute left-3 right-3 top-3 h-[3px] -translate-y-1/2 rounded-full bg-gradient-to-r from-gray-800 via-gray-800 to-gray-800" />
 
-            const isActive = user?.startupStage === stage;
-            return (
-              <button
-                key={stage}
-                onClick={(e) => handleStageClick(stage, e)}
-                onMouseEnter={() => setHoveredStage(stage)}
-                onMouseLeave={() => setHoveredStage(null)}
-                className={`flex items-center justify-between rounded-xl border px-4 py-3 text-left transition-all ${isActive
-                    ? "border-gray-900 bg-gray-900 text-white shadow-md dark:border-gray-100 dark:bg-gray-100 dark:text-gray-900"
-                    : "border-gray-200 bg-gray-50 text-gray-700 hover:border-gray-400 dark:border-gray-800 dark:bg-gray-800/40 dark:text-gray-200 dark:hover:border-gray-600"
-                  }`}
-                data-tooltip-id="my-tooltip"
-                data-tooltip-content={
-                  isLocked ? t("dashboard.purchasePlanToPlay") : ""
-                }
-              >
-                <span className="text-sm font-semibold">{stage}</span>
-                <span className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
-                  {isLocked && <Lock size={12} />}
-                  {hoveredStage === stage && <InfoIcon size={12} />}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-      </div>
+                {/* Active progress */}
+                {activeStageIndex > -1 && stages.length > 1 && (
+                  <div
+                    className="absolute left-3 top-3 h-[3px] -translate-y-1/2 rounded-full bg-gradient-to-r from-[#FAA2FF] via-[#FF8EEE] to-[#7A38FF]"
+                    style={{
+                      width: `${(activeStageIndex / (stages.length - 1)) * 100}%`,
+                    }}
+                  />
+                )}
 
-
-      <div
-        className={`mb-8 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900/40 p-5 shadow-sm transition-all duration-300 ${elonStep === 2 ? "ring-2 ring-blue-500 animate-pulse" : ""
-          }`}
-      >
-        <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between mb-4">
-          <div>
-            <p className="text-xs uppercase tracking-[0.2em] text-gray-500 dark:text-gray-400">
-              {t("dashboard.coreMetrics")}
-            </p>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-              {t("dashboard.trackNumbers")}
-            </h3>
-          </div>
-          <p className="text-sm text-gray-500 dark:text-gray-400">
-            {t("dashboard.tapMetric")}
-          </p>
-        </div>
-
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
-          {user &&
-            user.metrics &&
-            orderedMetrics.map((metric, index) => (
-              <button
-                key={index}
-                onClick={(e) => handleMetricClick(getShortName(metric), e)}
-                className="rounded-xl border border-gray-200 bg-gray-50 p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-gray-400 hover:bg-white dark:border-gray-800 dark:bg-gray-800/60 dark:hover:border-gray-600"
-              >
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
-                    {getShortName(metric)}
-                  </span>
-                </div>
-                <p className="mt-2 text-xl font-semibold text-gray-900 dark:text-white">
-                  {(() => {
-                    const shortName = getShortName(metric);
-                    const value = user?.metrics?.[metric] ?? 0;
-
-                    let displayValue;
-                    if (shortName === "UA" || shortName === "B") {
-                      displayValue = Math.floor(value);
-                    } else if (Number.isInteger(value) || countDecimalPlaces(value) <= 2) {
-                      displayValue = value;
-                    } else {
-                      displayValue = value.toFixed(2);
-                    }
-
-                    // Calculate percentage change from previous turn
-                    let percentageChange: number | null = null;
-                    if (previousMetrics && previousMetrics[metric] !== undefined && user?.metrics) {
-                      const prevValue = previousMetrics[metric];
-                      const currentValue = user.metrics[metric];
-                      const change = currentValue - prevValue;
-
-                      // Show percentage if there's any change (even small ones)
-                      if (Math.abs(change) > 0.0001) {
-                        if (Math.abs(prevValue) > 0.0001) {
-                          // Calculate percentage change
-                          percentageChange = (change / Math.abs(prevValue)) * 100;
-                        } else if (Math.abs(currentValue) > 0.0001) {
-                          // Previous was near zero, show as 100% change
-                          percentageChange = currentValue > 0 ? 100 : -100;
-                        } else {
-                          // Both are near zero, no change
-                          percentageChange = null;
-                        }
-                      }
-                    }
+                {/* Stars + labels */}
+                <div className="relative flex items-center justify-between">
+                  {stages.map((stage, index) => {
+                    const isLocked = index > 1 && !user?.isPurchaseDone;
+                    const isActive = user?.startupStage === stage;
+                    const isCompleted =
+                      activeStageIndex > -1 && index < activeStageIndex;
 
                     return (
-                      <div className="flex flex-col">
-                        <span>
-                          {displayValue}
-                          {shortName === "C1" ? "%" : ""}
-                          {dollarMetrics.includes(shortName) ? "$" : ""}
+                      <button
+                        key={stage}
+                        type="button"
+                        onClick={(e) => handleStageClick(stage, e)}
+                        onMouseEnter={() => setHoveredStage(stage)}
+                        onMouseLeave={() => setHoveredStage(null)}
+                        className="flex flex-col items-center gap-1 text-center focus:outline-none"
+                        data-tooltip-id="my-tooltip"
+                        data-tooltip-content={
+                          isLocked ? t("dashboard.purchasePlanToPlay") : ""
+                        }
+                        disabled={isLocked}
+                      >
+                        <div className="relative">
+                          <StageStar
+                            isActive={isActive}
+                            isCompleted={isCompleted}
+                            isLocked={isLocked}
+                          />
+                          {isLocked && (
+                            <span className="absolute -right-2 -top-2 flex h-4 w-4 items-center justify-center rounded-full bg-gray-900 text-[10px] text-gray-200">
+                              <Lock size={10} />
+                            </span>
+                          )}
+                        </div>
+                        <span
+                          className={`text-[11px] font-medium ${isActive
+                            ? "text-white"
+                            : "text-gray-400"
+                            }`}
+                        >
+                          {stage.toUpperCase()}
                         </span>
-                        {percentageChange !== null && Math.abs(percentageChange) >= 0.01 && (
-                          <span className={`mt-1 text-xs font-semibold ${percentageChange > 0
-                              ? "text-green-600 dark:text-green-400"
-                              : "text-red-600 dark:text-red-400"
-                            }`}>
-                            {percentageChange > 0 ? "+" : ""}{percentageChange.toFixed(2)}%
-                          </span>
-                        )}
-                      </div>
+                      </button>
                     );
-                  })()}
+                  })}
+                </div>
+              </div>
+            </div>
+
+            {/* Goal */}
+            <div className="hidden mt-4 min-w-[160px] flex-col items-end text-right sm:flex">
+              <p className="text-xs font-medium uppercase tracking-[0.18em] text-gray-500">
+                Goal
+              </p>
+              <p className="mt-1 text-sm font-semibold text-white">
+                {user?.startupStage === "FFF"
+                  ? t("dashboard.reachBuyers", { count: 10 })
+                  : user?.startupStage === "Angels"
+                    ? t("dashboard.reachBuyers", { count: 100 })
+                    : user?.startupStage === "pre_seed"
+                      ? t("dashboard.reachBuyers", { count: 500 })
+                      : user?.startupStage === "Seed"
+                        ? t("dashboard.reachBuyersWithCM", {
+                          count: "2,500",
+                        })
+                        : user?.startupStage === "a"
+                          ? t("dashboard.reachBuyersWithCMAndRevenue", {
+                            count: "10,000",
+                            cm: "100k",
+                            revenue: "0",
+                          })
+                          : user?.startupStage === "b"
+                            ? t("dashboard.reachBuyersWithCMAndRevenue", {
+                              count: "50,000",
+                              cm: "500k",
+                              revenue: "100k",
+                            })
+                            : user?.startupStage === "c"
+                              ? t("dashboard.reachBuyersWithCMAndRevenue", {
+                                count: "100,000",
+                                cm: "1M",
+                                revenue: "500k",
+                              })
+                              : t("dashboard.highestStageUnlocked")}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Three-card grid: Team & Stakes | Core Metrics | Financials */}
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-6">
+          {/* Card 1: Team + Stakes */}
+          <div className="lg:col-span-1 rounded-3xl border border-gray-800 bg-[#151516] p-4 shadow-[0_24px_80px_rgba(0,0,0,0.6)]">
+            <div className="mb-4 flex items-center justify-between">
+              {/* <div>
+                <p className="text-xs uppercase tracking-[0.2em] text-gray-500">Team</p>
+                <h3 className="text-lg font-semibold text-white">Roles & Stakes</h3>
+              </div> */}
+              {/* <span className="text-[11px] text-gray-400">Edit Team</span> */}
+            </div>
+
+            <div className="mb-4 flex flex-col gap-3">
+              {["Investors", "Founders", "Mentors"].map((label) => {
+                const mapKey = label === "Investors" ? "Investors" : label === "Founders" ? "Founder" : "Mentor";
+                const pct = user?.financesBreakdown?.[mapKey] ?? 0;
+                return (
+                  <div key={label} className="space-y-1">
+                    <div className="flex items-center justify-between text-sm text-gray-200">
+                      <span>{label}</span>
+                      <span>{pct}%</span>
+                    </div>
+                    <div className="h-2 w-full overflow-hidden rounded-full bg-gray-800">
+                      <div
+                        className={`h-full rounded-full ${label === "Investors"
+                          ? "bg-[#34c9a5]"
+                          : label === "Founders"
+                            ? "bg-[#7b5ef7]"
+                            : "bg-[#ff6d63]"}`}
+                        style={{ width: `${Math.min(100, Math.max(0, pct))}%` }}
+                      />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            <button
+              onClick={() => {
+                playSound("click");
+                setShowTeamModal(true);
+              }}
+              className="text-[11px] text-gray-400 bg-[#111113] px-3 py-2 rounded-2xl inline-flex items-center gap-1 w-fit hover:bg-[#1a1a1c] transition-colors cursor-pointer"
+            >
+              Edit Team
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <g clipPath="url(#clip0_6511_181)">
+                  <path d="M8 2H3.33333C2.97971 2 2.64057 2.14048 2.39052 2.39052C2.14048 2.64057 2 2.97971 2 3.33333V12.6667C2 13.0203 2.14048 13.3594 2.39052 13.6095C2.64057 13.8595 2.97971 14 3.33333 14H12.6667C13.0203 14 13.3594 13.8595 13.6095 13.6095C13.8595 13.3594 14 13.0203 14 12.6667V8" stroke="#8A8A8A" strokeWidth="1.33333" strokeLinecap="round" strokeLinejoin="round" />
+                  <path d="M12.25 1.74991C12.5152 1.48469 12.8749 1.33569 13.25 1.33569C13.6251 1.33569 13.9848 1.48469 14.25 1.74991C14.5152 2.01512 14.6642 2.37483 14.6642 2.74991C14.6642 3.12498 14.5152 3.48469 14.25 3.74991L8.24136 9.75924C8.08305 9.9174 7.88749 10.0332 7.67269 10.0959L5.75735 10.6559C5.69999 10.6726 5.63918 10.6736 5.58129 10.6588C5.52341 10.644 5.47057 10.6139 5.42832 10.5716C5.38607 10.5294 5.35595 10.4765 5.34112 10.4186C5.32629 10.3607 5.32729 10.2999 5.34402 10.2426L5.90402 8.32724C5.96704 8.11261 6.08304 7.91728 6.24136 7.75924L12.25 1.74991Z" stroke="#8A8A8A" strokeWidth="1.33333" strokeLinecap="round" strokeLinejoin="round" />
+                </g>
+                <defs>
+                  <clipPath id="clip0_6511_181">
+                    <rect width="16" height="16" fill="white" />
+                  </clipPath>
+                </defs>
+              </svg>
+            </button>
+
+            <div className="grid grid-cols-3 gap-3 text-center text-gray-300 bg-[#111113] mt-4 rounded-2xl">
+
+              {[
+                {
+                  label: "Developer",
+                  count:
+                    user?.teamMembers?.find((m: any) => m.roleName?.toLowerCase() === "developer")?.quantity ?? 0,
+                  svg: (
+                    <svg width="40" height="33" viewBox="0 0 40 33" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M12.6532 25.4091C12.6532 19.1666 17.4767 14.1061 23.4267 14.1061H28.4903C34.4404 14.1061 39.2638 19.1666 39.2638 25.4091C39.2638 27.2818 37.8168 28.8 36.0318 28.8H15.8853C14.1002 28.8 12.6532 27.2818 12.6532 25.4091Z" fill="url(#paint0_linear_6544_117)" />
+                      <path d="M31.5608 5.87755C31.5608 9.12363 29.0525 11.7551 25.9585 11.7551C22.8645 11.7551 20.3563 9.12363 20.3563 5.87755C20.3563 2.63147 22.8645 0 25.9585 0C29.0525 0 31.5608 2.63147 31.5608 5.87755Z" fill="url(#paint1_linear_6544_117)" />
+                      <foreignObject x="-5.4" y="10.3695" width="34.8" height="27.6635">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style={{ backdropFilter: "blur(2.7px)", clipPath: "url(#bgblur_0_6544_117_clip_path)", height: "100%", width: "100%" }}></div>
+                      </foreignObject>
+                      <path data-figma-bg-blur-radius="5.4" d="M23.9004 15.8691V30.6328C23.9004 31.6822 23.0493 32.5332 22 32.5332H2C0.950659 32.5332 0.0996094 31.6822 0.0996094 30.6328V15.8691H23.9004Z" fill="url(#paint2_linear_6544_117)" fillOpacity="0.3" stroke="url(#paint3_linear_6544_117)" strokeWidth="0.2" />
+                      <foreignObject x="-5.4" y="5.89175" width="34.8" height="14.5166">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style={{ backdropFilter: "blur(2.7px)", clipPath: "url(#bgblur_1_6544_117_clip_path)", height: "100%", width: "100%" }}></div>
+                      </foreignObject>
+                      <path data-figma-bg-blur-radius="5.4" d="M2 11.3914H22C23.0493 11.3914 23.9004 12.2424 23.9004 13.2917V14.908H0.0996094V13.2917C0.0996094 12.2424 0.950659 11.3914 2 11.3914Z" fill="url(#paint4_linear_6544_117)" fillOpacity="0.3" stroke="url(#paint5_linear_6544_117)" strokeWidth="0.2" />
+                      <path d="M14.7499 21.3147L16.9293 23.4941C17.3199 23.8846 17.3199 24.5178 16.9293 24.9083L14.7499 27.0877" stroke="white" strokeWidth="0.8" strokeLinejoin="round" />
+                      <path d="M9.24994 21.3147L7.07055 23.4941C6.68003 23.8846 6.68003 24.5178 7.07055 24.9083L9.24994 27.0877" stroke="white" strokeWidth="0.8" strokeLinejoin="round" />
+                      <line x1="13.1864" y1="20.3141" x2="10.8326" y2="28.3141" stroke="white" strokeWidth="0.8" />
+                      <circle cx="2.5" cy="13.1499" r="0.5" fill="#FF5555" />
+                      <circle cx="4.09998" cy="13.1499" r="0.5" fill="#FFD555" />
+                      <circle cx="5.70001" cy="13.1499" r="0.5" fill="#55FF5B" />
+                      <defs>
+                        <clipPath id="bgblur_0_6544_117_clip_path" transform="translate(5.4 -10.3695)">
+                          <path d="M23.9004 15.8691V30.6328C23.9004 31.6822 23.0493 32.5332 22 32.5332H2C0.950659 32.5332 0.0996094 31.6822 0.0996094 30.6328V15.8691H23.9004Z" />
+                        </clipPath>
+                        <clipPath id="bgblur_1_6544_117_clip_path" transform="translate(5.4 -5.89175)">
+                          <path d="M2 11.3914H22C23.0493 11.3914 23.9004 12.2424 23.9004 13.2917V14.908H0.0996094V13.2917C0.0996094 12.2424 0.950659 11.3914 2 11.3914Z" />
+                        </clipPath>
+                        <linearGradient id="paint0_linear_6544_117" x1="20.6027" y1="3.18226" x2="34.7263" y2="29.4924" gradientUnits="userSpaceOnUse">
+                          <stop stopColor="#9FFFD9" />
+                          <stop offset="0.375" stopColor="#BEA6FF" />
+                          <stop offset="1" stopColor="#0088FF" />
+                        </linearGradient>
+                        <linearGradient id="paint1_linear_6544_117" x1="20.6027" y1="3.18226" x2="34.7263" y2="29.4924" gradientUnits="userSpaceOnUse">
+                          <stop stopColor="#9FFFD9" />
+                          <stop offset="0.375" stopColor="#BEA6FF" />
+                          <stop offset="1" stopColor="#0088FF" />
+                        </linearGradient>
+                        <linearGradient id="paint2_linear_6544_117" x1="1.41638" y1="11.3583" x2="23.6624" y2="32.6331" gradientUnits="userSpaceOnUse">
+                          <stop stopColor="#79FFD7" />
+                          <stop offset="0.275735" stopColor="#D8DBFF" />
+                          <stop offset="1" stopColor="#78D4FF" />
+                        </linearGradient>
+                        <linearGradient id="paint3_linear_6544_117" x1="0" y1="24.2013" x2="24" y2="24.2013" gradientUnits="userSpaceOnUse">
+                          <stop stopColor="white" />
+                          <stop offset="1" stopColor="#B7ECFF" />
+                        </linearGradient>
+                        <linearGradient id="paint4_linear_6544_117" x1="0" y1="13.15" x2="24" y2="13.15" gradientUnits="userSpaceOnUse">
+                          <stop stopColor="#79FFD7" />
+                          <stop offset="1" stopColor="#78D4FF" />
+                        </linearGradient>
+                        <linearGradient id="paint5_linear_6544_117" x1="0" y1="13.15" x2="24" y2="13.15" gradientUnits="userSpaceOnUse">
+                          <stop stopColor="white" />
+                          <stop offset="1" stopColor="#B7ECFF" />
+                        </linearGradient>
+                      </defs>
+                    </svg>
+                  ),
+                },
+                {
+                  label: "CEO",
+                  count:
+                    user?.teamMembers?.find((m: any) => m.roleName?.toLowerCase() === "ceo")?.quantity ?? 0,
+                  svg: (
+                    <svg width="50" style={{ marginTop: "-15px" }} height="52" viewBox="0 0 50 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <g filter="url(#filter0_d_6544_111)">xwww
+                        <path d="M11.5 36.9091C11.5 30.6666 16.3235 25.6061 22.2735 25.6061H27.3371C33.2872 25.6061 38.1106 30.6666 38.1106 36.9091C38.1106 38.7818 36.6636 40.3 34.8786 40.3H14.7321C12.947 40.3 11.5 38.7818 11.5 36.9091Z" fill="url(#paint0_linear_6544_111)" />
+                        <path d="M30.4076 17.3776C30.4076 20.6236 27.8993 23.2551 24.8053 23.2551C21.7113 23.2551 19.2031 20.6236 19.2031 17.3776C19.2031 14.1315 21.7113 11.5 24.8053 11.5C27.8993 11.5 30.4076 14.1315 30.4076 17.3776Z" fill="url(#paint1_linear_6544_111)" />
+                      </g>
+                      <foreignObject x="3.29834" y="31.9058" width="43.0139" height="16.7883">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style={{ backdropFilter: 'blur(2px)', clipPath: 'url(#bgblur_0_6544_111_clip_path)', height: '100%', width: '100%' }}></div>
+                      </foreignObject>
+                      <rect data-figma-bg-blur-radius="4" x="7.39834" y="36.0058" width="34.8139" height="8.58833" rx="0.9" fill="url(#paint2_linear_6544_111)" fillOpacity="0.3" stroke="url(#paint3_linear_6544_111)" strokeWidth="0.2" />
+                      <g filter="url(#filter2_d_6544_111)">
+                        <path d="M24.6179 37.7364C24.6825 37.5629 24.928 37.5629 24.9927 37.7364L25.5143 39.1363C25.5424 39.2117 25.6129 39.2629 25.6932 39.2663L27.1858 39.3298C27.3708 39.3376 27.4467 39.5711 27.3016 39.6863L26.1314 40.6149C26.0684 40.6649 26.0415 40.7478 26.063 40.8252L26.4639 42.2643C26.5136 42.4428 26.315 42.5871 26.1607 42.4847L24.9159 41.6587C24.8489 41.6142 24.7617 41.6142 24.6947 41.6587L23.4499 42.4847C23.2956 42.5871 23.097 42.4428 23.1467 42.2643L23.5476 40.8252C23.5691 40.7478 23.5422 40.6649 23.4792 40.6149L22.309 39.6863C22.1639 39.5711 22.2398 39.3376 22.4248 39.3298L23.9174 39.2663C23.9977 39.2629 24.0682 39.2117 24.0963 39.1363L24.6179 37.7364Z" fill="white" />
+                      </g>
+                      <g filter="url(#filter3_d_6544_111)">
+                        <path d="M33.68 39.2809C33.7447 39.1073 33.9902 39.1073 34.0548 39.2809L34.3133 39.9745C34.3413 40.0498 34.4118 40.101 34.4922 40.1045L35.2317 40.1359C35.4168 40.1438 35.4926 40.3772 35.3475 40.4924L34.7677 40.9525C34.7047 41.0025 34.6778 41.0854 34.6994 41.1628L34.898 41.8759C34.9477 42.0543 34.7491 42.1986 34.5948 42.0962L33.978 41.6869C33.911 41.6425 33.8239 41.6425 33.7568 41.6869L33.1401 42.0962C32.9857 42.1986 32.7871 42.0543 32.8368 41.8759L33.0355 41.1628C33.057 41.0854 33.0301 41.0025 32.9671 40.9525L32.3873 40.4924C32.2422 40.3772 32.3181 40.1438 32.5031 40.1359L33.2427 40.1045C33.323 40.101 33.3935 40.0498 33.4216 39.9745L33.68 39.2809Z" fill="white" />
+                      </g>
+                      <g filter="url(#filter4_d_6544_111)">
+                        <path d="M15.5557 39.2809C15.6204 39.1073 15.8659 39.1073 15.9306 39.2809L16.189 39.9745C16.2171 40.0498 16.2876 40.101 16.3679 40.1045L17.1074 40.1359C17.2925 40.1438 17.3684 40.3772 17.2233 40.4924L16.6435 40.9525C16.5805 41.0025 16.5535 41.0854 16.5751 41.1628L16.7737 41.8759C16.8235 42.0543 16.6248 42.1986 16.4705 42.0962L15.8537 41.6869C15.7867 41.6425 15.6996 41.6425 15.6326 41.6869L15.0158 42.0962C14.8615 42.1986 14.6629 42.0543 14.7126 41.8759L14.9112 41.1628C14.9328 41.0854 14.9059 41.0025 14.8429 40.9525L14.263 40.4924C14.118 40.3772 14.1938 40.1438 14.3789 40.1359L15.1184 40.1045C15.1988 40.101 15.2692 40.0498 15.2973 39.9745L15.5557 39.2809Z" fill="white" />
+                      </g>
+                      <defs>
+                        <filter id="filter0_d_6544_111" x="0" y="0" width="49.6107" height="51.8" filterUnits="userSpaceOnUse" colorInterpolationFilters="sRGB">
+                          <feFlood floodOpacity="0" result="BackgroundImageFix" />
+                          <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha" />
+                          <feOffset />
+                          <feGaussianBlur stdDeviation="5.75" />
+                          <feComposite in2="hardAlpha" operator="out" />
+                          <feColorMatrix type="matrix" values="0 0 0 0 1 0 0 0 0 0.80625 0 0 0 0 0.354166 0 0 0 0.06 0" />
+                          <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_6544_111" />
+                          <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_6544_111" result="shape" />
+                        </filter>
+                        <clipPath id="bgblur_0_6544_111_clip_path" transform="translate(-3.29834 -31.9058)">
+                          <rect x="7.39834" y="36.0058" width="34.8139" height="8.58833" rx="0.9" />
+                        </clipPath>
+                        <filter id="filter2_d_6544_111" x="18.233" y="33.6062" width="13.1447" height="12.9126" filterUnits="userSpaceOnUse" colorInterpolationFilters="sRGB">
+                          <feFlood floodOpacity="0" result="BackgroundImageFix" />
+                          <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha" />
+                          <feOffset />
+                          <feGaussianBlur stdDeviation="2" />
+                          <feComposite in2="hardAlpha" operator="out" />
+                          <feColorMatrix type="matrix" values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.25 0" />
+                          <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_6544_111" />
+                          <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_6544_111" result="shape" />
+                        </filter>
+                        <filter id="filter3_d_6544_111" x="28.3113" y="35.1506" width="11.1122" height="10.9797" filterUnits="userSpaceOnUse" colorInterpolationFilters="sRGB">
+                          <feFlood floodOpacity="0" result="BackgroundImageFix" />
+                          <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha" />
+                          <feOffset />
+                          <feGaussianBlur stdDeviation="2" />
+                          <feComposite in2="hardAlpha" operator="out" />
+                          <feColorMatrix type="matrix" values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.25 0" />
+                          <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_6544_111" />
+                          <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_6544_111" result="shape" />
+                        </filter>
+                        <filter id="filter4_d_6544_111" x="10.1871" y="35.1506" width="11.1122" height="10.9797" filterUnits="userSpaceOnUse" colorInterpolationFilters="sRGB">
+                          <feFlood floodOpacity="0" result="BackgroundImageFix" />
+                          <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha" />
+                          <feOffset />
+                          <feGaussianBlur stdDeviation="2" />
+                          <feComposite in2="hardAlpha" operator="out" />
+                          <feColorMatrix type="matrix" values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.25 0" />
+                          <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_6544_111" />
+                          <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_6544_111" result="shape" />
+                        </filter>
+                        <linearGradient id="paint0_linear_6544_111" x1="19.4495" y1="14.6823" x2="33.5731" y2="40.9924" gradientUnits="userSpaceOnUse">
+                          <stop stopColor="#FFF948" />
+                          <stop offset="0.451923" stopColor="#FFC131" />
+                          <stop offset="1" stopColor="#FFE600" />
+                        </linearGradient>
+                        <linearGradient id="paint1_linear_6544_111" x1="19.4495" y1="14.6823" x2="33.5731" y2="40.9924" gradientUnits="userSpaceOnUse">
+                          <stop stopColor="#FFF948" />
+                          <stop offset="0.451923" stopColor="#FFC131" />
+                          <stop offset="1" stopColor="#FFE600" />
+                        </linearGradient>
+                        <linearGradient id="paint2_linear_6544_111" x1="9.36472" y1="33.6069" x2="16.9727" y2="53.975" gradientUnits="userSpaceOnUse">
+                          <stop stopColor="#FFA179" />
+                          <stop offset="0.275735" stopColor="#FFEED8" />
+                          <stop offset="1" stopColor="#FFE136" />
+                        </linearGradient>
+                        <linearGradient id="paint3_linear_6544_111" x1="7.29834" y1="40.2999" x2="42.3123" y2="40.2999" gradientUnits="userSpaceOnUse">
+                          <stop stopColor="white" stopOpacity="0.5" />
+                          <stop offset="1" stopColor="#FFDF5E" />
+                        </linearGradient>
+                      </defs>
+                    </svg>
+                  ),
+                },
+                {
+                  label: "Sales",
+                  count:
+                    user?.teamMembers?.find((m: any) => m.roleName?.toLowerCase() === "sales")?.quantity ?? 0,
+                  svg: (
+                    <svg width="39" height="35" viewBox="0 0 39 35" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M12.1377 25.4091C12.1377 19.1666 16.9612 14.1061 22.9112 14.1061H27.9748C33.9249 14.1061 38.7483 19.1666 38.7483 25.4091C38.7483 27.2818 37.3013 28.8 35.5163 28.8H15.3698C13.5847 28.8 12.1377 27.2818 12.1377 25.4091Z" fill="url(#paint0_linear_6544_103)" />
+                      <path d="M31.0453 5.87755C31.0453 9.12363 28.537 11.7551 25.443 11.7551C22.349 11.7551 19.8408 9.12363 19.8408 5.87755C19.8408 2.63147 22.349 0 25.443 0C28.537 0 31.0453 2.63147 31.0453 5.87755Z" fill="url(#paint1_linear_6544_103)" />
+                      <foreignObject x="-6" y="7.73315" width="38.886" height="30.8999">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style={{ backdropFilter: "blur(3px)", clipPath: "url(#bgblur_0_6544_103_clip_path)", height: "100%", width: "100%" }}></div>
+                      </foreignObject>
+                      <rect data-figma-bg-blur-radius="6" x="0.1" y="13.8332" width="26.686" height="18.6999" rx="4.9" fill="url(#paint2_linear_6544_103)" fillOpacity="0.2" stroke="url(#paint3_linear_6544_103)" strokeWidth="0.2" />
+                      <g filter="url(#filter1_d_6544_103)">
+                        <path d="M16.3083 18.0409C16.8187 17.7938 17.4329 18.0206 17.6606 18.5399L18.8259 21.1981C18.9222 21.418 18.9359 21.6659 18.865 21.8953L16.6166 29.1688C16.4538 29.6955 15.895 29.9918 15.3679 29.8303L11.2241 28.56C10.6952 28.398 10.3983 27.8372 10.5614 27.3087L12.7904 20.0981C12.8724 19.8334 13.061 19.6146 13.3103 19.4938L16.3083 18.0409ZM16.3445 19.247C16.0383 19.3814 15.8989 19.7383 16.033 20.0446C16.1673 20.351 16.5246 20.491 16.831 20.3569C17.1375 20.2226 17.2773 19.8645 17.143 19.558C17.0085 19.2517 16.6509 19.1127 16.3445 19.247Z" fill="url(#paint4_linear_6544_103)" />
+                      </g>
+                      <g filter="url(#filter2_dd_6544_103)">
+                        <path d="M16.9593 18.0373C17.5259 18.016 17.9974 18.4703 17.9974 19.0373V21.9397C17.9974 22.1798 17.9104 22.4123 17.7533 22.594L12.7738 28.3528C12.4132 28.7698 11.7825 28.8167 11.3646 28.4573L8.07946 25.6301C7.66018 25.2693 7.61334 24.6365 7.97497 24.218L12.9115 18.509C13.0928 18.2995 13.3534 18.1748 13.6302 18.1643L16.9593 18.0373ZM16.5082 19.1565C16.1738 19.1567 15.9028 19.4275 15.9027 19.762C15.9027 20.0965 16.1737 20.3682 16.5082 20.3684C16.8428 20.3684 17.1146 20.0966 17.1146 19.762C17.1145 19.4274 16.8427 19.1565 16.5082 19.1565Z" fill="url(#paint5_linear_6544_103)" />
+                      </g>
+                      <path d="M11.594 24.6866L14.5587 21.241L14.7794 21.431L11.8147 24.8765L11.594 24.6866ZM14.4122 22.914C14.5134 22.7637 14.539 22.6014 14.489 22.4272C14.439 22.2531 14.3306 22.0942 14.1637 21.9506C14.0417 21.8456 13.9179 21.7734 13.7924 21.7341C13.6678 21.6957 13.5502 21.6889 13.4396 21.714C13.3299 21.7399 13.2373 21.7968 13.1616 21.8847C13.0983 21.9583 13.0614 22.0366 13.0508 22.1197C13.0419 22.2026 13.0502 22.2855 13.0757 22.3683C13.102 22.4503 13.136 22.5287 13.1778 22.6037C13.2202 22.6777 13.2613 22.7435 13.3008 22.8009L13.5159 23.1172C13.5715 23.1978 13.629 23.2925 13.6883 23.4014C13.7486 23.511 13.7944 23.6293 13.8257 23.7562C13.8588 23.883 13.8635 24.0136 13.84 24.1479C13.8165 24.2823 13.7492 24.4141 13.638 24.5433C13.5099 24.6923 13.355 24.7933 13.1735 24.8463C12.9929 24.9002 12.7976 24.8985 12.5877 24.8412C12.3786 24.7847 12.1682 24.6653 11.9565 24.4831C11.7591 24.3133 11.6155 24.1343 11.5259 23.9463C11.4371 23.7591 11.4005 23.573 11.416 23.388C11.4324 23.2038 11.5001 23.0317 11.619 22.8717L11.9636 23.1682C11.883 23.28 11.8439 23.3962 11.8462 23.5169C11.8502 23.6375 11.885 23.7549 11.9507 23.8692C12.018 23.9833 12.1064 24.0875 12.2159 24.1816C12.3433 24.2913 12.4754 24.3691 12.6124 24.415C12.75 24.4601 12.8805 24.4709 13.0038 24.4474C13.1279 24.423 13.2332 24.3605 13.3196 24.26C13.3984 24.1685 13.4369 24.072 13.4352 23.9706C13.4334 23.8691 13.4063 23.7646 13.3537 23.6569C13.3011 23.5492 13.238 23.4402 13.1642 23.3299L12.9085 22.9412C12.7464 22.6939 12.6519 22.4589 12.6252 22.2359C12.5984 22.013 12.6649 21.8087 12.8247 21.6229C12.9575 21.4686 13.115 21.3699 13.2973 21.3269C13.4812 21.2837 13.6715 21.2912 13.8681 21.3495C14.0663 21.4077 14.2534 21.5124 14.4292 21.6637C14.6069 21.8166 14.7374 21.9843 14.8208 22.1669C14.9049 22.3486 14.9403 22.529 14.9268 22.7079C14.9143 22.8876 14.8504 23.049 14.7353 23.1919L14.4122 22.914Z" fill="white" />
+                      <defs>
+                        <clipPath id="bgblur_0_6544_103_clip_path" transform="translate(6 -7.73315)">
+                          <rect x="0.1" y="13.8332" width="26.686" height="18.6999" rx="4.9" />
+                        </clipPath>
+                        <filter id="filter1_d_6544_103" x="6.51666" y="13.9409" width="16.393" height="19.9333" filterUnits="userSpaceOnUse" colorInterpolationFilters="sRGB">
+                          <feFlood floodOpacity="0" result="BackgroundImageFix" />
+                          <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha" />
+                          <feOffset />
+                          <feGaussianBlur stdDeviation="2" />
+                          <feComposite in2="hardAlpha" operator="out" />
+                          <feColorMatrix type="matrix" values="0 0 0 0 1 0 0 0 0 0.347756 0 0 0 0 0.869551 0 0 0 0.21 0" />
+                          <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_6544_103" />
+                          <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_6544_103" result="shape" />
+                        </filter>
+                        <filter id="filter2_dd_6544_103" x="3.73163" y="14.0366" width="18.2658" height="20.6624" filterUnits="userSpaceOnUse" colorInterpolationFilters="sRGB">
+                          <feFlood floodOpacity="0" result="BackgroundImageFix" />
+                          <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha" />
+                          <feOffset />
+                          <feGaussianBlur stdDeviation="2" />
+                          <feComposite in2="hardAlpha" operator="out" />
+                          <feColorMatrix type="matrix" values="0 0 0 0 1 0 0 0 0 0.347756 0 0 0 0 0.869551 0 0 0 0.21 0" />
+                          <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_6544_103" />
+                          <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha" />
+                          <feOffset dy="2" />
+                          <feGaussianBlur stdDeviation="2" />
+                          <feComposite in2="hardAlpha" operator="out" />
+                          <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.56 0" />
+                          <feBlend mode="normal" in2="effect1_dropShadow_6544_103" result="effect2_dropShadow_6544_103" />
+                          <feBlend mode="normal" in="SourceGraphic" in2="effect2_dropShadow_6544_103" result="shape" />
+                        </filter>
+                        <linearGradient id="paint0_linear_6544_103" x1="20.0872" y1="3.18226" x2="34.2108" y2="29.4924" gradientUnits="userSpaceOnUse">
+                          <stop stopColor="#FA9FFF" />
+                          <stop offset="0.375" stopColor="#FFB7CF" />
+                          <stop offset="1" stopColor="#FF0088" />
+                        </linearGradient>
+                        <linearGradient id="paint1_linear_6544_103" x1="20.0872" y1="3.18226" x2="34.2108" y2="29.4924" gradientUnits="userSpaceOnUse">
+                          <stop stopColor="#FA9FFF" />
+                          <stop offset="0.375" stopColor="#FFB7CF" />
+                          <stop offset="1" stopColor="#FF0088" />
+                        </linearGradient>
+                        <linearGradient id="paint2_linear_6544_103" x1="26.886" y1="16.0163" x2="-0.513409" y2="28.851" gradientUnits="userSpaceOnUse">
+                          <stop stopColor="#FFD7E6" />
+                          <stop offset="0.5" stopColor="#FF9AA2" />
+                          <stop offset="1" stopColor="#FF9AD7" />
+                        </linearGradient>
+                        <linearGradient id="paint3_linear_6544_103" x1="28.8624" y1="16.7355" x2="-1.22768e-06" y2="32.6331" gradientUnits="userSpaceOnUse">
+                          <stop stopColor="white" stopOpacity="0.5" />
+                          <stop offset="1" stopColor="#FF8BC9" />
+                        </linearGradient>
+                        <linearGradient id="paint4_linear_6544_103" x1="12.5578" y1="19.6843" x2="16.8387" y2="29.4495" gradientUnits="userSpaceOnUse">
+                          <stop stopColor="#FBA0FF" />
+                          <stop offset="1" stopColor="#DD1CFF" />
+                        </linearGradient>
+                        <linearGradient id="paint5_linear_6544_103" x1="12.8645" y1="18.0366" x2="12.8645" y2="28.699" gradientUnits="userSpaceOnUse">
+                          <stop stopColor="#FBA0FF" />
+                          <stop offset="1" stopColor="#FF1C93" />
+                        </linearGradient>
+                      </defs>
+                    </svg>
+                  ),
+                },
+              ].map((role) => (
+                <div key={role.label} className="flex flex-col items-center gap-1 rounded-3xl px-3 py-3">
+                  <div className="mb-1">{role.svg}</div>
+                  <span className="text-xs text-gray-400">{role.label}</span>
+                  <span className="text-base font-semibold text-white">{role.count}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Card 2: Core metrics */}
+          <div
+            className={`lg:col-span-4 rounded-3xl border border-gray-800 bg-[#151516] p-4 shadow-[0_24px_80px_rgba(0,0,0,0.6)] transition-all duration-300 ${elonStep === 2 ? "ring-2 ring-blue-500 animate-pulse" : ""
+              }`}
+          >
+            {/* <div className="mb-4 flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+              <div>
+                <p className="text-xs uppercase tracking-[0.2em] text-gray-500 dark:text-gray-400">
+                  {t("dashboard.coreMetrics")}
                 </p>
+                <h3 className="text-lg font-semibold text-white">
+                  {t("dashboard.trackNumbers")}
+                </h3>
+              </div>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                {t("dashboard.tapMetric")}
+              </p>
+            </div> */}
+
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+              {user &&
+                user.metrics &&
+                orderedMetrics.map((metric, index) => (
+                  <button
+                    key={index}
+                    onClick={(e) => handleMetricClick(getShortName(metric), e)}
+                    className="rounded-2xl border border-gray-800 bg-[#0f1018] p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-gray-700 hover:bg-[#151623]"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-md font-medium text-gray-400">
+                        {getShortName(metric)}
+                      </span>
+                    </div>
+                    <p className="mt-2 text-3xl font-semibold text-white mt-16">
+                      {(() => {
+                        const shortName = getShortName(metric);
+                        const value = user?.metrics?.[metric] ?? 0;
+
+                        let displayValue;
+                        if (shortName === "UA" || shortName === "B") {
+                          displayValue = Math.floor(value);
+                        } else if (Number.isInteger(value) || countDecimalPlaces(value) <= 2) {
+                          displayValue = value;
+                        } else {
+                          displayValue = value.toFixed(2);
+                        }
+
+                        let percentageChange: number | null = null;
+                        if (previousMetrics && previousMetrics[metric] !== undefined && user?.metrics) {
+                          const prevValue = previousMetrics[metric];
+                          const currentValue = user.metrics[metric];
+                          const change = currentValue - prevValue;
+                          if (Math.abs(change) > 0.0001) {
+                            if (Math.abs(prevValue) > 0.0001) {
+                              percentageChange = (change / Math.abs(prevValue)) * 100;
+                            } else if (Math.abs(currentValue) > 0.0001) {
+                              percentageChange = currentValue > 0 ? 100 : -100;
+                            } else {
+                              percentageChange = null;
+                            }
+                          }
+                        }
+
+                        return (
+                          <div className="flex flex-col">
+                            <span>
+                              {displayValue}
+                              {shortName === "C1" ? "%" : ""}
+                              {dollarMetrics.includes(shortName) ? "$" : ""}
+                            </span>
+                            {percentageChange !== null && Math.abs(percentageChange) >= 0.01 && (
+                              <span
+                                className={`mt-1 text-xs font-semibold ${percentageChange > 0
+                                  ? "text-green-500"
+                                  : "text-red-400"
+                                  }`}
+                              >
+                                {percentageChange > 0 ? "+" : ""}
+                                {percentageChange.toFixed(2)}%
+                              </span>
+                            )}
+                          </div>
+                        );
+                      })()}
+                    </p>
+                  </button>
+                ))}
+            </div>
+          </div>
+
+          {/* Card 3: Financial metrics */}
+          <div className="lg:col-span-1 rounded-3xl border border-gray-800 bg-[#151516] p-4 shadow-[0_24px_80px_rgba(0,0,0,0.6)]">
+            <div className="space-y-4">
+              {[
+                { 
+                  label: t("sidebar.salaries"), 
+                  value: user?.salaries ?? 0, 
+                  positive: false, 
+                  iconKey: (
+                    <svg width="28" height="26" viewBox="0 0 28 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <foreignObject x="-4.15409" y="-4.67271" width="34.8348" height="23.7231">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style={{ backdropFilter: "blur(2.7px)", clipPath: "url(#bgblur_0_6543_2_clip_path)", height: "100%", width: "100%" }}></div>
+                      </foreignObject>
+                      <path data-figma-bg-blur-radius="5.4" d="M6.9135 0.891882L24.8444 5.69646C25.1087 5.76757 25.2507 6.0551 25.1466 6.30821C25.096 6.43084 24.994 6.52584 24.8679 6.56717L3.84111 13.4524C2.34107 13.9436 0.930726 12.4977 1.45933 11.0106L4.63179 2.09122C4.96368 1.15804 5.9568 0.635675 6.9135 0.891882Z" fill="url(#paint0_linear_6543_2)" stroke="url(#paint1_linear_6543_2)" strokeWidth="0.2"/>
+                      <foreignObject x="-5.03101" y="0.363428" width="38.2267" height="30.7209">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style={{ backdropFilter: "blur(2.7px)", clipPath: "url(#bgblur_1_6543_2_clip_path)", height: "100%", width: "100%" }}></div>
+                      </foreignObject>
+                      <path data-figma-bg-blur-radius="5.4" d="M3.36996 5.86304H24.7948C26.3964 5.86304 27.6961 7.16184 27.6961 8.76343V11.2371H18.7918C17.0798 11.2371 15.6922 12.6246 15.6922 14.3367V17.1111C15.6922 18.8232 17.0798 20.2107 18.7918 20.2107H27.6961V22.6843C27.6961 24.2859 26.3964 25.5847 24.7948 25.5847H3.36996C1.7683 25.5847 0.468597 24.2859 0.468597 22.6843V8.76343C0.468597 7.16184 1.7683 5.86304 3.36996 5.86304Z" fill="url(#paint2_linear_6543_2)" fillOpacity="0.3" stroke="url(#paint3_linear_6543_2)" strokeWidth="0.2"/>
+                      <path d="M27.7948 19.0632H19.1942C17.8136 19.0632 16.6943 17.9438 16.6942 16.5632V14.8845C16.6942 13.5038 17.8135 12.3845 19.1942 12.3845H27.7948V19.0632ZM20.8055 14.2849C20.0112 14.2851 19.3673 14.929 19.3671 15.7234C19.3671 16.5179 20.0111 17.1626 20.8055 17.1628C21.6002 17.1628 22.245 16.518 22.245 15.7234C22.2448 14.9289 21.6001 14.2849 20.8055 14.2849Z" fill="url(#paint4_linear_6543_2)"/>
+                      <path d="M8.21473 19.4516V12.1789H8.68064V19.4516H8.21473ZM9.45052 14.5795C9.4278 14.3503 9.33026 14.1723 9.15791 14.0454C8.98556 13.9185 8.75166 13.855 8.45621 13.855C8.25545 13.855 8.08594 13.8835 7.94768 13.9403C7.80943 13.9952 7.70336 14.0719 7.6295 14.1704C7.55753 14.2689 7.52155 14.3806 7.52155 14.5056C7.51776 14.6098 7.53954 14.7007 7.58689 14.7783C7.63613 14.856 7.70336 14.9232 7.78859 14.98C7.87382 15.035 7.9723 15.0833 8.08405 15.1249C8.19579 15.1647 8.31511 15.1988 8.442 15.2272L8.96473 15.3522C9.21852 15.409 9.45147 15.4848 9.66359 15.5795C9.87571 15.6742 10.0594 15.7907 10.2147 15.9289C10.37 16.0672 10.4903 16.23 10.5755 16.4175C10.6626 16.605 10.7072 16.82 10.709 17.0624C10.7072 17.4185 10.6162 17.7272 10.4363 17.9886C10.2583 18.248 10.0007 18.4497 9.66359 18.5937C9.32836 18.7357 8.92401 18.8068 8.45052 18.8068C7.98083 18.8068 7.57174 18.7348 7.22325 18.5908C6.87666 18.4469 6.60583 18.2338 6.41075 17.9516C6.21757 17.6675 6.11624 17.3162 6.10677 16.8977H7.29711C7.31037 17.0927 7.36624 17.2556 7.46473 17.3863C7.56511 17.5151 7.69863 17.6126 7.8653 17.6789C8.03386 17.7433 8.2242 17.7755 8.43632 17.7755C8.64465 17.7755 8.82552 17.7452 8.97893 17.6846C9.13424 17.624 9.2545 17.5397 9.33973 17.4318C9.42496 17.3238 9.46757 17.1997 9.46757 17.0596C9.46757 16.9289 9.42874 16.8191 9.35109 16.73C9.27533 16.641 9.16359 16.5653 9.01586 16.5028C8.87003 16.4403 8.69105 16.3835 8.47893 16.3323L7.84541 16.1732C7.35488 16.0539 6.96757 15.8674 6.68348 15.6136C6.39939 15.3598 6.25829 15.0179 6.26018 14.588C6.25829 14.2357 6.35204 13.928 6.54143 13.6647C6.73272 13.4014 6.99503 13.196 7.32836 13.0482C7.6617 12.9005 8.04049 12.8266 8.46473 12.8266C8.89655 12.8266 9.27344 12.9005 9.59541 13.0482C9.91927 13.196 10.1712 13.4014 10.3511 13.6647C10.531 13.928 10.6238 14.2329 10.6295 14.5795H9.45052Z" fill="url(#paint5_linear_6543_2)"/>
+                      <defs>
+                        <clipPath id="bgblur_0_6543_2_clip_path" transform="translate(4.15409 4.67271)">
+                          <path d="M6.9135 0.891882L24.8444 5.69646C25.1087 5.76757 25.2507 6.0551 25.1466 6.30821C25.096 6.43084 24.994 6.52584 24.8679 6.56717L3.84111 13.4524C2.34107 13.9436 0.930726 12.4977 1.45933 11.0106L4.63179 2.09122C4.96368 1.15804 5.9568 0.635675 6.9135 0.891882Z"/>
+                        </clipPath>
+                        <clipPath id="bgblur_1_6543_2_clip_path" transform="translate(5.03101 -0.363428)">
+                          <path d="M3.36996 5.86304H24.7948C26.3964 5.86304 27.6961 7.16184 27.6961 8.76343V11.2371H18.7918C17.0798 11.2371 15.6922 12.6246 15.6922 14.3367V17.1111C15.6922 18.8232 17.0798 20.2107 18.7918 20.2107H27.6961V22.6843C27.6961 24.2859 26.3964 25.5847 24.7948 25.5847H3.36996C1.7683 25.5847 0.468597 24.2859 0.468597 22.6843V8.76343C0.468597 7.16184 1.7683 5.86304 3.36996 5.86304Z"/>
+                        </clipPath>
+                        <linearGradient id="paint0_linear_6543_2" x1="8.06828" y1="-4.29703" x2="27.1224" y2="25.9254" gradientUnits="userSpaceOnUse">
+                          <stop stopColor="#79FFD7"/>
+                          <stop offset="0.275735" stopColor="#D8DBFF"/>
+                          <stop offset="1" stopColor="#78D4FF"/>
+                        </linearGradient>
+                        <linearGradient id="paint1_linear_6543_2" x1="2.22811" y1="0.156011" x2="18.9824" y2="21.0146" gradientUnits="userSpaceOnUse">
+                          <stop stopColor="#706BFF"/>
+                          <stop offset="1" stopColor="#B7ECFF"/>
+                        </linearGradient>
+                        <linearGradient id="paint2_linear_6543_2" x1="1.98809" y1="0.552272" x2="28.2147" y2="24.8143" gradientUnits="userSpaceOnUse">
+                          <stop stopColor="#79FFD7"/>
+                          <stop offset="0.275735" stopColor="#D8DBFF"/>
+                          <stop offset="1" stopColor="#78D4FF"/>
+                        </linearGradient>
+                        <linearGradient id="paint3_linear_6543_2" x1="-1.65338" y1="6.54462" x2="25.8971" y2="25.6857" gradientUnits="userSpaceOnUse">
+                          <stop stopColor="#706BFF"/>
+                          <stop offset="1" stopColor="#B7ECFF"/>
+                        </linearGradient>
+                        <linearGradient id="paint4_linear_6543_2" x1="18.066" y1="15.563" x2="25.9761" y2="18.7058" gradientUnits="userSpaceOnUse">
+                          <stop stopColor="#95B8FF"/>
+                          <stop offset="1" stopColor="#3BFFD8"/>
+                        </linearGradient>
+                        <linearGradient id="paint5_linear_6543_2" x1="6.1243" y1="11.7244" x2="11.0201" y2="20.1571" gradientUnits="userSpaceOnUse">
+                          <stop stopColor="#F8DAFF"/>
+                          <stop offset="1" stopColor="#3BC1FF"/>
+                        </linearGradient>
+                      </defs>
+                    </svg>
+                  )
+                },
+                { 
+                  label: t("sidebar.revenue"), 
+                  value: user?.revenue ?? 0, 
+                  positive: true, 
+                  iconKey: (
+                    <svg width="25" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <rect x="1.04178" y="0.5" width="16.2114" height="16.2114" rx="8.10571" fill="url(#paint0_linear_6543_7)"/>
+                      <rect x="1.04178" y="0.5" width="16.2114" height="16.2114" rx="8.10571" stroke="url(#paint1_linear_6543_7)"/>
+                      <path d="M8.90379 13.5148V4.42389H9.48618V13.5148H8.90379ZM10.4485 7.4246C10.4201 7.13815 10.2982 6.91561 10.0828 6.75699C9.86734 6.59837 9.57496 6.51906 9.20564 6.51906C8.95469 6.51906 8.74281 6.55458 8.56999 6.6256C8.39717 6.69425 8.26459 6.79014 8.17226 6.91324C8.0823 7.03635 8.03732 7.17603 8.03732 7.33228C8.03258 7.46248 8.05981 7.57612 8.11899 7.67318C8.18055 7.77025 8.26459 7.85429 8.37112 7.92532C8.47766 7.99397 8.60076 8.05434 8.74044 8.10642C8.88012 8.15614 9.02927 8.19875 9.18789 8.23426L9.84129 8.39051C10.1585 8.46154 10.4497 8.55623 10.7149 8.6746C10.98 8.79298 11.2097 8.93857 11.4038 9.11139C11.5979 9.28422 11.7483 9.48782 11.8548 9.72219C11.9637 9.95657 12.0193 10.2253 12.0217 10.5283C12.0193 10.9734 11.9057 11.3593 11.6808 11.686C11.4582 12.0103 11.1363 12.2624 10.7149 12.4424C10.2958 12.6199 9.7904 12.7087 9.19854 12.7087C8.61142 12.7087 8.10005 12.6187 7.66445 12.4388C7.23121 12.2589 6.89267 11.9925 6.64882 11.6398C6.40735 11.2847 6.28069 10.8455 6.26885 10.3223H7.75678C7.77335 10.5662 7.84319 10.7698 7.96629 10.9331C8.09177 11.0941 8.25867 11.216 8.467 11.2989C8.67771 11.3794 8.91563 11.4196 9.18078 11.4196C9.4412 11.4196 9.66729 11.3818 9.85905 11.306C10.0532 11.2302 10.2035 11.1249 10.31 10.9899C10.4166 10.855 10.4698 10.6999 10.4698 10.5247C10.4698 10.3614 10.4213 10.2241 10.3242 10.1128C10.2296 10.0015 10.0899 9.90685 9.90522 9.82872C9.72292 9.7506 9.4992 9.67958 9.23405 9.61566L8.44215 9.41679C7.82898 9.26764 7.34485 9.03445 6.98973 8.71722C6.63462 8.39998 6.45825 7.97266 6.46061 7.43526C6.45825 6.99492 6.57543 6.61021 6.81218 6.28114C7.05129 5.95207 7.37917 5.6952 7.79584 5.51054C8.21251 5.32588 8.68599 5.23355 9.21629 5.23355C9.75607 5.23355 10.2272 5.32588 10.6296 5.51054C11.0345 5.6952 11.3493 5.95207 11.5742 6.28114C11.7992 6.61021 11.9152 6.99137 11.9223 7.4246H10.4485Z" fill="white"/>
+                      <foreignObject x="-5" y="-0.937744" width="34.6465" height="29.0869">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style={{backdropFilter:"blur(2.5px)",clipPath:"url(#bgblur_0_6543_7_clip_path)",height:"100%",width:"100%"}}></div>
+                      </foreignObject>
+                      <path data-figma-bg-blur-radius="5" d="M1.33887 15.9529H3.38184C3.73192 15.9529 4.04525 16.0586 4.26855 16.2253C4.49186 16.3922 4.62012 16.6158 4.62012 16.8533V22.1492C4.62012 22.3866 4.49181 22.6093 4.26855 22.7761C4.04524 22.943 3.732 23.0496 3.38184 23.0496H1.33887C0.988767 23.0496 0.67546 22.9429 0.452148 22.7761C0.228844 22.6093 0.0996094 22.3866 0.0996094 22.1492V16.8533C0.0996094 16.6158 0.228844 16.3922 0.452148 16.2253C0.675445 16.0587 0.988889 15.9529 1.33887 15.9529ZM7.98047 12.4031H10.0234C10.3734 12.4031 10.6869 12.5088 10.9102 12.6755C11.1334 12.8423 11.2626 13.0651 11.2627 13.3025V22.1492C11.2627 22.3866 11.1335 22.6093 10.9102 22.7761C10.6868 22.9429 10.3735 23.0496 10.0234 23.0496H7.98047C7.63034 23.0495 7.31705 22.9429 7.09375 22.7761C6.87053 22.6093 6.74219 22.3866 6.74219 22.1492V13.3025C6.74228 13.0651 6.87054 12.8423 7.09375 12.6755C7.31705 12.5087 7.63034 12.4031 7.98047 12.4031ZM14.623 8.98022H16.666C17.0161 8.98025 17.3294 9.08586 17.5527 9.25269C17.7759 9.41945 17.9042 9.6423 17.9043 9.87964V22.1492C17.9043 22.3866 17.776 22.6093 17.5527 22.7761C17.3294 22.9429 17.0161 23.0495 16.666 23.0496H14.623C14.273 23.0496 13.9596 22.9429 13.7363 22.7761C13.513 22.6093 13.3838 22.3866 13.3838 22.1492V9.87964C13.3839 9.64229 13.5131 9.41946 13.7363 9.25269C13.9596 9.08598 14.273 8.98022 14.623 8.98022ZM21.2646 4.16187H23.3076C23.6577 4.16187 23.971 4.26852 24.1943 4.4353C24.4176 4.60213 24.5469 4.82481 24.5469 5.06226V22.1492C24.5469 22.3866 24.4176 22.6093 24.1943 22.7761C23.971 22.9429 23.6577 23.0496 23.3076 23.0496H21.2646C20.9145 23.0496 20.6012 22.943 20.3779 22.7761C20.1547 22.6093 20.0264 22.3866 20.0264 22.1492V5.06226C20.0264 4.82484 20.1547 4.60212 20.3779 4.4353C20.6012 4.26847 20.9145 4.16187 21.2646 4.16187Z" fill="url(#paint2_linear_6543_7)" fillOpacity="0.3" stroke="url(#paint3_linear_6543_7)" strokeWidth="0.2"/>
+                      <defs>
+                        <clipPath id="bgblur_0_6543_7_clip_path" transform="translate(5 0.937744)">
+                          <path d="M1.33887 15.9529H3.38184C3.73192 15.9529 4.04525 16.0586 4.26855 16.2253C4.49186 16.3922 4.62012 16.6158 4.62012 16.8533V22.1492C4.62012 22.3866 4.49181 22.6093 4.26855 22.7761C4.04524 22.943 3.732 23.0496 3.38184 23.0496H1.33887C0.988767 23.0496 0.67546 22.9429 0.452148 22.7761C0.228844 22.6093 0.0996094 22.3866 0.0996094 22.1492V16.8533C0.0996094 16.6158 0.228844 16.3922 0.452148 16.2253C0.675445 16.0587 0.988889 15.9529 1.33887 15.9529ZM7.98047 12.4031H10.0234C10.3734 12.4031 10.6869 12.5088 10.9102 12.6755C11.1334 12.8423 11.2626 13.0651 11.2627 13.3025V22.1492C11.2627 22.3866 11.1335 22.6093 10.9102 22.7761C10.6868 22.9429 10.3735 23.0496 10.0234 23.0496H7.98047C7.63034 23.0495 7.31705 22.9429 7.09375 22.7761C6.87053 22.6093 6.74219 22.3866 6.74219 22.1492V13.3025C6.74228 13.0651 6.87054 12.8423 7.09375 12.6755C7.31705 12.5087 7.63034 12.4031 7.98047 12.4031ZM14.623 8.98022H16.666C17.0161 8.98025 17.3294 9.08586 17.5527 9.25269C17.7759 9.41945 17.9042 9.6423 17.9043 9.87964V22.1492C17.9043 22.3866 17.776 22.6093 17.5527 22.7761C17.3294 22.9429 17.0161 23.0495 16.666 23.0496H14.623C14.273 23.0496 13.9596 22.9429 13.7363 22.7761C13.513 22.6093 13.3838 22.3866 13.3838 22.1492V9.87964C13.3839 9.64229 13.5131 9.41946 13.7363 9.25269C13.9596 9.08598 14.273 8.98022 14.623 8.98022ZM21.2646 4.16187H23.3076C23.6577 4.16187 23.971 4.26852 24.1943 4.4353C24.4176 4.60213 24.5469 4.82481 24.5469 5.06226V22.1492C24.5469 22.3866 24.4176 22.6093 24.1943 22.7761C23.971 22.9429 23.6577 23.0496 23.3076 23.0496H21.2646C20.9145 23.0496 20.6012 22.943 20.3779 22.7761C20.1547 22.6093 20.0264 22.3866 20.0264 22.1492V5.06226C20.0264 4.82484 20.1547 4.60212 20.3779 4.4353C20.6012 4.26847 20.9145 4.16187 21.2646 4.16187Z"/>
+                        </clipPath>
+                        <linearGradient id="paint0_linear_6543_7" x1="4.45044" y1="4.31416" x2="14.3016" y2="12.3337" gradientUnits="userSpaceOnUse">
+                          <stop stopColor="#FFC109"/>
+                          <stop offset="1" stopColor="#FFA02B"/>
+                        </linearGradient>
+                        <linearGradient id="paint1_linear_6543_7" x1="14.1531" y1="0.749924" x2="9.14749" y2="17.2114" gradientUnits="userSpaceOnUse">
+                          <stop stopColor="#FF8000"/>
+                          <stop offset="1" stopColor="#FFE373"/>
+                        </linearGradient>
+                        <linearGradient id="paint2_linear_6543_7" x1="1.55e-07" y1="19.501" x2="27.6013" y2="24.4758" gradientUnits="userSpaceOnUse">
+                          <stop stopColor="#FFAEAE"/>
+                          <stop offset="1" stopColor="#FFBC40"/>
+                        </linearGradient>
+                        <linearGradient id="paint3_linear_6543_7" x1="12.3232" y1="4.06226" x2="12.3232" y2="23.1492" gradientUnits="userSpaceOnUse">
+                          <stop stopColor="#FFC47D"/>
+                          <stop offset="1" stopColor="white"/>
+                        </linearGradient>
+                      </defs>
+                    </svg>
+                  ) 
+                },
+                { 
+                  label: t("sidebar.marketing"), 
+                  value: user?.marketing ?? 0, 
+                  positive: false, 
+                  iconKey: (
+                    <svg width="29" height="27" viewBox="0 0 29 27" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <foreignObject x="9.5799" y="-5" width="23.9182" height="21.2107">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style={{backdropFilter:"blur(2.5px)",clipPath:"url(#bgblur_0_6544_91_clip_path)",height:"100%",width:"100%"}}></div>
+                      </foreignObject>
+                      <rect data-figma-bg-blur-radius="5" x="14.6799" y="0.1" width="13.7182" height="11.0107" rx="2.9" fill="url(#paint0_linear_6544_91)" fillOpacity="0.3" stroke="url(#paint1_linear_6544_91)" strokeWidth="0.2"/>
+                      <path d="M11.4008 7.54261C10.2525 9.53157 7.79341 10.2617 5.90832 9.1733C4.02324 8.08494 3.42598 5.59029 4.57431 3.60133C5.72263 1.61237 8.1817 0.882285 10.0668 1.97064C11.9519 3.05899 12.5491 5.55365 11.4008 7.54261Z" fill="url(#paint2_linear_6544_91)"/>
+                      <path d="M16.862 10.6956C15.7137 12.6846 13.2546 13.4147 11.3695 12.3263C9.48443 11.238 8.88717 8.74331 10.0355 6.75435C11.1838 4.76539 13.6429 4.03531 15.528 5.12366C17.4131 6.21201 18.0103 8.70667 16.862 10.6956Z" fill="url(#paint3_linear_6544_91)"/>
+                      <path d="M6.34516 15.0123C6.23557 15.0445 6.12132 14.9785 6.09441 14.8675L4.04593 6.41742L14.6874 12.5613L6.34516 15.0123Z" fill="url(#paint4_linear_6544_91)"/>
+                      <path d="M11.6225 10.3116C11.2206 11.0077 10.1307 11.1309 9.18817 10.5867C8.24563 10.0426 7.80736 9.03709 8.20927 8.34095C8.61119 7.64482 9.70109 7.52163 10.6436 8.06581C11.5862 8.60999 12.0244 9.61546 11.6225 10.3116Z" fill="url(#paint5_linear_6544_91)"/>
+                      <path d="M21.6064 7.65894L22.3223 3.2953H23.0041L22.2882 7.65894H21.6064ZM19.6525 6.57655L19.7655 5.89473H23.1746L23.0616 6.57655H19.6525ZM20.0723 7.65894L20.7882 3.2953H21.47L20.7541 7.65894H20.0723ZM19.9018 5.0595L20.0169 4.37769H23.426L23.3109 5.0595H19.9018Z" fill="white"/>
+                      <foreignObject x="-2.28458" y="3.65894" width="32.1263" height="27.822">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style={{backdropFilter:"blur(2.5px)",clipPath:"url(#bgblur_1_6544_91_clip_path)",height:"100%",width:"100%"}}></div>
+                      </foreignObject>
+                      <rect data-figma-bg-blur-radius="5" x="2.81542" y="8.75894" width="21.9263" height="17.6221" rx="2.9" fill="url(#paint6_linear_6544_91)" fillOpacity="0.3" stroke="url(#paint7_linear_6544_91)" strokeWidth="0.2"/>
+                      <path d="M17.0594 18.7781L15.9708 14.7231C15.8524 14.2822 15.3106 14.1197 14.9684 14.4226L14.2823 15.0298C13.5187 15.7056 12.608 16.1947 11.6223 16.4583C10.7972 16.6789 10.3082 17.5279 10.5293 18.3514C10.7504 19.1749 11.5991 19.6661 12.4242 19.4454C13.41 19.1818 14.4436 19.1508 15.4434 19.3551L16.3419 19.5385C16.7899 19.6301 17.1778 19.219 17.0594 18.7781Z" stroke="white" strokeWidth="0.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M12.3642 16.249L13.6133 20.8724" stroke="white" strokeWidth="0.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      <defs>
+                        <clipPath id="bgblur_0_6544_91_clip_path" transform="translate(-9.5799 5)">
+                          <rect x="14.6799" y="0.1" width="13.7182" height="11.0107" rx="2.9"/>
+                        </clipPath>
+                        <clipPath id="bgblur_1_6544_91_clip_path" transform="translate(2.28458 -3.65894)">
+                          <rect x="2.81542" y="8.75894" width="21.9263" height="17.6221" rx="2.9"/>
+                        </clipPath>
+                        <linearGradient id="paint0_linear_6544_91" x1="21.539" y1="0" x2="21.539" y2="11.2107" gradientUnits="userSpaceOnUse">
+                          <stop stopColor="#43FFBD"/>
+                          <stop offset="1" stopColor="#36ABFF"/>
+                        </linearGradient>
+                        <linearGradient id="paint1_linear_6544_91" x1="21.539" y1="0" x2="21.539" y2="11.2107" gradientUnits="userSpaceOnUse">
+                          <stop stopColor="#43FFBD"/>
+                          <stop offset="1" stopColor="#36ABFF"/>
+                        </linearGradient>
+                        <linearGradient id="paint2_linear_6544_91" x1="12.7974" y1="3.54715" x2="6.14385" y2="15.0714" gradientUnits="userSpaceOnUse">
+                          <stop stopColor="#FF4379"/>
+                          <stop offset="1" stopColor="#FF363A"/>
+                        </linearGradient>
+                        <linearGradient id="paint3_linear_6544_91" x1="12.7974" y1="3.54715" x2="6.14385" y2="15.0714" gradientUnits="userSpaceOnUse">
+                          <stop stopColor="#FF4379"/>
+                          <stop offset="1" stopColor="#FF363A"/>
+                        </linearGradient>
+                        <linearGradient id="paint4_linear_6544_91" x1="12.7974" y1="3.54715" x2="6.14385" y2="15.0714" gradientUnits="userSpaceOnUse">
+                          <stop stopColor="#FF4379"/>
+                          <stop offset="1" stopColor="#FF363A"/>
+                        </linearGradient>
+                        <linearGradient id="paint5_linear_6544_91" x1="12.7974" y1="3.54715" x2="6.14385" y2="15.0714" gradientUnits="userSpaceOnUse">
+                          <stop stopColor="#FF4379"/>
+                          <stop offset="1" stopColor="#FF363A"/>
+                        </linearGradient>
+                        <linearGradient id="paint6_linear_6544_91" x1="13.7786" y1="8.65894" x2="13.7786" y2="26.481" gradientUnits="userSpaceOnUse">
+                          <stop stopColor="#FF4379"/>
+                          <stop offset="1" stopColor="#FF363A"/>
+                        </linearGradient>
+                        <linearGradient id="paint7_linear_6544_91" x1="13.7786" y1="8.65894" x2="13.7786" y2="26.481" gradientUnits="userSpaceOnUse">
+                          <stop stopColor="#FF4379"/>
+                          <stop offset="1" stopColor="#FF363A"/>
+                        </linearGradient>
+                      </defs>
+                    </svg>
+                  )
+                },
+                { 
+                  label: t("sidebar.costOfSales"), 
+                  value: user?.costOfSales ?? 0, 
+                  positive: false, 
+                  iconKey: (
+                    <svg width="31" height="24" viewBox="0 0 31 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <g filter="url(#filter0_d_6544_83)">
+                        <rect x="4.54169" y="6.65576" width="13.6167" height="3.37426" rx="1" fill="url(#paint0_linear_6544_83)" />
+                      </g>
+                      <foreignObject x="-4.99997" y="2.69238" width="32.7502" height="26.0955">
+                        <div 
+                          xmlns="http://www.w3.org/1999/xhtml" 
+                          style={{
+                            backdropFilter: "blur(2.5px)",
+                            clipPath: "url(#bgblur_0_6544_83_clip_path)",
+                            height: "100%",
+                            width: "100%"
+                          }}
+                        ></div>
+                      </foreignObject>
+                      <path data-figma-bg-blur-radius="5" d="M0.793976 7.79199H21.9561C22.3392 7.79199 22.6501 8.10242 22.6504 8.48535V22.9941C22.6502 23.3773 22.3393 23.6875 21.9561 23.6875H0.793976C0.410905 23.6873 0.099812 23.3771 0.0996399 22.9941V8.48535C0.100005 8.1026 0.41096 7.7922 0.793976 7.79199Z" fill="url(#paint1_linear_6544_83)" fillOpacity="0.3" stroke="url(#paint2_linear_6544_83)" strokeWidth="0.2"/>
+                      <path d="M21.75 4.04858C22.3023 4.04858 22.75 4.4963 22.75 5.04858V6.42261C22.75 6.97483 22.3023 7.42261 21.75 7.42261H1.00003C0.447895 7.42249 0.000104814 6.97475 3.05176e-05 6.42261V5.04858C3.05176e-05 4.49637 0.447849 4.04871 1.00003 4.04858H21.75ZM8.93655 4.74585C8.78267 4.74605 8.65834 4.87124 8.65823 5.02515C8.65823 5.17914 8.7826 5.30425 8.93655 5.30444H14.6719C14.826 5.30444 14.9512 5.17926 14.9512 5.02515C14.9511 4.87112 14.826 4.74585 14.6719 4.74585H8.93655Z" fill="url(#paint3_linear_6544_83)"/>
+                      <g filter="url(#filter2_dd_6544_83)">
+                        <path d="M17.6785 4.79235C17.7949 4.23905 18.3484 3.89279 18.897 4.02992L21.7048 4.73179C21.9371 4.7899 22.141 4.93031 22.2787 5.12621L26.6457 11.3361C26.9619 11.7858 26.8548 12.4073 26.406 12.7247L22.8765 15.2191C22.4261 15.5375 21.8025 15.4297 21.4851 14.9787L17.1559 8.82238C16.9971 8.59633 16.9395 8.31409 16.9963 8.04369L17.6785 4.79235ZM18.6521 5.49946C18.5714 5.82302 18.7679 6.15063 19.0914 6.23163C19.4151 6.31253 19.7434 6.11607 19.8245 5.79254C19.9055 5.46879 19.7083 5.14013 19.3845 5.0592C19.0608 4.97842 18.733 5.17579 18.6521 5.49946Z" fill="url(#paint4_linear_6544_83)"/>
+                      </g>
+                      <path d="M23.2462 12.3451L20.6225 8.63333L20.8603 8.46525L23.484 12.177L23.2462 12.3451ZM22.21 9.18112C22.0887 9.0465 21.9375 8.98232 21.7564 8.98858C21.5753 8.99484 21.3948 9.06152 21.2151 9.1886C21.0836 9.28153 20.9836 9.3841 20.9151 9.49632C20.8475 9.60786 20.8125 9.72032 20.81 9.83369C20.8085 9.94639 20.8412 10.0501 20.9082 10.1448C20.9642 10.2241 21.0312 10.2789 21.1092 10.3093C21.1875 10.338 21.2699 10.3501 21.3565 10.3454C21.4424 10.3398 21.5268 10.3258 21.6096 10.3035C21.6917 10.2802 21.7654 10.2564 21.8308 10.2319L22.1898 10.1C22.2814 10.0656 22.3873 10.0328 22.5073 10.0016C22.6283 9.96974 22.7541 9.95399 22.8848 9.95436C23.0158 9.95308 23.1437 9.98013 23.2684 10.0355C23.393 10.0909 23.5046 10.1882 23.6029 10.3274C23.7164 10.4878 23.7768 10.6625 23.7843 10.8515C23.7927 11.0398 23.7437 11.2288 23.6372 11.4186C23.5317 11.6077 23.3649 11.7829 23.1367 11.9441C22.9241 12.0945 22.7157 12.1903 22.5116 12.2317C22.3084 12.2724 22.119 12.2628 21.9433 12.2029C21.7685 12.1423 21.618 12.0349 21.4916 11.8807L21.8627 11.6183C21.9517 11.7236 22.055 11.7898 22.1726 11.8168C22.2906 11.8421 22.4129 11.8368 22.5397 11.8008C22.6667 11.7632 22.7892 11.7027 22.9072 11.6194C23.0444 11.5223 23.152 11.413 23.2298 11.2913C23.3069 11.1687 23.349 11.0447 23.356 10.9194C23.3625 10.7931 23.3274 10.6758 23.2509 10.5675C23.1812 10.4689 23.0969 10.4082 22.9981 10.3853C22.8993 10.3624 22.7912 10.3633 22.674 10.3882C22.5568 10.4131 22.4357 10.4479 22.3108 10.4927L21.8717 10.6466C21.5925 10.7439 21.3416 10.7785 21.1188 10.7504C20.896 10.7224 20.7139 10.6083 20.5725 10.4082C20.455 10.2419 20.3974 10.0652 20.3998 9.87791C20.4026 9.68899 20.456 9.50624 20.5602 9.32965C20.6647 9.15142 20.8117 8.99534 21.0012 8.86142C21.1926 8.72614 21.3869 8.6402 21.5843 8.60361C21.781 8.56605 21.9645 8.57548 22.1349 8.63192C22.3062 8.68766 22.4472 8.78874 22.558 8.93515L22.21 9.18112Z" fill="white" />
+                      <defs>
+                        <filter id="filter0_d_6544_83" x="0.541687" y="6.65576" width="21.6168" height="12.3743" filterUnits="userSpaceOnUse" colorInterpolationFilters="sRGB">
+                          <feFlood floodOpacity="0" result="BackgroundImageFix" />
+                          <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha" />
+                          <feOffset dy="5" />
+                          <feGaussianBlur stdDeviation="2" />
+                          <feComposite in2="hardAlpha" operator="out" />
+                          <feColorMatrix type="matrix" values="0 0 0 0 0.810203 0 0 0 0 0.482371 0 0 0 0 1 0 0 0 0.25 0" />
+                          <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_6544_83" />
+                          <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_6544_83" result="shape" />
+                        </filter>
+                        <clipPath id="bgblur_0_6544_83_clip_path" transform="translate(4.99997 -2.69238)">
+                          <path d="M0.793976 7.79199H21.9561C22.3392 7.79199 22.6501 8.10242 22.6504 8.48535V22.9941C22.6502 23.3773 22.3393 23.6875 21.9561 23.6875H0.793976C0.410905 23.6873 0.099812 23.3771 0.0996399 22.9941V8.48535C0.100005 8.1026 0.41096 7.7922 0.793976 7.79199Z" />
+                        </clipPath>
+                        <filter id="filter2_dd_6544_83" x="12.9749" y="0" width="17.8524" height="21.4021" filterUnits="userSpaceOnUse" colorInterpolationFilters="sRGB">
+                          <feFlood floodOpacity="0" result="BackgroundImageFix" />
+                          <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha" />
+                          <feOffset />
+                          <feGaussianBlur stdDeviation="2" />
+                          <feComposite in2="hardAlpha" operator="out" />
+                          <feColorMatrix type="matrix" values="0 0 0 0 1 0 0 0 0 0.347756 0 0 0 0 0.869551 0 0 0 0.21 0" />
+                          <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_6544_83" />
+                          <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha" />
+                          <feOffset dy="2" />
+                          <feGaussianBlur stdDeviation="2" />
+                          <feComposite in2="hardAlpha" operator="out" />
+                          <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.56 0" />
+                          <feBlend mode="normal" in2="effect1_dropShadow_6544_83" result="effect2_dropShadow_6544_83" />
+                          <feBlend mode="normal" in="SourceGraphic" in2="effect2_dropShadow_6544_83" result="shape" />
+                        </filter>
+                        <linearGradient id="paint0_linear_6544_83" x1="8.09095" y1="6.65576" x2="11.4563" y2="12.1791" gradientUnits="userSpaceOnUse">
+                          <stop stopColor="#738DFF"/>
+                          <stop offset="1" stopColor="#CA4FFF"/>
+                        </linearGradient>
+                        <linearGradient id="paint1_linear_6544_83" x1="5.92997" y1="7.69238" x2="21.5399" y2="16.6658" gradientUnits="userSpaceOnUse">
+                          <stop stopColor="#738DFF"/>
+                          <stop offset="1" stopColor="#CA4FFF"/>
+                        </linearGradient>
+                        <linearGradient id="paint2_linear_6544_83" x1="5.92997" y1="7.69238" x2="21.5399" y2="16.6658" gradientUnits="userSpaceOnUse">
+                          <stop stopColor="#738DFF"/>
+                          <stop offset="1" stopColor="#F1D2FF"/>
+                        </linearGradient>
+                        <linearGradient id="paint3_linear_6544_83" x1="5.92997" y1="4.04858" x2="8.36732" y2="10.7328" gradientUnits="userSpaceOnUse">
+                          <stop stopColor="#738DFF"/>
+                          <stop offset="1" stopColor="#CA4FFF"/>
+                        </linearGradient>
+                        <linearGradient id="paint4_linear_6544_83" x1="15.7701" y1="13.5496" x2="29.11" y2="8.90281" gradientUnits="userSpaceOnUse">
+                          <stop stopColor="#738DFF"/>
+                          <stop offset="1" stopColor="#8A4FFF"/>
+                        </linearGradient>
+                      </defs>
+                    </svg>
+                  ) 
+                },
+              ].map((item) => (
+                <div
+                  key={item.label}
+                  className="flex items-center gap-3 rounded-xl bg-[#111113] px-4 py-3"
+                >
+                  {/* Icon placeholder - SVG will be pasted here */}
+                  <div className="flex-shrink-0 w-10 h-10 flex items-center justify-center">
+                    {/* SVG placeholder for {item.iconKey} */}
+                    <div className="w-full h-full flex items-center justify-center text-md text-gray-500">
+                      {item.iconKey}
+                    </div>
+                  </div>
+                  <div className="flex-1 flex items-center justify-between">
+                    <span className="text-sm text-gray-400">{item.label}</span>
+                    <span className="text-sm font-medium text-white">
+                      {item.positive ? `$${item.value}` : `-$${Math.abs(item.value)}`}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Secondary controls row (AI advisor + tutorial) */}
+        {/* <div className="mb-2 mt-4 flex w-full flex-col gap-3 sm:flex-row sm:justify-end">
+          <button
+            onClick={() => {
+              playSound("click");
+              setChatModalOpen(true);
+            }}
+            className="flex w-full items-center justify-center gap-2 rounded-full bg-gray-100/5 px-5 py-2.5 text-sm font-medium text-white shadow-sm ring-1 ring-gray-700/60 backdrop-blur hover:bg-gray-100/10 hover:ring-gray-500 transition duration-200 sm:w-auto sm:min-w-[180px]"
+          >
+            <InfoIcon className="h-4 w-4" />
+            {t("dashboard.askAIAdvisor")}
+          </button>
+          <button
+            onClick={handleShowTutorial}
+            className="flex w-full items-center justify-center gap-2 rounded-full border border-gray-700/70 bg-transparent px-5 py-2.5 text-sm font-medium text-gray-200 hover:border-gray-400 hover:bg-gray-100/5 transition duration-150 sm:w-auto"
+            title={t("dashboard.startElonTutorial")}
+          >
+            <ArrowRight className="h-4 w-4" />
+            {t("dashboard.showTutorial")}
+          </button>
+        </div> */}
+
+        {/* Filters bar (restored) */}
+        <div className="mb-4 mt-2 w-full rounded-3xl bg-[#11121a]/90 p-3 shadow-[0_20px_60px_rgba(0,0,0,0.45)] border border-gray-800">
+          <div className="flex flex-wrap items-center gap-2 text-xs text-gray-300">
+            <span className="px-3 py-2 text-sm font-semibold text-gray-400">Filters</span>
+            <button className="flex items-center gap-2 rounded-full bg-gradient-to-r from-[#c26bff] to-[#5e7bff] px-4 py-2 text-sm font-semibold text-white shadow hover:opacity-90 transition">
+              In Progress
+              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-white/20 text-xs">×</span>
+            </button>
+            {["UA", "C1", "AOV", "COGS", "APC", "CPA", "BUGS"].map((label) => (
+              <button
+                key={label}
+                className="rounded-full bg-[#0f1018] px-4 py-2 text-xs font-medium text-gray-200 hover:bg-[#161824] transition"
+              >
+                {label}
               </button>
             ))}
+          </div>
         </div>
-      </div>
-      <div className="mt-6 mb-6 flex flex-col sm:flex-row gap-3 justify-end w-full">
-        <button
-          onClick={() => {
-            playSound("click");
-            setChatModalOpen(true);
-          }}
-          className="flex items-center justify-center gap-2 text-sm font-medium bg-gray-900 dark:bg-gray-700 text-white dark:text-white px-5 py-2.5 rounded-lg shadow-sm hover:bg-gray-800 dark:hover:bg-gray-600 transition duration-200 w-full sm:w-auto sm:min-w-[160px]"
-        >
-          <InfoIcon className="w-4 h-4" />
-          {t("dashboard.askAIAdvisor")}
-        </button>
-        <button
-          onClick={handleShowTutorial}
-          className="flex items-center justify-center gap-2 text-sm font-medium bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-750 px-5 py-2.5 rounded-lg transition duration-150 w-full sm:w-auto"
-          title={t("dashboard.startElonTutorial")}
-        >
-          <ArrowRight className="w-4 h-4" />
-          {t("dashboard.showTutorial")}
-        </button>
-      </div>
 
-      <SpotlightModal
-        isOpen={modalInfo.isOpen}
-        onClose={handleModalClose}
-        title={modalInfo.title}
-        content={modalInfo.content}
-        anchorEl={modalInfo.anchorEl}
-        selectedMetric={selectedMetric}
-      />
-      <div className={`mt-4 w-full relative items-center 
-     ${elonStep === 4 ? "ring-1 ring-blue-600 p-4 rounded-2xl animate-pulse" : ''}
-      lg:static md:mt-4 2xl:mt-7.5`}>
-        <TaskGrid />
+        {/* Tasks grid – main bottom section */}
+        <SpotlightModal
+          isOpen={modalInfo.isOpen}
+          onClose={handleModalClose}
+          title={modalInfo.title}
+          content={modalInfo.content}
+          anchorEl={modalInfo.anchorEl}
+          selectedMetric={selectedMetric}
+        />
+        <div
+          className={`relative w-full items-center rounded-3xl shadow-[0_24px_80px_rgba(0,0,0,0.6)] ${elonStep === 4 ? "ring-1 ring-blue-600 animate-pulse" : ""
+            } lg:static`}
+        >
+          <TaskGrid />
+        </div>
       </div>
       {/* Floating Make Turn Button */}
       <button
@@ -1472,6 +2205,7 @@ const ECommerce: React.FC = () => {
         {/* Animated gradient shimmer effect on hover */}
         <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 ease-in-out"></span>
 
+
         {/* Bug count badge */}
         {(() => {
           const bugCount = user?.tasks?.filter((task: any) => task.isBug === true).length || 0;
@@ -1481,6 +2215,7 @@ const ECommerce: React.FC = () => {
             </span>
           ) : null;
         })()}
+
 
         {isScrolling ? (
           <span className="font-bold text-white text-lg relative z-10 group-hover:scale-110 transition-transform duration-300">{t("dashboard.makeTurn")}</span>
@@ -1563,10 +2298,14 @@ const ECommerce: React.FC = () => {
                       className={`rounded-lg p-4 border ${msg.isPositive
                         ? "bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800"
                         : "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800"
+                        ? "bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800"
+                        : "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800"
                         }`}
                     >
                       <p
                         className={`text-sm font-medium ${msg.isPositive
+                          ? "text-green-700 dark:text-green-400"
+                          : "text-red-700 dark:text-red-400"
                           ? "text-green-700 dark:text-green-400"
                           : "text-red-700 dark:text-red-400"
                           }`}
@@ -1692,6 +2431,8 @@ const ECommerce: React.FC = () => {
                         />
                       )}
                       <div className={`whitespace-pre-wrap break-words px-4 py-3 rounded-2xl text-sm shadow-md ${isUser
+                        ? "bg-blue-600 text-white"
+                        : "bg-gray-100 dark:bg-[#2d3746]/70 text-gray-900 dark:text-white"
                         ? "bg-blue-600 text-white"
                         : "bg-gray-100 dark:bg-[#2d3746]/70 text-gray-900 dark:text-white"
                         }`}>
@@ -1888,9 +2629,12 @@ const ECommerce: React.FC = () => {
         notifications={turnNotifications}
       />
 
-      {/* </div> */}
-    </>
+      {/* Team Management Modal */}
+      <TeamManagementModal
+        isOpen={showTeamModal}
+        onClose={() => setShowTeamModal(false)}
+      />
+    </div>
   );
 };
-
 export default ECommerce;

@@ -44,10 +44,10 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       }
     }
     return [
-      {
-        message: "Welcome to the game",
-        isPositive: true,
-      },
+    {
+      message: "Welcome to the game",
+      isPositive: true,
+    },
     ];
   });
   const [elonStep, setElonStep] = useState<number | null>(0);

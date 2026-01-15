@@ -244,7 +244,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, sidebarCollapsed = false, setSid
   return (
     <>
       <aside
-        className={`fixed left-0 ${elonStep === 3 ? 'z-9999' : 'z-999999'} top-0 lg:z-50 flex h-screen flex-col overflow-y-hidden bg-white dark:bg-boxdark border-r border-stroke dark:border-strokedark duration-300 ease-linear lg:translate-x-0 ${
+        className={`fixed left-0 ${elonStep === 3 ? 'z-9999' : 'z-999999'} top-0 lg:z-50 flex h-screen flex-col overflow-y-hidden bg-transparent  duration-300 ease-linear lg:translate-x-0 ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         } ${sidebarCollapsed ? "w-20" : "w-[300px]"}`}
         style={{ height: '100dvh' }} 

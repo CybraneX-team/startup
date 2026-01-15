@@ -50,9 +50,8 @@ const Header = (props: {
   return (
     <>
       <header
-        className={`fixed top-0 left-0 right-0 z-[1000] w-full backdrop-blur-md border-b ${
-          HeaderDark ? "bg-[#878C94]/95" : "bg-white/95"
-        } dark:bg-gray-900/95 border-gray-200 dark:border-gray-800 shadow-sm transition-all duration-300`}
+        className={`fixed top-0 left-0 right-0 z-[1000] w-full bg-transparent backdrop-blur-md
+         dark:bg-gray-900/95 border-gray-200 dark:border-gray-800 shadow-sm transition-all duration-300`}
       >
         <div className="flex flex-nowrap items-center justify-between px-3 py-2 md:px-6 md:py-3 gap-2">
           {/* Left: Back Button & Hamburger */}

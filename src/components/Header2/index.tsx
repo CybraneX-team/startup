@@ -132,20 +132,20 @@ const Header = () => {
                         </Link>
                       </li>
                       <li>
-                        <Link
+                          <Link
                           href="/home#pricing"
                           onClick={() => setNavbarOpen(false)}
                           className="flex py-2 text-base lg:mr-0 lg:inline-flex lg:px-0 lg:py-6 text-dark hover:text-primary dark:text-white/70 dark:hover:text-white"
                         >
                           Pricing
-                        </Link>
+                          </Link>
                       </li>
                       <li>
                         <Link
                           href="/home#contact"
                           onClick={() => setNavbarOpen(false)}
                           className="flex py-2 text-base lg:mr-0 lg:inline-flex lg:px-0 lg:py-6 text-dark hover:text-primary dark:text-white/70 dark:hover:text-white"
-                        >
+                            >
                           Contact
                         </Link>
                       </li>
@@ -159,13 +159,13 @@ const Header = () => {
                         </Link>
                       </li>
                       <li className="lg:hidden">
-                        <Link
+                                <Link
                           href="/auth/signup"
                           onClick={() => setNavbarOpen(false)}
                           className="flex py-2 text-base lg:mr-0 lg:inline-flex lg:px-0 lg:py-6 text-primary dark:text-white font-semibold"
-                        >
+                                >
                           Sign Up
-                        </Link>
+                                </Link>
                       </li>
                     </ul>
                   )}
