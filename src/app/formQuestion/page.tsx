@@ -1,7 +1,9 @@
 "use client"
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Building2, LayoutGrid, Users, Target, Flag, Wallet, TrendingUp } from 'lucide-react';
+import { Building2, LayoutGrid, Users, Target, Flag, Wallet, TrendingUp, MapPin } from 'lucide-react';
+import Select from 'react-select'; // Import for better dropdowns
+import countryList from 'react-select-country-list'; // Import for real country data
 import DefaultLayout from '@/components/Layouts/DefaultLayout';
 import { useUser } from "@/context/UserContext";
 import { useRouter } from "next/navigation";
@@ -18,6 +20,7 @@ const initialAnswers = {
   businessName: '',
   industry: '',
   productType: '',
+  businessLocation: '',
   targetAudience: '',
   goal: '',
   businessModel : '',
@@ -32,6 +35,9 @@ export default function StartupBasicsForm() {
   const [formData, setFormData] = useState(initialAnswers);
   const { user, setUser, setloader, setUserState, setLoaderMessage, userLoaded } = useUser();
   const router = useRouter(); 
+
+  // Initialize the country list for the dropdown
+  const countryOptions = useMemo(() => countryList().getData(), []);
   
   const handleChange = (key: keyof typeof formData, value: string) => {
     setFormData({ ...formData, [key]: value });
@@ -48,12 +54,32 @@ export default function StartupBasicsForm() {
   
   const handleSubmit = async () => {
     if (!user || !user.gameId) return;
+
+    // --- VALIDATION LOGIC ---
+    // 1. Business Description Word Count (Max 200 words)
+    const descriptionWords = formData.businessDescription.trim().split(/\s+/).filter(Boolean);
+    if (descriptionWords.length > 200) {
+        alert("🚨 Business Description is too long! Please keep it under 200 words so the AI stays focused.");
+        return;
+    }
+
+    // 2. Location Selection Check
+    if (!formData.businessLocation) {
+        alert("📍 Please select a valid Country from the list.");
+        return;
+    }
+
+    // 3. Prevent empty required fields
+    if (!formData.businessName || !formData.industry) {
+        alert("Please fill in the core details (Name and Industry) before launching!");
+        return;
+    }
+
     setloader(true);
     const messages = [
       "🔍 Analyzing your financials...",
-      "💰 Injecting starting capital...",
+      "🌍 Factoring in regional constraints...",
       "🧠 Calibrating mentors for your industry...",
-      "✨ Generating custom tasks...",
       "🚀 Preparing your simulation..."
     ];
   
@@ -100,6 +126,7 @@ export default function StartupBasicsForm() {
       businessName: "BoltCart",
       industry: "E-commerce",
       productType: "1-hour delivery platform for local stores",
+      businessLocation: "United States",
       targetAudience: "Busy city shoppers",
       goal: "Partner with 100 stores in 3 months",
       businessModel: "D2C",
@@ -113,6 +140,7 @@ export default function StartupBasicsForm() {
       businessName: "MediConnect",
       industry: "Healthcare",
       productType: "Telemedicine app for seniors",
+      businessLocation: "United Kingdom",
       targetAudience: "Elderly population",
       goal: "Sign up 500 senior patients",
       businessModel: "B2C",
@@ -126,6 +154,7 @@ export default function StartupBasicsForm() {
       businessName: "EduSpark",
       industry: "Education",
       productType: "AI Tutoring Platform",
+      businessLocation: "India",
       targetAudience: "High school students",
       goal: "Launch pilot program in 10 schools",
       businessModel: "B2B",
@@ -139,6 +168,7 @@ export default function StartupBasicsForm() {
       businessName: "FinanceEase",
       industry: "Finance",
       productType: "Personal Finance Manager App",
+      businessLocation: "Canada",
       targetAudience: "Young professionals",
       goal: "Acquire 2000 active users",
       businessModel: "B2C",
@@ -152,6 +182,7 @@ export default function StartupBasicsForm() {
       businessName: "NexusQuantum",
       industry: "Other",
       productType: "Error-Corrected Quantum Processor Unit",
+      businessLocation: "Germany",
       targetAudience: "Research labs & Cybersec firms",
       goal: "Achieve stable 10-qubit entanglement in prototype",
       businessModel: "DeepTech",
@@ -165,6 +196,7 @@ export default function StartupBasicsForm() {
         businessName: "VoltCycle",
         industry: "Mobility",
         productType: "Solid-state battery electric motorbike",
+        businessLocation: "United States",
         targetAudience: "Urban eco-commuters",
         goal: "Secure 500 paid pre-orders via crowdfunding",
         businessModel: "D2C",
@@ -205,20 +237,38 @@ export default function StartupBasicsForm() {
                 <h3 className="font-semibold text-lg border-b pb-2 dark:border-gray-700">1. Core Concept</h3>
                 {[
                     { label: "Startup Name", icon: <Building2 />, key: "businessName", placeholder: "e.g. QuantumDynamics" },
+                    { label: "Business Location", icon: <MapPin />, key: "businessLocation", type: "country" },
                     { label: "Industry", icon: <LayoutGrid />, key: "industry", type: "select", options: industries },
                     { label: "Business Description (Crucial for AI)", icon: <Target />, key: "businessDescription", placeholder: "e.g. Developing stable qubits for banking security..." },
                     { label: "Business Model", icon: <Target />, key: "businessModel", type: "select", options: ["B2C", "D2C", "B2B", "Marketplace", "SaaS", "DeepTech"] },
                     { label: "Product / Service", icon: <LayoutGrid />, key: "productType", placeholder: "e.g. Quantum Encryption API" },
                     { label: "Target Audience", icon: <Users />, key: "targetAudience", placeholder: "e.g. Global Banks" },
-                    { label: "Main Goal", icon: <Flag />, key: "goal", placeholder: "e.g. Secure 5 Pilot Banks" }
+                    { label: "Main Goal", icon: <Flag />, key: "goal", placeholder: "e.g. Secure 5 Pilot Banks" },
+                    
                 ].map(({ label, icon, key, type, placeholder, options }) => (
                     <div key={key} className="space-y-2">
                     <label className="font-normal flex items-center gap-2 text-base">
                         {icon} {label}
                     </label>
-                    {type === 'select' ? (
+                    {type === 'country' ? (
+                        <Select
+                            options={countryOptions}
+                            value={countryOptions.find(opt => opt.label === formData.businessLocation)}
+                            onChange={(val) => handleChange('businessLocation', val ? val.label : '')}
+                            placeholder="Select a Country..."
+                            className="text-black"
+                            styles={{
+                              control: (baseStyles) => ({
+                                ...baseStyles,
+                                borderRadius: '0.75rem',
+                                padding: '0.2rem',
+                                backgroundColor: 'rgb(249 250 251)', // Matches bg-gray-50
+                              }),
+                            }}
+                        />
+                    ) : type === 'select' ? (
                         <select
-                        value={formData[key as keyof typeof formData]}
+                        value={formData[key as keyof typeof formData] || ''}
                         onChange={(e) => handleChange(key as keyof typeof formData, e.target.value)}
                         className="w-full p-3 rounded-xl bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 dark:text-white focus:outline-none"
                         >
@@ -239,7 +289,7 @@ export default function StartupBasicsForm() {
                         <input
                         type="text"
                         placeholder={placeholder}
-                        value={formData[key as keyof typeof formData]}
+                        value={formData[key as keyof typeof formData] || ''}
                         onChange={(e) => handleChange(key as keyof typeof formData, e.target.value)}
                         className="w-full p-3 rounded-xl bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 dark:text-white focus:outline-none"
                         />
@@ -259,7 +309,7 @@ export default function StartupBasicsForm() {
                         </label>
                         <input
                         type="number"
-                        value={formData.startingRevenue}
+                        value={formData.startingRevenue || '0'}
                         onChange={(e) => handleChange("startingRevenue", e.target.value)}
                         className="w-full p-3 rounded-xl bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600"
                         />
@@ -270,7 +320,7 @@ export default function StartupBasicsForm() {
                         </label>
                         <input
                         type="number"
-                        value={formData.startingUsers}
+                        value={formData.startingUsers || '0'}
                         onChange={(e) => handleChange("startingUsers", e.target.value)}
                         className="w-full p-3 rounded-xl bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600"
                         />
@@ -292,7 +342,6 @@ export default function StartupBasicsForm() {
         </div>
 
         {!user?.isAiCustomizationDone && (
-            // Updated grid to use max 2 columns (md:grid-cols-2 lg:grid-cols-2)
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8 max-w-4xl mb-20">
             {startupTemplates.map((template, idx) => (
                 <motion.div
@@ -300,7 +349,7 @@ export default function StartupBasicsForm() {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => {
-                    setFormData(template); 
+                    setFormData({...initialAnswers, ...template}); 
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                 }}
                 className="cursor-pointer p-8 rounded-[2rem] shadow-lg bg-white dark:bg-[#151d2f] hover:border-indigo-500 transition-all border-2 border-transparent dark:border-gray-800"
