@@ -34,7 +34,7 @@ const GameSwitchMenu = () => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
-
+  
   const filteredGames = user?.userGames?.filter((game: userGameType, index: number) => {
     const nameToCheck = game.gameName !== "Game" ? game.gameName : `Game ${index + 1}`;
     return nameToCheck.toLowerCase().includes(searchTerm.toLowerCase());
