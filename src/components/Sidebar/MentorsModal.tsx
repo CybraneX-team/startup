@@ -1,5 +1,6 @@
 "use client"
 import React, { useEffect, useState } from "react";
+import { X } from "lucide-react";
 import { useUser } from "@/context/UserContext";
 import { useLanguage } from "@/context/LanguageContext";
 import DealModal from "./dealModel";
@@ -124,80 +125,75 @@ const MentorCard: React.FC<MentorCardProps> = ({
 
   return (
     <>
-      <div
-        onClick={() => {
-          if (!isSigned) setShowDealModal(true);
-        }}
-        className="min-w-[310px] lg:min-w-[350px] cursor-pointer 
-        flex-none rounded-xl border border-gray-200 bg-white p-5 hover:shadow-lg transition dark:bg-[#24303F]"
-      >
-        <div className="mb-4 flex items-center gap-3">
-          <div className={`h-14 w-14 rounded-full ${getAvatarColor(title)} flex items-center justify-center flex-shrink-0`}>
-            <span className="text-lg font-semibold text-white">
+      <div className="w-full sm:w-[320px] flex-shrink-0 rounded-xl bg-[#161618] dark:bg-[#161618] p-5 flex flex-col h-full">
+        <div className="flex items-center gap-4 mb-4">
+          <div className={`h-16 w-16 rounded-full ${getAvatarColor(title)} flex items-center justify-center flex-shrink-0`}>
+            <span className="text-xl font-semibold text-white">
               {getInitials(title)}
             </span>
           </div>
-          <h3 className="text-xl font-medium text-gray-800 dark:text-white flex-1">
-            {isTranslating ? t("common.loading") : translatedTitle}
-          </h3>
+          <div className="flex-1 min-w-0">
+            <h3 className="text-lg font-semibold text-gray-800 dark:text-white truncate">
+              {isTranslating ? t("common.loading") : translatedTitle}
+            </h3>
+          </div>
         </div>
 
-        <p className="mb-6 text-sm w-70 lg:w-90 text-gray-600 dark:text-white">
+        <p className="mb-4 text-sm text-gray-600 dark:text-gray-300">
           {isTranslating ? t("common.loading") : translatedDescription}
         </p>
 
-        <div className="mb-3 flex items-center justify-between border-b border-gray-200 pb-3">
-          <span className="text-sm font-medium text-gray-700 dark:text-white">{t("modals.mentors.conditions")}</span>
-          <span className="text-sm font-medium text-blue-500">{conditions}%</span>
-        </div>
-
-        <div className="mb-3">
-          <h4 className="mb-2 text-sm font-medium text-gray-700 dark:text-white">{t("modals.mentors.benefits")}</h4>
-          <ul>
-            {isTranslating ? (
-              <li className="flex items-start gap-2 text-sm text-blue-500">
-                <span className="mt-1 h-2 w-2 flex-none rounded-full bg-blue-500"></span>
-                {t("common.loading")}
-              </li>
-            ) : (
-              translatedBenefits.map((benefit, idx) => (
-                <li key={idx} className="flex items-start gap-2 text-sm text-blue-500">
-                  <span className="mt-1 h-2 w-2 flex-none rounded-full bg-blue-500"></span>
-                  {benefit}
-                </li>
-              ))
-            )}
-          </ul>
-        </div>
-
-        <div>
-          <h4 className="mb-2 text-sm font-medium text-gray-700 dark:text-white">{t("modals.mentors.limitations")}</h4>
-          <ul>
-            {isTranslating ? (
-              <li className="flex items-start gap-2 text-sm text-blue-500">
-                <span className="mt-1 h-2 w-2 flex-none rounded-full bg-blue-500"></span>
-                {t("common.loading")}
-              </li>
-            ) : (
-              translatedLimitations.map((limitation, idx) => (
-                <li key={idx} className="flex items-start gap-2 text-sm text-blue-500">
-                  <span className="mt-1 h-2 w-2 flex-none rounded-full bg-blue-500"></span>
-                  {limitation}
-                </li>
-              ))
-            )}
-          </ul>
-        </div>
-        <div className="mt-4 text-right">
-                  {user?.myMentors.some(
-                    (element) => element.mentorName === title,
-                  ) ? (
-                    <span className="rounded border border-green-600 px-2 py-1 font-semibold text-green-600">
-                      {t("modals.mentors.signed")}
-                    </span> 
-                  ): null
-                }
+        <div className="space-y-3 border-t border-gray-200 dark:border-gray-700 pt-3 text-sm">
+          <div className="flex justify-between">
+            <span className="text-gray-600 dark:text-white">{t("modals.mentors.conditions")}</span>
+            <span className="text-blue-500">{conditions}%</span>
           </div>
+          <div className="flex justify-between">
+            <span className="text-gray-600 dark:text-white flex items-center">
+              <span className="h-2 w-2 rounded-full bg-blue-500 mr-2" />
+              {t("modals.mentors.benefits")}
+            </span>
+          </div>
+          {isTranslating ? (
+            <p className="text-sm text-blue-500">{t("common.loading")}</p>
+          ) : (
+            translatedBenefits.map((benefit, idx) => (
+              <p key={idx} className="text-sm text-blue-500 pl-4">
+                • {benefit}
+              </p>
+            ))
+          )}
+          <div className="flex justify-between mt-2">
+            <span className="text-gray-600 dark:text-white flex items-center">
+              <span className="h-2 w-2 rounded-full bg-blue-500 mr-2" />
+              {t("modals.mentors.limitations")}
+            </span>
+          </div>
+          {isTranslating ? (
+            <p className="text-sm text-blue-500">{t("common.loading")}</p>
+          ) : (
+            translatedLimitations.map((limitation, idx) => (
+              <p key={idx} className="text-sm text-blue-500 pl-4">
+                • {limitation}
+              </p>
+            ))
+          )}
+        </div>
+
+        <div className="mt-auto pt-6 text-right">
+          {isSigned ? (
+            <span className="rounded-full border border-green-600 px-4 py-2 text-sm font-semibold text-green-600">
+              {t("modals.mentors.signed")}
+            </span>
+          ) : (
+            <button
+              onClick={() => setShowDealModal(true)}
+              className="rounded-full bg-gradient-to-b from-[#F5D0FE] via-[#E9D5FF] to-[#DDD6FE] px-6 py-2.5 text-sm font-semibold text-gray-800 shadow-md hover:from-[#FCE7F3] hover:via-[#F3E8FF] hover:to-[#E9D5FF] transition-all duration-300 hover:shadow-lg hover:scale-105 active:scale-100"
+            >
+              Sign
+            </button>
+          )}
+        </div>
       </div>
 
       <DealModal
@@ -249,56 +245,49 @@ const MentorsModal: React.FC<MentorsModalProps> = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
   return (
-<div className="fixed inset-0 z-[99999] flex items-center justify-center">
-
-      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm " onClick={onClose}></div>
-      
-<div className="relative w-full max-w-4xl mx-4 sm:mx-auto my-6 rounded-xl bg-white p-6 shadow-lg dark:bg-boxdark max-h-[95vh] overflow-y-auto">
-      {/* Close button */}
-        <button 
+    <>
+      <div className="fixed inset-0 z-[99999] flex items-center justify-center">
+        {/* Full screen backdrop */}
+        <div 
+          className="absolute inset-0 bg-black/40 backdrop-blur-sm"
           onClick={onClose}
-          className="absolute right-4 top-4 text-gray-400 hover:text-gray-600"
-        >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M18 6L6 18M6 6L18 18" stroke="#C5C7D0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-        </button>
-        
-        {/* Modal header */}
-        <div className="mb-6">
-          <div className="flex items-center gap-2">
-            <h2 className="text-2xl font-medium text-gray-800 dark:text-white">{t("modals.mentors.title")}</h2>
-            <span className="text-2xl font-medium text-green-500">{user?.mentorsAvailable.length || 0}</span>
+        ></div>
+
+        {/* Modal Container */}
+        <div className="relative w-full max-w-[95vw] sm:max-w-[90vw] md:max-w-[85vw] lg:max-w-screen-xl max-h-[90vh] rounded-2xl bg-[#1B1B1D96] shadow-lg backdrop-blur-sm bg-opacity-70 border border-white/10 overflow-y-auto overflow-x-hidden mx-4">
+          {/* Close button */}
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 z-50 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+          >
+            <X className="h-6 w-6" />
+          </button>
+
+          {/* Header */}
+          <div className="p-6 sticky top-0 z-40 rounded-2xl">
+            <h2 className="text-2xl font-medium text-gray-800 dark:text-white inline">
+              {t("modals.mentors.title")}{" "}
+            </h2>
           </div>
-          <p className="mt-2 text-sm  text-gray-600 dark:text-white">
-            {t("modals.mentors.description")}
-          </p>
-         
-        </div>
-        
-        {/* Scrollable cards container */}
-        <div className="overflow-x-auto pb-4 custom-scrollbar">
-          <div className="flex flex-col lg:flex-row gap-4 ">
-            {mentorsArray.map((mentor, index) => (
-              <MentorCard
-                key={index}
-                title={mentor.mentorName}
-                description={mentor.mentorDescription}
-                conditions={mentor.share}
-                benefits={mentor.skillDescription.benefit}
-                limitations={mentor.skillDescription.limitation}
-                // isSelected={index === 3} // For demo purposes, making the Developer Friend selected
-              />
-            ))}
+
+          {/* Cards */}
+          <div className="sm:overflow-x-auto overflow-y-auto">
+            <div className="flex flex-col sm:flex-row gap-4 p-6 lg:w-80 sm:min-w-full items-stretch">
+              {mentorsArray.map((mentor, index) => (
+                <MentorCard
+                  key={index}
+                  title={mentor.mentorName}
+                  description={mentor.mentorDescription}
+                  conditions={mentor.share}
+                  benefits={mentor.skillDescription.benefit}
+                  limitations={mentor.skillDescription.limitation}
+                />
+              ))}
+            </div>
           </div>
         </div>
-        
-        {/* Progress indicator */}
-        {/* <div className="mt-4 h-2 w-full rounded-full bg-gray-200">
-          <div className="h-full w-3/4 rounded-full bg-blue-500"></div>
-        </div> */}
       </div>
-    </div>
+    </>
   );
 };
 

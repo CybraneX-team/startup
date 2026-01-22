@@ -26,7 +26,7 @@ export default function DefaultLayout({
 
       {/* Main dashboard area */}
       <main
-        className={`flex-1 w-full px-4 pt-16 md:pt-20 ${
+        className={`flex-1 w-full px-4 pt-12 ${
           isAuthPage ? "flex justify-center" : ""
         }`}
       >

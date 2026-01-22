@@ -25,12 +25,12 @@ const DealModal: React.FC<DealModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center ">
       <div
-        className="absolute inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-sm"
+        className="absolute inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-md"
         onClick={onClose}
       ></div>
-      <div className="relative z-10 w-full max-w-md rounded-2xl bg-white p-6 shadow-xl dark:bg-[#1A232F] dark:text-white">
+      <div className="relative z-10 w-full max-w-md rounded-2xl bg-[#1B1B1D99] p-6 shadow-xl dark:text-white">
         <h2 className="text-xl font-semibold text-gray-800 mb-2 dark:text-white">
           {t("modals.mentors.makeDeal", { name: mentorName })}
         </h2>
@@ -43,13 +43,13 @@ const DealModal: React.FC<DealModalProps> = ({
           <div className="border-b border-gray-200 mb-3 dark:border-gray-600" />
 
           <div className="mb-3">
-            <h4 className="text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">
+            <h4 className="text-sm font-medium text-[#3EFF30] mb-1">
               {t("modals.mentors.benefits")}
             </h4>
             <ul className="list-none space-y-1">
               {benefits.map((b, i) => (
-                <li key={i} className="flex gap-2 text-sm text-blue-500">
-                  <span className="mt-1 h-2 w-2 rounded-full bg-blue-500 flex-none" />
+                <li key={i} className="flex gap-2 text-sm text-grey-500">
+                  <span className="mt-1 h-2 w-2 rounded-full bg-gray-500 flex-none" />
                   {b}
                 </li>
               ))}
@@ -57,13 +57,13 @@ const DealModal: React.FC<DealModalProps> = ({
           </div>
 
           <div>
-            <h4 className="text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">
+            <h4 className="text-sm font-medium text-[#FF6176] mb-1">
               {t("modals.mentors.limitations")}
             </h4>
             <ul className="list-none space-y-1">
               {limitations.map((l, i) => (
-                <li key={i} className="flex gap-2 text-sm text-blue-500">
-                  <span className="mt-1 h-2 w-2 rounded-full bg-blue-500 flex-none" />
+                <li key={i} className="flex gap-2 text-sm text-grey-500">
+                  <span className="mt-1 h-2 w-2 rounded-full bg-gray-500 flex-none" />
                   {l}
                 </li>
               ))}
@@ -74,7 +74,7 @@ const DealModal: React.FC<DealModalProps> = ({
         <div className="flex gap-4 mt-4">
           <button
             onClick={onSign}
-            className="flex-1 rounded-lg bg-green-400 py-2 text-white font-semibold hover:bg-green-500 transition"
+            className="flex-1 rounded-lg bg-green-400 py-2 text-black font-semibold hover:bg-green-500 transition"
           >
             {t("modals.mentors.yesSignIt")}
           </button>

@@ -28,7 +28,7 @@ const SpotlightModal: React.FC<SpotlightModalProps> = ({
       />
       
       <div
-        className={`relative w-full ${isMetricModal ? "max-w-sm" : "max-w-3xl"} rounded-xl bg-white overflow-hidden shadow-lg dark:bg-boxdark`}
+        className={`relative w-full ${isMetricModal ? "max-w-sm" : "max-w-3xl"} rounded-3xl bg-[#1B1B1D96] shadow-lg backdrop-blur-sm bg-opacity-70 overflow-hidden shadow-lg`}
       >
         <div className="p-5 border-b border-gray-100 dark:border-gray-700">
           <div className="flex items-center justify-between">

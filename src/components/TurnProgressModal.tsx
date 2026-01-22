@@ -214,9 +214,9 @@ const TurnProgressModal: React.FC<TurnProgressModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/50 backdrop-blur-sm">
-      <div className="relative w-full max-w-4xl max-h-[90vh] mx-4 my-4 bg-white dark:bg-[#1A232F] rounded-2xl shadow-2xl overflow-hidden flex flex-col border border-gray-200 dark:border-gray-700">
+      <div className="relative w-full max-w-4xl max-h-[90vh] mx-4 my-4 bg-[#1B1B1D96] border rounded-3xl border-white/10 p-6 shadow-lg backdrop-blur-md bg-opacity-90 overflow-hidden flex flex-col border border-gray-200 dark:border-gray-700">
         {/* Header */}
-        <div className="flex items-center justify-between p-5 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-[#1A232F]">
+        <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-lg bg-gray-100 dark:bg-gray-800">
               <BarChart3 className="h-5 w-5 text-gray-700 dark:text-gray-300" />
@@ -240,10 +240,10 @@ const TurnProgressModal: React.FC<TurnProgressModalProps> = ({
         </div>
 
         {/* Content - Scrollable */}
-        <div className="flex-1 overflow-y-auto p-5 space-y-5 bg-white dark:bg-[#1A232F]">
+        <div className="flex-1 overflow-y-auto py-5 space-y-5">
           {/* Stage Change Alert */}
           {stageChanged && (
-            <div className="p-4 rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800">
+            <div className="p-4 rounded-xl bg-[#111113]">
               <div className="flex items-center gap-3">
                 <CheckCircle2 className="h-5 w-5 text-gray-700 dark:text-gray-300" />
                 <div>
@@ -277,7 +277,7 @@ const TurnProgressModal: React.FC<TurnProgressModalProps> = ({
                   return (
                     <div
                       key={change.key}
-                      className="p-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#1A232F]"
+                      className="p-3 rounded-lg bg-[#111113]"
                     >
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-1.5">
@@ -314,7 +314,7 @@ const TurnProgressModal: React.FC<TurnProgressModalProps> = ({
                       </div>
                       
                       <div className="mt-2 pt-2 border-t border-gray-200 dark:border-gray-700">
-                        <div className="flex items-center justify-between px-2 py-1 rounded bg-gray-50 dark:bg-gray-800">
+                        <div className="flex items-center justify-between rounded px-2 py-2 rounded bg-[#1a1a1a]">
                           <span className="text-xs font-medium text-gray-700 dark:text-gray-300">
                             Change:
                           </span>
@@ -364,7 +364,7 @@ const TurnProgressModal: React.FC<TurnProgressModalProps> = ({
                   return (
                     <div
                       key={index}
-                      className="p-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#1A232F]"
+                      className="p-3 rounded-lg bg-[#111113]"
                     >
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-1.5">
@@ -401,7 +401,7 @@ const TurnProgressModal: React.FC<TurnProgressModalProps> = ({
                       </div>
                       
                       <div className="mt-2 pt-2 border-t border-gray-200 dark:border-gray-700">
-                        <div className="flex items-center justify-between px-2 py-1 rounded bg-gray-50 dark:bg-gray-800">
+                        <div className="flex items-center justify-between px-2 py-2 rounded bg-[#1a1a1a]">
                           <span className="text-xs font-medium text-gray-700 dark:text-gray-300">
                             Change:
                           </span>
@@ -442,15 +442,15 @@ const TurnProgressModal: React.FC<TurnProgressModalProps> = ({
                   translatedNotifications.map((notif, index) => (
                     <div
                       key={index}
-                      className="p-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#1A232F] flex items-start gap-3"
+                      className="p-3 rounded-lg bg-[#111113] flex items-start gap-3"
                     >
-                      <div className="p-1.5 rounded bg-gray-100 dark:bg-gray-800 flex-shrink-0 mt-0.5">
+                      {/* <div className="p-1.5 rounded bg-gray-100 dark:bg-gray-800 flex-shrink-0 mt-0.5">
                         {notif.isPositive ? (
                           <CheckCircle2 className="h-4 w-4 text-gray-700 dark:text-gray-300" />
                         ) : (
                           <AlertCircle className="h-4 w-4 text-gray-700 dark:text-gray-300" />
                         )}
-                      </div>
+                      </div> */}
                       <p className="text-sm text-gray-900 dark:text-white flex-1 leading-relaxed">
                         {notif.message}
                       </p>
@@ -475,13 +475,13 @@ const TurnProgressModal: React.FC<TurnProgressModalProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="p-5 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-[#1A232F]">
+        <div className="p-5">
           <button
             onClick={() => {
               playSound("click");
               onClose();
             }}
-            className="w-full py-3 px-6 rounded-xl bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 font-semibold hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors border border-gray-300 dark:border-gray-600"
+            className="w-full py-3 px-6 rounded-full text-black bg-gradient-to-b from-[#F5D0FE] via-[#E9D5FF] to-[#DDD6FE] hover:from-[#FCE7F3] hover:via-[#F3E8FF] hover:to-[#E9D5FF] transition-all duration-300 hover:shadow-lg hover:scale-105 active:scale-100 font-semibold hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors border border-gray-300 dark:border-gray-600"
           >
             {t("modals.turnProgress.continue")}
           </button>

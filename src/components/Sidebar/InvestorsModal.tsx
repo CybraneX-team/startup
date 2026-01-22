@@ -81,7 +81,7 @@ const InvestorCard: React.FC<{
   };
 
   return (
-    <div className="w-full sm:w-[320px] flex-shrink-0 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#1A232F] p-5">
+    <div className="w-full sm:w-[320px] flex-shrink-0 rounded-xl bg-[#161618] dark:bg-[#161618] p-5 flex flex-col h-full">
       <div className="flex items-center gap-4 mb-4">
         <div className={`h-16 w-16 rounded-full ${getAvatarColor(investor.name)} flex items-center justify-center flex-shrink-0`}>
           <span className="text-xl font-semibold text-white">
@@ -132,15 +132,15 @@ const InvestorCard: React.FC<{
         </div>
       </div>
 
-      <div className="mt-4 text-right">
+      <div className="mt-auto pt-6 text-right">
         {signed ? (
-          <span className="rounded border border-green-600 px-2 py-1 text-sm font-semibold text-green-600">
+          <span className="rounded-full border border-green-600 px-4 py-2 text-sm font-semibold text-green-600">
             {t("modals.investors.signed")}
           </span>
         ) : (
           <button
             onClick={onSignClick}
-            className="mt-2 rounded border border-gray-300 px-3 py-1 text-sm hover:border-green-500"
+            className="rounded-full bg-gradient-to-b from-[#F5D0FE] via-[#E9D5FF] to-[#DDD6FE] px-6 py-2.5 text-sm font-semibold text-gray-800 shadow-md hover:from-[#FCE7F3] hover:via-[#F3E8FF] hover:to-[#E9D5FF] transition-all duration-300 hover:shadow-lg hover:scale-105 active:scale-100"
           >
             {t("modals.investors.signInvestment")}
           </button>
@@ -250,7 +250,7 @@ const InvestorsModal: React.FC<InvestorsModalProps> = ({ isOpen, onClose }) => {
         ></div>
 
         {/* Modal Container */}
-        <div className="relative w-full max-w-[95vw] sm:max-w-[90vw] md:max-w-[85vw] lg:max-w-screen-xl max-h-[90vh] bg-white dark:bg-[#1A232F] rounded-xl shadow-lg overflow-y-auto overflow-x-hidden mx-4">
+        <div className="relative w-full max-w-[95vw] sm:max-w-[90vw] md:max-w-[85vw] lg:max-w-screen-xl max-h-[90vh] rounded-2xl bg-[#1B1B1D96] shadow-lg backdrop-blur-sm bg-opacity-70 border border-white/10 overflow-y-auto overflow-x-hidden mx-4">
           {/* Close button */}
           <button
             onClick={onClose}
@@ -260,21 +260,21 @@ const InvestorsModal: React.FC<InvestorsModalProps> = ({ isOpen, onClose }) => {
           </button>
 
           {/* Header */}
-          <div className="p-6 border-b border-gray-200 dark:border-gray-700 sticky top-0 bg-white dark:bg-[#1A232F] z-40">
+          <div className="p-6 sticky top-0 z-40 rounded-2xl">
             <h2 className="text-2xl font-medium text-gray-800 dark:text-white inline">
               {t("modals.investors.title")}{" "}
             </h2>
-            <span className="text-2xl font-medium text-green-500">
+            {/* <span className="text-2xl font-medium text-green-500">
               {user?.availableInvestments.length}
             </span>
             <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
               {t("modals.investors.description")}
-            </p>
+            </p> */}
           </div>
 
           {/* Cards */}
           <div className="sm:overflow-x-auto overflow-y-auto">
-            <div className="flex flex-col sm:flex-row gap-4 p-6  lg:w-80 sm:min-w-full">
+            <div className="flex flex-col sm:flex-row gap-4 p-6 lg:w-80 sm:min-w-full items-stretch">
               {investmentsArray.map((e, i) => {
                 const signed = user?.investmentsMade?.some((inv: any) => inv.name === e.name) ?? false;
 
@@ -301,44 +301,70 @@ const InvestorsModal: React.FC<InvestorsModalProps> = ({ isOpen, onClose }) => {
       {/* Confirm Modal */}
       {(showSignConfirm || showBuyoutConfirm) && selectedInvestor && (
         <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
-          <div className="rounded-xl bg-white dark:bg-[#1A232F] p-6 shadow-xl max-w-sm w-full text-gray-800 dark:text-white">
-            <h2 className="text-lg font-semibold mb-2">
-              {showSignConfirm ? t("modals.investors.makeDeal") : t("modals.investors.buyoutShare")}
-            </h2>
-            <p className="mb-2">{translatedSelectedName || selectedInvestor.name}</p>
-            <p className="text-sm">
-              {showSignConfirm ? t("modals.investors.investment") : t("modals.investors.share")}:{" "}
-              <span className="text-green-600">
-                {showSignConfirm
-                  ? `$${selectedInvestor.money}`
-                  : `${selectedInvestor.share}%`}
-              </span>
-            </p>
-            <p className="text-sm mb-4">
+          <div className="rounded-2xl bg-[#1B1B1D96] shadow-lg backdrop-blur-sm bg-opacity-70  p-8 w-full max-w-md text-gray-900 dark:text-white relative">
+            <h2 className="text-xl font-semibold mb-2">
               {showSignConfirm ? (
                 <>
-                  {t("modals.investors.advantage")}:{" "}
-                  <span className="text-blue-500">
-                    {selectedInvestor.bug_percent_point < 0
-                      ? t("modals.investors.reducesBugs", { count: Math.abs(selectedInvestor.bug_percent_point) })
-                      : t("modals.investors.increasesBugs", { count: selectedInvestor.bug_percent_point })}
-                  </span>
+                  {t("modals.investors.makeDeal")}
+                  {" "} <br/>
+                  <span className="text-white">{translatedSelectedName || selectedInvestor.name}</span>
                 </>
               ) : (
                 <>
-                  {t("modals.investors.buyoutPrice")}:{" "}
-                  <span className="text-green-600">${selectedInvestor.buyout}</span>
+                  {t("modals.investors.buyoutShare")}
+                  {" "}
+                  <span className="text-white">{translatedSelectedName || selectedInvestor.name}</span>
                 </>
               )}
-            </p>
-            <div className="flex justify-end gap-2">
+            </h2>
+            <div className="flex flex-row items-center gap-2 text-sm text-gray-400 mb-3">
+              <span>
+                {showSignConfirm 
+                  ? t("modals.investors.investment") + " (required stake)" 
+                  : t("modals.investors.share")}
+              </span>
+              <span className="ml-1 font-bold text-blue-400 text-base">
+                {showSignConfirm
+                  ? (selectedInvestor.requiredStake ?? selectedInvestor.share ?? 0)
+                  : (selectedInvestor.share ?? 0)}
+              </span>
+              {showSignConfirm && (
+                <span className="ml-0.5 text-blue-400 text-base">%</span>
+              )}
+            </div>
+            <hr className="border-t border-gray-600 mb-4" />
+
+            <div className="mb-5">
+              <div className="font-semibold text-green-500 mb-1">
+                {t("modals.mentors.benefits") /* For "Benefits" as in screenshot */}
+              </div>
+              <ul className="mb-3">
+                <li className="flex items-center gap-2 text-sm text-white">
+                  <span className="inline-block w-2 h-2 rounded-full bg-green-400"></span>
+                  {showSignConfirm
+                    ? (
+                        selectedInvestor.benefit 
+                        // fallback to default 'advantage' line if .benefit not defined
+                        ? selectedInvestor.benefit
+                        : (
+                          selectedInvestor.bug_percent_point < 0
+                          ? t("modals.investors.reducesBugs", { count: Math.abs(selectedInvestor.bug_percent_point) })
+                          : t("modals.investors.advantage") // fallback line
+                        )
+                      )
+                    : (selectedInvestor.signedBenefit || t("modals.investors.signed"))}
+                </li>
+              </ul>
+            </div>
+
+            <div className="flex flex-row gap-4 pt-2 mt-2">
               <button
                 onClick={() => {
                   setShowBuyoutConfirm(false);
                   setShowSignConfirm(false);
                   setSelectedInvestor(null);
                 }}
-                className="px-4 py-2 border rounded text-gray-600 dark:text-white dark:border-gray-500"
+                className="flex-1 rounded-xl border border-gray-500 bg-transparent text-white py-3 font-semibold text-base transition-colors hover:bg-gray-800"
               >
                 {t("modals.investors.noCancel")}
               </button>
@@ -353,9 +379,11 @@ const InvestorsModal: React.FC<InvestorsModalProps> = ({ isOpen, onClose }) => {
                   setShowSignConfirm(false);
                   setSelectedInvestor(null);
                 }}
-                className="px-4 py-2 rounded bg-green-500 text-white"
+                className="flex-1 rounded-xl bg-green-500 text-white font-bold py-3 text-base transition-colors hover:bg-green-600"
               >
-                {t("modals.investors.yes")}
+                {showSignConfirm
+                  ? t("modals.mentors.yesSignIt")
+                  : t("modals.investors.yes")}
               </button>
             </div>
           </div>

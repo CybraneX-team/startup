@@ -12,6 +12,8 @@ const config: Config = {
   theme: {
     fontFamily: {
       satoshi: ["Satoshi", "sans-serif"],
+      sora: ["Sora", "sans-serif"],
+      sans: ["Sora", "sans-serif"], // Set Sora as default sans-serif font
     },
     screens: {
       "2xsm": "375px",
