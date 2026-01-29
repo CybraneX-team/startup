@@ -88,24 +88,24 @@ const Header = () => {
                   className="absolute right-4 top-1/2 block translate-y-[-50%] rounded-lg px-3 py-[6px] ring-primary focus:ring-2 lg:hidden"
                 >
                   <span
-                    className={`relative my-1.5 block h-0.5 w-[30px] bg-black transition-all duration-300 dark:bg-white ${
+                    className={`relative my-1.5 block h-0.5 w-[30px] bg-white transition-all duration-300 ${
                       navbarOpen ? " top-[7px] rotate-45" : " "
                     }`}
                   />
                   <span
-                    className={`relative my-1.5 block h-0.5 w-[30px] bg-black transition-all duration-300 dark:bg-white ${
+                    className={`relative my-1.5 block h-0.5 w-[30px] bg-white transition-all duration-300 ${
                       navbarOpen ? "opacity-0 " : " "
                     }`}
                   />
                   <span
-                    className={`relative my-1.5 block h-0.5 w-[30px] bg-black transition-all duration-300 dark:bg-white ${
+                    className={`relative my-1.5 block h-0.5 w-[30px] bg-white transition-all duration-300 ${
                       navbarOpen ? " top-[-8px] -rotate-45" : " "
                     }`}
                   />
                 </button>
                 <nav
                   id="navbarCollapse"
-                  className={`navbar border-body-color/50 dark:border-body-color/20 dark:bg-dark absolute right-0 z-30 w-[250px] rounded border-[.5px] bg-white px-6 py-4 duration-300 lg:visible lg:static lg:w-auto lg:border-none lg:!bg-transparent lg:p-0 lg:opacity-100 ${
+                  className={`navbar absolute right-4 z-30 w-[calc(100vw-2rem)] max-w-xs rounded-2xl border border-gray-800 bg-[#050509] px-6 py-4 duration-300 lg:visible lg:static lg:w-auto lg:max-w-none lg:border-none lg:bg-transparent lg:p-0 lg:opacity-100 ${
                     navbarOpen
                       ? "visible top-full opacity-100"
                       : "invisible top-[120%] opacity-0"
@@ -117,7 +117,7 @@ const Header = () => {
                         <Link
                           href="/home#features"
                           onClick={() => setNavbarOpen(false)}
-                          className="flex py-2 text-base lg:mr-0 lg:inline-flex lg:px-0 lg:py-6 text-dark hover:text-primary dark:text-white/70 dark:hover:text-white"
+                          className="flex py-2 text-base lg:mr-0 lg:inline-flex lg:px-0 lg:py-6 text-gray-100 hover:text-primary"
                         >
                           Features
                         </Link>
@@ -126,16 +126,16 @@ const Header = () => {
                         <Link
                           href="/home#about"
                           onClick={() => setNavbarOpen(false)}
-                          className="flex py-2 text-base lg:mr-0 lg:inline-flex lg:px-0 lg:py-6 text-dark hover:text-primary dark:text-white/70 dark:hover:text-white"
+                          className="flex py-2 text-base lg:mr-0 lg:inline-flex lg:px-0 lg:py-6 text-gray-100 hover:text-primary"
                         >
                           About
                         </Link>
                       </li>
                       <li>
-                          <Link
+                        <Link
                           href="/home#pricing"
                           onClick={() => setNavbarOpen(false)}
-                          className="flex py-2 text-base lg:mr-0 lg:inline-flex lg:px-0 lg:py-6 text-dark hover:text-primary dark:text-white/70 dark:hover:text-white"
+                          className="flex py-2 text-base lg:mr-0 lg:inline-flex lg:px-0 lg:py-6 text-gray-100 hover:text-primary"
                         >
                           Pricing
                           </Link>
@@ -144,7 +144,7 @@ const Header = () => {
                         <Link
                           href="/home#contact"
                           onClick={() => setNavbarOpen(false)}
-                          className="flex py-2 text-base lg:mr-0 lg:inline-flex lg:px-0 lg:py-6 text-dark hover:text-primary dark:text-white/70 dark:hover:text-white"
+                          className="flex py-2 text-base lg:mr-0 lg:inline-flex lg:px-0 lg:py-6 text-gray-100 hover:text-primary"
                             >
                           Contact
                         </Link>
@@ -153,7 +153,7 @@ const Header = () => {
                         <Link
                           href="/auth/signin"
                           onClick={() => setNavbarOpen(false)}
-                          className="flex py-2 text-base lg:mr-0 lg:inline-flex lg:px-0 lg:py-6 text-dark hover:text-primary dark:text-white/70 dark:hover:text-white"
+                          className="flex py-2 text-base lg:mr-0 lg:inline-flex lg:px-0 lg:py-6 text-gray-100 hover:text-primary"
                         >
                           Sign In
                         </Link>
@@ -162,7 +162,7 @@ const Header = () => {
                                 <Link
                           href="/auth/signup"
                           onClick={() => setNavbarOpen(false)}
-                          className="flex py-2 text-base lg:mr-0 lg:inline-flex lg:px-0 lg:py-6 text-primary dark:text-white font-semibold"
+                          className="flex py-2 text-base lg:mr-0 lg:inline-flex lg:px-0 lg:py-6 text-primary font-semibold"
                                 >
                           Sign Up
                                 </Link>

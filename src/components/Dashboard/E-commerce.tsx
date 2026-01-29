@@ -7,6 +7,8 @@ import TooltipModal from "@/components/TooltipModal";
 import { Bell } from "lucide-react";
 import { Tooltip } from 'react-tooltip'
 import SpotlightModal from "@/components/SpotlightModal";
+import TurnLoader from "@/components/Loader/TurnLoader";
+import StageStar from "@/components/StageStar";
 
 // import { Dice1, InfoIcon } from "lucide-react";
 import { useUser } from "@/context/UserContext";
@@ -108,52 +110,6 @@ interface Metric {
   value: string;
 }
 
-const StageStar: React.FC<{
-  isActive: boolean;
-  isCompleted: boolean;
-  isLocked: boolean;
-}> = ({ isActive, isCompleted, isLocked }) => {
-  const baseGlow =
-    "absolute inset-0 rounded-full blur-lg bg-gradient-to-r from-[#FAA2FF] via-[#FF8EEE] to-[#7A38FF]";
-
-  return (
-    <div className="relative flex items-center justify-center">
-      {(isActive || isCompleted) && (
-        <span
-          className={`${baseGlow} opacity-70`}
-          aria-hidden="true"
-        />
-      )}
-      <svg
-        width="35"
-        height="35"
-        viewBox="0 0 35 35"
-        xmlns="http://www.w3.org/2000/svg"
-        className={`relative h-7 w-7 drop-shadow-md ${isLocked ? "opacity-40" : "opacity-100"
-          }`}
-      >
-        <defs>
-          <linearGradient
-            id="stage-star-gradient"
-            x1="9.55709"
-            y1="32.0524"
-            x2="38.4765"
-            y2="-0.153282"
-            gradientUnits="userSpaceOnUse"
-          >
-            <stop stopColor="#FAA2FF" />
-            <stop offset="1" stopColor="#7A38FF" />
-          </linearGradient>
-        </defs>
-        <path
-          d="M3.39462 22.5879C-1.1314 20.406 -1.1314 13.9602 3.39462 11.7783L7.16262 9.9619C8.38553 9.37237 9.37236 8.38553 9.9619 7.16262L11.7783 3.39462C13.9602 -1.1314 20.406 -1.1314 22.5879 3.39462L24.4043 7.16262C24.9938 8.38553 25.9807 9.37237 27.2036 9.9619L30.9716 11.7783C35.4976 13.9602 35.4976 20.406 30.9716 22.5879L27.2036 24.4043C25.9807 24.9938 24.9938 25.9807 24.4043 27.2036L22.5879 30.9716C20.406 35.4976 13.9602 35.4976 11.7783 30.9716L9.9619 27.2036C9.37236 25.9807 8.38553 24.9938 7.16262 24.4043L3.39462 22.5879Z"
-          fill="url(#stage-star-gradient)"
-        />
-      </svg>
-    </div>
-  );
-};
-
 const DevIcon = () => (
   <Image src="/employees/developerIcon.svg" alt="Developer" width={32} height={32} />
 );
@@ -172,29 +128,50 @@ const InfoModal: React.FC<ModalProps> = ({
   title,
   content,
 }) => {
-  if (!isOpen) return null;
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [shouldRender, setShouldRender] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      setShouldRender(true);
+      setTimeout(() => setIsAnimating(true), 10);
+    } else {
+      setIsAnimating(false);
+      const timer = setTimeout(() => setShouldRender(false), 300);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen]);
+
+  if (!shouldRender) return null;
+  
   const isMetricModal = Object.values(metricsInfo).some(
     (metric) => metric.title === title,
   );
 
   return (
     <>
-      <div className="fixed inset-0 z-[99999] flex items-center justify-center">
+      <div className="fixed inset-0 z-[99999] flex items-center justify-center px-4 sm:px-0">
         <div
-          className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+          className={`absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity duration-300 ${
+            isAnimating ? 'opacity-100' : 'opacity-0'
+          }`}
           onClick={onClose}
         ></div>
         <div
-          className={`relative w-full ${isMetricModal ? "max-w-sm" : "max-w-3xl"} rounded-2xl bg-white p-6 dark:bg-boxdark`}
+          className={`relative w-full ${isMetricModal ? "max-w-sm" : "max-w-3xl"} rounded-2xl bg-white p-4 sm:p-6 dark:bg-boxdark transition-all duration-300 max-h-[90vh] overflow-y-auto ${
+            isAnimating 
+              ? 'opacity-100 scale-100 translate-y-0' 
+              : 'opacity-0 scale-95 translate-y-4'
+          }`}
         >
-          <div className="-m-6 mb-4 flex items-center justify-between rounded-tl-2xl rounded-tr-2xl bg-[#f3f3f3] p-5 dark:bg-transparent">
-            <h2 className="text-xl font-semibold">{title}</h2>
+          <div className="-m-4 sm:-m-6 mb-3 sm:mb-4 flex items-center justify-between rounded-tl-2xl rounded-tr-2xl bg-[#f3f3f3] p-4 sm:p-5 dark:bg-transparent">
+            <h2 className="text-lg sm:text-xl font-semibold truncate pr-2">{title}</h2>
             <button
               onClick={onClose}
-              className="text-gray-500 hover:text-gray-700"
+              className="text-gray-500 hover:text-gray-700 flex-shrink-0"
             >
               <svg
-                className="h-6 w-6"
+                className="h-5 w-5 sm:h-6 sm:w-6"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -208,7 +185,7 @@ const InfoModal: React.FC<ModalProps> = ({
               </svg>
             </button>
           </div>
-          <div className="text-gray-600 dark:text-gray-300">{content}</div>
+          <div className="text-gray-600 dark:text-gray-300 text-sm sm:text-base">{content}</div>
         </div>
       </div>
     </>
@@ -777,6 +754,7 @@ const ECommerce: React.FC = () => {
 
 
   const [confirmationAction, setConfirmationAction] = useState<null | 'skip' | 'buyout' | 'prevent'>(null);
+  const [activeFinanceView, setActiveFinanceView] = useState<"funds" | "breakdown">("funds");
 
 
   const [chatModalOpen, setChatModalOpen] = useState(false);
@@ -960,6 +938,23 @@ const ECommerce: React.FC = () => {
   const [showInvestorsModal, setShowInvestorsModal] = useState(false);
   const [showMentorsModal, setShowMentorsModal] = useState(false);
   const [showFoundersModal, setShowFoundersModal] = useState(false);
+  const [taskGridModalOpen, setTaskGridModalOpen] = useState(false);
+
+  // When any modal is open, hide Make Turn button on mobile so it doesn't overlap modals (desktop unchanged)
+  const isAnyModalOpen = !!(
+    confirmationAction ||
+    isNotificationModalOpen ||
+    showSkipBugModal ||
+    chatModalOpen ||
+    showBoostModal ||
+    showStageUpgradeModal ||
+    showTurnProgressModal ||
+    showTeamModal ||
+    showInvestorsModal ||
+    showMentorsModal ||
+    showFoundersModal ||
+    taskGridModalOpen
+  );
 
   // Load persisted data on mount
   useEffect(() => {
@@ -1341,68 +1336,56 @@ const ECommerce: React.FC = () => {
     <div className="relative w-full bg-[#050509] text-gray-100">
       <Tooltip id="my-tooltip" />
       {showElon && <ElonAssistant onStepChange={setElonStep} />}
-      {loader && (
-        <div className="fixed inset-0 z-[99999] flex flex-col items-center justify-center bg-black/50 backdrop-blur-sm">
-          <div className="mb-4 flex gap-2">
-            <div className="h-4 w-4 animate-bounce rounded-full bg-blue-700 [animation-delay:.1s]" />
-            <div className="h-4 w-4 animate-bounce rounded-full bg-blue-700 [animation-delay:.3s]" />
-            <div className="h-4 w-4 animate-bounce rounded-full bg-blue-700 [animation-delay:.5s]" />
-          </div>
-          <p className="mt-2 text-sm font-medium text-white">{loaderMessage}</p>
-        </div>
-      )}
+      {loader && <TurnLoader message={loaderMessage} />}
 
       {gameOverModal ? <GameOverModal /> : null}
 
       {notEnoughCredits ? <NotEnoughCredits /> : null}
 
       {/* Dashboard background + centered content column */}
-      <div className="mx-auto flex min-h-[calc(100vh-5rem)] w-full flex-col gap-6 px-2 pt-4 pb-10 md:px-0 md:pt-6">
+      <div className="mx-auto flex min-h-[calc(100vh-5rem)] w-full flex-col gap-6 px-0 pt-4 pb-10  md:px-0 md:pt-6">
         {/* Startup stages card */}
         <div
-          className={`rounded-3xl border border-gray-800 bg-[#151516] px-6 py-5 shadow-[0_24px_80px_rgba(0,0,0,0.6)] transition-all duration-300 ${elonStep === 1 ? "ring-2 ring-blue-500 animate-pulse" : ""
-            }`}
+          className={`rounded-3xl border border-gray-800 bg-[#151516] px-4 py-6 sm:px-6 sm:py-7 shadow-[0_24px_80px_rgba(0,0,0,0.6)] transition-all duration-300 ${
+            elonStep === 1 ? "ring-2 ring-blue-500 animate-pulse" : ""
+          }`}
         >
-          <div className="flex items-start justify-between gap-4 relative">
+          <div className="relative flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             {/* Business idea */}
-            <div className="min-w-[180px] absolute left-0 top-1/2 -translate-y-1/2 flex flex-col items-start z-10 w-[180px]">
-              <p className="text-xs font-medium uppercase tracking-[0.18em] text-gray-500 text-center">
+            <div className="z-10 flex w-full flex-col items-start text-left sm:absolute sm:left-0 sm:top-1/2 sm:w-[180px] sm:min-w-[180px] sm:-translate-y-1/2">
+              <p className="text-xs font-medium uppercase tracking-[0.18em] text-gray-500 text-left sm:text-center">
                 Business Idea
               </p>
-              <p className="mt-1 text-sm font-semibold text-white text-center">
+              <p className="mt-1 text-sm font-semibold text-white text-left sm:text-center">
                 {user?.gameName || "Your Startup"}
               </p>
             </div>
 
             {/* Progress track + stages */}
-            <div className="flex-1 pl-40 pr-44">
-              {/* <div className="flex items-center justify-between mb-1">
-                <p className="text-xs uppercase tracking-[0.18em] text-gray-500">
-                  {t("dashboard.startupStages")}
-                </p>
-              </div> */}
+            <div className="flex-1 w-full sm:pl-40 sm:pr-44">
+              {/* Mobile: vertical zig-zag timeline */}
+              <div className="mt-4 relative md:hidden">
+                {/* Vertical base track */}
+                <div className="absolute left-1/2 top-0 bottom-0 w-[3px] -translate-x-1/2 rounded-full bg-gradient-to-b from-gray-800 via-gray-800 to-gray-800" />
 
-              <div className="relative mt-3">
-                {/* Base track */}
-                <div className="absolute left-3 right-3 top-3 h-[3px] -translate-y-1/2 rounded-full bg-gradient-to-r from-gray-800 via-gray-800 to-gray-800" />
-
-                {/* Active progress */}
+                {/* Active progress along the track */}
                 {activeStageIndex > -1 && stages.length > 1 && (
                   <div
-                    className="absolute left-3 top-3 h-[3px] -translate-y-1/2 rounded-full bg-gradient-to-r from-[#FAA2FF] via-[#FF8EEE] to-[#7A38FF]"
+                    className="absolute left-1/2 top-0 w-[3px] -translate-x-1/2 rounded-full bg-gradient-to-b from-[#FAA2FF] via-[#FF8EEE] to-[#7A38FF]"
                     style={{
-                      width: `${(activeStageIndex / (stages.length - 1)) * 100}%`,
+                      height: `${(activeStageIndex / (stages.length - 1)) * 100}%`,
                     }}
                   />
                 )}
 
-                {/* Stars + labels */}
-                <div className="relative flex items-center justify-between">
+                {/* Zig-zag stars + labels vertically */}
+                <div className="relative flex flex-col gap-4">
                   {stages.map((stage, index) => {
                     const isLocked = index > 1 && !user?.isPurchaseDone;
                     const isActive = user?.startupStage === stage;
                     const isCompleted =
                       activeStageIndex > -1 && index < activeStageIndex;
+                    const alignLeft = index % 2 === 0;
 
                     return (
                       <button
@@ -1411,7 +1394,11 @@ const ECommerce: React.FC = () => {
                         onClick={(e) => handleStageClick(stage, e)}
                         onMouseEnter={() => setHoveredStage(stage)}
                         onMouseLeave={() => setHoveredStage(null)}
-                        className="flex flex-col items-center gap-1 text-center focus:outline-none"
+                        className={`relative flex items-center gap-3 text-left focus:outline-none ${
+                          alignLeft
+                            ? "self-start pr-10"
+                            : "self-end pl-10 flex-row-reverse"
+                        }`}
                         data-tooltip-id="my-tooltip"
                         data-tooltip-content={
                           isLocked ? t("dashboard.purchasePlanToPlay") : ""
@@ -1431,16 +1418,90 @@ const ECommerce: React.FC = () => {
                           )}
                         </div>
                         <span
-                          className={`text-[11px] font-medium ${isActive
-                            ? "text-white"
-                            : "text-gray-400"
-                            }`}
+                          className={`text-[11px] font-medium ${
+                            isActive ? "text-white" : "text-gray-400"
+                          }`}
                         >
                           {stage.toUpperCase()}
                         </span>
                       </button>
                     );
                   })}
+                </div>
+              </div>
+
+              {/* Desktop / tablet: original horizontal timeline */}
+              <div className="mt-3 hidden md:block">
+                <div className="relative">
+                  {/* Base track */}
+                  <div className="absolute left-3 right-3 top-3 h-[3px] -translate-y-1/2 rounded-full bg-gradient-to-r from-gray-800 via-gray-800 to-gray-800 z-0" />
+
+                  {/* Active progress */}
+                  {activeStageIndex > -1 && stages.length > 1 && (
+                    <div
+                      className="absolute left-3 top-3 h-[3px] -translate-y-1/2 rounded-full bg-gradient-to-r from-[#FAA2FF] via-[#FF8EEE] to-[#7A38FF]"
+                      style={{
+                        width: `${(activeStageIndex / (stages.length - 1)) * 100}%`,
+                      }}
+                    />
+                  )}
+
+                  {/* Stars + labels */}
+                  <div className="relative flex items-center justify-between">
+                    {stages.map((stage, index) => {
+                      const isLocked = index > 1 && !user?.isPurchaseDone;
+                      const isActive = user?.startupStage === stage;
+                      const isCompleted =
+                        activeStageIndex > -1 && index < activeStageIndex;
+
+                      return (
+                        <button
+                          key={stage}
+                          type="button"
+                          onClick={(e) => handleStageClick(stage, e)}
+                          onMouseEnter={() => setHoveredStage(stage)}
+                          onMouseLeave={() => setHoveredStage(null)}
+                          className="flex flex-col items-center gap-1 text-center focus:outline-none relative z-10"
+                          data-tooltip-id="my-tooltip"
+                          data-tooltip-content={
+                            isLocked ? t("dashboard.purchasePlanToPlay") : ""
+                          }
+                          disabled={isLocked}
+                        >
+                          {/* Desktop StageStar marker - using stars.svg */}
+                          <div className="relative flex items-center justify-center">
+                            <div className={`relative ${isLocked ? "opacity-40" : "opacity-100"}`}>
+                              {(isActive || isCompleted) && (
+                                <span
+                                  className="absolute inset-0 rounded-full blur-lg bg-gradient-to-r from-[#FAA2FF] via-[#FF8EEE] to-[#7A38FF] opacity-70"
+                                  aria-hidden="true"
+                                />
+                              )}
+                              <Image
+                                src="/stars.svg"
+                                alt="Stage star"
+                                width={35}
+                                height={35}
+                                className="relative h-7 w-7 drop-shadow-[0_0_14px_rgba(122,56,255,0.9)]"
+                              />
+                            </div>
+                            {isLocked && (
+                              <span className="absolute -right-2 -top-2 flex h-4 w-4 items-center justify-center rounded-full bg-gray-900 text-[10px] text-gray-200">
+                                <Lock size={10} />
+                              </span>
+                            )}
+                          </div>
+                          <span
+                            className={`text-[11px] font-medium ${
+                              isActive ? "text-white" : "text-gray-400"
+                            }`}
+                          >
+                            {stage.toUpperCase()}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
             </div>
@@ -1487,88 +1548,124 @@ const ECommerce: React.FC = () => {
 
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-6">
           {/* Card 1: Financials */}
-          <div className="lg:col-span-2 rounded-3xl border border-gray-800 bg-[#1B1B1D] p-2 shadow-[0_24px_80px_rgba(0,0,0,0.6)]">
-            <div className="flex gap-4 h-full">
+          <div className="lg:col-span-2 rounded-3xl border border-gray-800 bg-[#1B1B1D] p-3 sm:p-4 shadow-[0_24px_80px_rgba(0,0,0,0.6)]">
+            {/* Mobile toggle between Available Funds and Breakdown */}
+            <div className="mb-3 flex w-full md:hidden rounded-full bg-[#151516] p-1 text-xs font-medium text-gray-300">
+              <button
+                type="button"
+                onClick={() => setActiveFinanceView("funds")}
+                className={`flex-1 rounded-full px-3 py-2 transition-colors ${
+                  activeFinanceView === "funds"
+                    ? "bg-gradient-to-b from-[#F5D0FE] via-[#E9D5FF] to-[#DDD6FE] text-black"
+                    : "text-gray-400"
+                }`}
+              >
+                Available Funds
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveFinanceView("breakdown")}
+                className={`flex-1 rounded-full px-3 py-2 transition-colors ${
+                  activeFinanceView === "breakdown"
+                    ? "bg-gradient-to-b from-[#F5D0FE] via-[#E9D5FF] to-[#DDD6FE] text-black"
+                    : "text-gray-400"
+                }`}
+              >
+                Financial Breakdown
+              </button>
+            </div>
+
+            <div className="flex flex-col md:flex-row gap-4 w-full">
               {/* Left Section: Available Funds */}
-              <div className="flex-1 flex flex-col rounded-3xl bg-[#161618] p-4">
+              <div
+                className={`w-full md:w-auto flex-1 rounded-3xl bg-[#161618] p-4 ${
+                  activeFinanceView === "funds" ? "block" : "hidden"
+                } md:flex md:flex-col`}
+              >
 
 
                 {/* Header */}
-                <div className="mb-4">
-                  <p className="text-xs text-gray-400 mb-1 mt-4">Available Funds</p>
+                <div className="mb-4 text-left">
+                  <p className="text-xs text-gray-400 mb-1">Available Funds</p>
                   <p className="text-2xl font-bold text-white">${user?.finances?.toLocaleString() ?? "0"}</p>
                 </div>
 
-                {/* Progress Bars */}
-                <div className="flex flex-col gap-3 mt-20">
-                  {/* Investors Bar */}
-                  <div className="relative h-3 w-full rounded-full overflow-hidden bg-gray-800">
-                    <div
-                      className="h-full rounded-full bg-[#34c9a5]"
-                      style={{
-                        width: `${Math.min(100, Math.max(0, user?.financesBreakdown?.Investors ?? 0))}%`,
+                {/* Progress Bars with Labels - Mobile optimized */}
+                <div className="flex flex-col gap-4 mt-6 md:mt-16">
+                  {/* Investors */}
+                  <div className="space-y-2">
+                    <button
+                      onClick={() => {
+                        playSound("click");
+                        setShowInvestorsModal(true);
                       }}
-                    />
+                      className="flex items-center gap-2 text-sm text-white hover:text-gray-300 transition-colors cursor-pointer w-full text-left"
+                    >
+                      <div className="w-2 h-2 rounded-full bg-[#34c9a5]" />
+                      <span>Investors</span>
+                    </button>
+                    <div className="relative h-3 w-full rounded-full overflow-hidden bg-gray-800">
+                      <div
+                        className="h-full rounded-full bg-[#34c9a5]"
+                        style={{
+                          width: `${Math.min(100, Math.max(0, user?.financesBreakdown?.Investors ?? 0))}%`,
+                        }}
+                      />
+                    </div>
                   </div>
 
-                  {/* Founders Bar */}
-                  <div className="relative h-3 w-full rounded-full overflow-hidden bg-gray-800">
-                    <div
-                      className="h-full rounded-full bg-[#7b5ef7]"
-                      style={{
-                        width: `${Math.min(100, Math.max(0, user?.financesBreakdown?.Founder ?? 0))}%`,
+                  {/* Founders */}
+                  <div className="space-y-2">
+                    <button
+                      onClick={() => {
+                        playSound("click");
+                        setShowFoundersModal(true);
                       }}
-                    />
+                      className="flex items-center gap-2 text-sm text-white hover:text-gray-300 transition-colors cursor-pointer w-full text-left"
+                    >
+                      <div className="w-2 h-2 rounded-full bg-[#7b5ef7]" />
+                      <span>Founders</span>
+                    </button>
+                    <div className="relative h-3 w-full rounded-full overflow-hidden bg-gray-800">
+                      <div
+                        className="h-full rounded-full bg-[#7b5ef7]"
+                        style={{
+                          width: `${Math.min(100, Math.max(0, user?.financesBreakdown?.Founder ?? 0))}%`,
+                        }}
+                      />
+                    </div>
                   </div>
 
-                  {/* Mentors Bar */}
-                  <div className="relative h-3 w-full rounded-full overflow-hidden bg-gray-800">
-                    <div
-                      className="h-full rounded-full bg-[#ff6d63]"
-                      style={{
-                        width: `${Math.min(100, Math.max(0, user?.financesBreakdown?.Mentor ?? 0))}%`,
+                  {/* Mentors */}
+                  <div className="space-y-2">
+                    <button
+                      onClick={() => {
+                        playSound("click");
+                        setShowMentorsModal(true);
                       }}
-                    />
+                      className="flex items-center gap-2 text-sm text-white hover:text-gray-300 transition-colors cursor-pointer w-full text-left"
+                    >
+                      <div className="w-2 h-2 rounded-full bg-[#ff6d63]" />
+                      <span>Mentors</span>
+                    </button>
+                    <div className="relative h-3 w-full rounded-full overflow-hidden bg-gray-800">
+                      <div
+                        className="h-full rounded-full bg-[#ff6d63]"
+                        style={{
+                          width: `${Math.min(100, Math.max(0, user?.financesBreakdown?.Mentor ?? 0))}%`,
+                        }}
+                      />
+                    </div>
                   </div>
-                </div>
-
-                {/* Legend */}
-                <div className="flex flex-col gap-2 mt-5">
-                  <button
-                    onClick={() => {
-                      playSound("click");
-                      setShowInvestorsModal(true);
-                    }}
-                    className="flex items-center gap-2 text-sm text-white hover:text-gray-300 transition-colors cursor-pointer"
-                  >
-                    <div className="w-2 h-2 rounded-full bg-[#34c9a5]" />
-                    <span>Investors</span>
-                  </button>
-                  <button
-                    onClick={() => {
-                      playSound("click");
-                      setShowFoundersModal(true);
-                    }}
-                    className="flex items-center gap-2 text-sm text-white hover:text-gray-300 transition-colors cursor-pointer"
-                  >
-                    <div className="w-2 h-2 rounded-full bg-[#7b5ef7]" />
-                    <span>Founders</span>
-                  </button>
-                  <button
-                    onClick={() => {
-                      playSound("click");
-                      setShowMentorsModal(true);
-                    }}
-                    className="flex items-center gap-2 text-sm text-white hover:text-gray-300 transition-colors cursor-pointer"
-                  >
-                    <div className="w-2 h-2 rounded-full bg-[#ff6d63]" />
-                    <span>Mentors</span>
-                  </button>
                 </div>
               </div>
 
               {/* Right Section: Financial metrics */}
-              <div className="flex-1 flex flex-col ">
+              <div
+                className={`w-full md:w-auto mt-4 md:mt-0 ${
+                  activeFinanceView === "breakdown" ? "block" : "hidden"
+                } md:flex md:flex-col`}
+              >
                 <div className="space-y-2">
                   {[
                     {
@@ -1578,11 +1675,11 @@ const ECommerce: React.FC = () => {
                       iconKey: (
                         <svg width="28" height="26" viewBox="0 0 28 26" fill="none" xmlns="http://www.w3.org/2000/svg">
                           <foreignObject x="-4.15409" y="-4.67271" width="34.8348" height="23.7231">
-                            <div xmlns="http://www.w3.org/1999/xhtml" style={{ backdropFilter: "blur(2.7px)", clipPath: "url(#bgblur_0_6543_2_clip_path)", height: "100%", width: "100%" }}></div>
+                            <div style={{ backdropFilter: "blur(2.7px)", clipPath: "url(#bgblur_0_6543_2_clip_path)", height: "100%", width: "100%" }}></div>
                           </foreignObject>
                           <path data-figma-bg-blur-radius="5.4" d="M6.9135 0.891882L24.8444 5.69646C25.1087 5.76757 25.2507 6.0551 25.1466 6.30821C25.096 6.43084 24.994 6.52584 24.8679 6.56717L3.84111 13.4524C2.34107 13.9436 0.930726 12.4977 1.45933 11.0106L4.63179 2.09122C4.96368 1.15804 5.9568 0.635675 6.9135 0.891882Z" fill="url(#paint0_linear_6543_2)" stroke="url(#paint1_linear_6543_2)" strokeWidth="0.2" />
                           <foreignObject x="-5.03101" y="0.363428" width="38.2267" height="30.7209">
-                            <div xmlns="http://www.w3.org/1999/xhtml" style={{ backdropFilter: "blur(2.7px)", clipPath: "url(#bgblur_1_6543_2_clip_path)", height: "100%", width: "100%" }}></div>
+                            <div style={{ backdropFilter: "blur(2.7px)", clipPath: "url(#bgblur_1_6543_2_clip_path)", height: "100%", width: "100%" }}></div>
                           </foreignObject>
                           <path data-figma-bg-blur-radius="5.4" d="M3.36996 5.86304H24.7948C26.3964 5.86304 27.6961 7.16184 27.6961 8.76343V11.2371H18.7918C17.0798 11.2371 15.6922 12.6246 15.6922 14.3367V17.1111C15.6922 18.8232 17.0798 20.2107 18.7918 20.2107H27.6961V22.6843C27.6961 24.2859 26.3964 25.5847 24.7948 25.5847H3.36996C1.7683 25.5847 0.468597 24.2859 0.468597 22.6843V8.76343C0.468597 7.16184 1.7683 5.86304 3.36996 5.86304Z" fill="url(#paint2_linear_6543_2)" fillOpacity="0.3" stroke="url(#paint3_linear_6543_2)" strokeWidth="0.2" />
                           <path d="M27.7948 19.0632H19.1942C17.8136 19.0632 16.6943 17.9438 16.6942 16.5632V14.8845C16.6942 13.5038 17.8135 12.3845 19.1942 12.3845H27.7948V19.0632ZM20.8055 14.2849C20.0112 14.2851 19.3673 14.929 19.3671 15.7234C19.3671 16.5179 20.0111 17.1626 20.8055 17.1628C21.6002 17.1628 22.245 16.518 22.245 15.7234C22.2448 14.9289 21.6001 14.2849 20.8055 14.2849Z" fill="url(#paint4_linear_6543_2)" />
@@ -1634,7 +1731,7 @@ const ECommerce: React.FC = () => {
                           <rect x="1.04178" y="0.5" width="16.2114" height="16.2114" rx="8.10571" stroke="url(#paint1_linear_6543_7)" />
                           <path d="M8.90379 13.5148V4.42389H9.48618V13.5148H8.90379ZM10.4485 7.4246C10.4201 7.13815 10.2982 6.91561 10.0828 6.75699C9.86734 6.59837 9.57496 6.51906 9.20564 6.51906C8.95469 6.51906 8.74281 6.55458 8.56999 6.6256C8.39717 6.69425 8.26459 6.79014 8.17226 6.91324C8.0823 7.03635 8.03732 7.17603 8.03732 7.33228C8.03258 7.46248 8.05981 7.57612 8.11899 7.67318C8.18055 7.77025 8.26459 7.85429 8.37112 7.92532C8.47766 7.99397 8.60076 8.05434 8.74044 8.10642C8.88012 8.15614 9.02927 8.19875 9.18789 8.23426L9.84129 8.39051C10.1585 8.46154 10.4497 8.55623 10.7149 8.6746C10.98 8.79298 11.2097 8.93857 11.4038 9.11139C11.5979 9.28422 11.7483 9.48782 11.8548 9.72219C11.9637 9.95657 12.0193 10.2253 12.0217 10.5283C12.0193 10.9734 11.9057 11.3593 11.6808 11.686C11.4582 12.0103 11.1363 12.2624 10.7149 12.4424C10.2958 12.6199 9.7904 12.7087 9.19854 12.7087C8.61142 12.7087 8.10005 12.6187 7.66445 12.4388C7.23121 12.2589 6.89267 11.9925 6.64882 11.6398C6.40735 11.2847 6.28069 10.8455 6.26885 10.3223H7.75678C7.77335 10.5662 7.84319 10.7698 7.96629 10.9331C8.09177 11.0941 8.25867 11.216 8.467 11.2989C8.67771 11.3794 8.91563 11.4196 9.18078 11.4196C9.4412 11.4196 9.66729 11.3818 9.85905 11.306C10.0532 11.2302 10.2035 11.1249 10.31 10.9899C10.4166 10.855 10.4698 10.6999 10.4698 10.5247C10.4698 10.3614 10.4213 10.2241 10.3242 10.1128C10.2296 10.0015 10.0899 9.90685 9.90522 9.82872C9.72292 9.7506 9.4992 9.67958 9.23405 9.61566L8.44215 9.41679C7.82898 9.26764 7.34485 9.03445 6.98973 8.71722C6.63462 8.39998 6.45825 7.97266 6.46061 7.43526C6.45825 6.99492 6.57543 6.61021 6.81218 6.28114C7.05129 5.95207 7.37917 5.6952 7.79584 5.51054C8.21251 5.32588 8.68599 5.23355 9.21629 5.23355C9.75607 5.23355 10.2272 5.32588 10.6296 5.51054C11.0345 5.6952 11.3493 5.95207 11.5742 6.28114C11.7992 6.61021 11.9152 6.99137 11.9223 7.4246H10.4485Z" fill="white" />
                           <foreignObject x="-5" y="-0.937744" width="34.6465" height="29.0869">
-                            <div xmlns="http://www.w3.org/1999/xhtml" style={{ backdropFilter: "blur(2.5px)", clipPath: "url(#bgblur_0_6543_7_clip_path)", height: "100%", width: "100%" }}></div>
+                            <div style={{ backdropFilter: "blur(2.5px)", clipPath: "url(#bgblur_0_6543_7_clip_path)", height: "100%", width: "100%" }}></div>
                           </foreignObject>
                           <path data-figma-bg-blur-radius="5" d="M1.33887 15.9529H3.38184C3.73192 15.9529 4.04525 16.0586 4.26855 16.2253C4.49186 16.3922 4.62012 16.6158 4.62012 16.8533V22.1492C4.62012 22.3866 4.49181 22.6093 4.26855 22.7761C4.04524 22.943 3.732 23.0496 3.38184 23.0496H1.33887C0.988767 23.0496 0.67546 22.9429 0.452148 22.7761C0.228844 22.6093 0.0996094 22.3866 0.0996094 22.1492V16.8533C0.0996094 16.6158 0.228844 16.3922 0.452148 16.2253C0.675445 16.0587 0.988889 15.9529 1.33887 15.9529ZM7.98047 12.4031H10.0234C10.3734 12.4031 10.6869 12.5088 10.9102 12.6755C11.1334 12.8423 11.2626 13.0651 11.2627 13.3025V22.1492C11.2627 22.3866 11.1335 22.6093 10.9102 22.7761C10.6868 22.9429 10.3735 23.0496 10.0234 23.0496H7.98047C7.63034 23.0495 7.31705 22.9429 7.09375 22.7761C6.87053 22.6093 6.74219 22.3866 6.74219 22.1492V13.3025C6.74228 13.0651 6.87054 12.8423 7.09375 12.6755C7.31705 12.5087 7.63034 12.4031 7.98047 12.4031ZM14.623 8.98022H16.666C17.0161 8.98025 17.3294 9.08586 17.5527 9.25269C17.7759 9.41945 17.9042 9.6423 17.9043 9.87964V22.1492C17.9043 22.3866 17.776 22.6093 17.5527 22.7761C17.3294 22.9429 17.0161 23.0495 16.666 23.0496H14.623C14.273 23.0496 13.9596 22.9429 13.7363 22.7761C13.513 22.6093 13.3838 22.3866 13.3838 22.1492V9.87964C13.3839 9.64229 13.5131 9.41946 13.7363 9.25269C13.9596 9.08598 14.273 8.98022 14.623 8.98022ZM21.2646 4.16187H23.3076C23.6577 4.16187 23.971 4.26852 24.1943 4.4353C24.4176 4.60213 24.5469 4.82481 24.5469 5.06226V22.1492C24.5469 22.3866 24.4176 22.6093 24.1943 22.7761C23.971 22.9429 23.6577 23.0496 23.3076 23.0496H21.2646C20.9145 23.0496 20.6012 22.943 20.3779 22.7761C20.1547 22.6093 20.0264 22.3866 20.0264 22.1492V5.06226C20.0264 4.82484 20.1547 4.60212 20.3779 4.4353C20.6012 4.26847 20.9145 4.16187 21.2646 4.16187Z" fill="url(#paint2_linear_6543_7)" fillOpacity="0.3" stroke="url(#paint3_linear_6543_7)" strokeWidth="0.2" />
                           <defs>
@@ -1668,7 +1765,7 @@ const ECommerce: React.FC = () => {
                       iconKey: (
                         <svg width="29" height="27" viewBox="0 0 29 27" fill="none" xmlns="http://www.w3.org/2000/svg">
                           <foreignObject x="9.5799" y="-5" width="23.9182" height="21.2107">
-                            <div xmlns="http://www.w3.org/1999/xhtml" style={{ backdropFilter: "blur(2.5px)", clipPath: "url(#bgblur_0_6544_91_clip_path)", height: "100%", width: "100%" }}></div>
+                            <div style={{ backdropFilter: "blur(2.5px)", clipPath: "url(#bgblur_0_6544_91_clip_path)", height: "100%", width: "100%" }}></div>
                           </foreignObject>
                           <rect data-figma-bg-blur-radius="5" x="14.6799" y="0.1" width="13.7182" height="11.0107" rx="2.9" fill="url(#paint0_linear_6544_91)" fillOpacity="0.3" stroke="url(#paint1_linear_6544_91)" strokeWidth="0.2" />
                           <path d="M11.4008 7.54261C10.2525 9.53157 7.79341 10.2617 5.90832 9.1733C4.02324 8.08494 3.42598 5.59029 4.57431 3.60133C5.72263 1.61237 8.1817 0.882285 10.0668 1.97064C11.9519 3.05899 12.5491 5.55365 11.4008 7.54261Z" fill="url(#paint2_linear_6544_91)" />
@@ -1677,7 +1774,7 @@ const ECommerce: React.FC = () => {
                           <path d="M11.6225 10.3116C11.2206 11.0077 10.1307 11.1309 9.18817 10.5867C8.24563 10.0426 7.80736 9.03709 8.20927 8.34095C8.61119 7.64482 9.70109 7.52163 10.6436 8.06581C11.5862 8.60999 12.0244 9.61546 11.6225 10.3116Z" fill="url(#paint5_linear_6544_91)" />
                           <path d="M21.6064 7.65894L22.3223 3.2953H23.0041L22.2882 7.65894H21.6064ZM19.6525 6.57655L19.7655 5.89473H23.1746L23.0616 6.57655H19.6525ZM20.0723 7.65894L20.7882 3.2953H21.47L20.7541 7.65894H20.0723ZM19.9018 5.0595L20.0169 4.37769H23.426L23.3109 5.0595H19.9018Z" fill="white" />
                           <foreignObject x="-2.28458" y="3.65894" width="32.1263" height="27.822">
-                            <div xmlns="http://www.w3.org/1999/xhtml" style={{ backdropFilter: "blur(2.5px)", clipPath: "url(#bgblur_1_6544_91_clip_path)", height: "100%", width: "100%" }}></div>
+                            <div style={{ backdropFilter: "blur(2.5px)", clipPath: "url(#bgblur_1_6544_91_clip_path)", height: "100%", width: "100%" }}></div>
                           </foreignObject>
                           <rect data-figma-bg-blur-radius="5" x="2.81542" y="8.75894" width="21.9263" height="17.6221" rx="2.9" fill="url(#paint6_linear_6544_91)" fillOpacity="0.3" stroke="url(#paint7_linear_6544_91)" strokeWidth="0.2" />
                           <path d="M17.0594 18.7781L15.9708 14.7231C15.8524 14.2822 15.3106 14.1197 14.9684 14.4226L14.2823 15.0298C13.5187 15.7056 12.608 16.1947 11.6223 16.4583C10.7972 16.6789 10.3082 17.5279 10.5293 18.3514C10.7504 19.1749 11.5991 19.6661 12.4242 19.4454C13.41 19.1818 14.4436 19.1508 15.4434 19.3551L16.3419 19.5385C16.7899 19.6301 17.1778 19.219 17.0594 18.7781Z" stroke="white" strokeWidth="0.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -1734,7 +1831,6 @@ const ECommerce: React.FC = () => {
                           <path d="M3.3457 14.1238L10.8709 4.02972C11.6707 2.9569 13.278 2.9569 14.0778 4.02972L21.603 14.1238" stroke="url(#paint0_linear_6638_766)" strokeLinecap="round" strokeLinejoin="round" />
                           <foreignObject x="-3.6543" y="9" width="33" height="25">
                             <div
-                              xmlns="http://www.w3.org/1999/xhtml"
                               style={{
                                 backdropFilter: "blur(2px)",
                                 clipPath: "url(#bgblur_0_6638_766_clip_path)",
@@ -1784,7 +1880,6 @@ const ECommerce: React.FC = () => {
                           </g>
                           <foreignObject x="-4.99997" y="2.69238" width="32.7502" height="26.0955">
                             <div
-                              xmlns="http://www.w3.org/1999/xhtml"
                               style={{
                                 backdropFilter: "blur(2.5px)",
                                 clipPath: "url(#bgblur_0_6544_83_clip_path)",
@@ -1856,7 +1951,7 @@ const ECommerce: React.FC = () => {
                   ].map((item) => (
                     <div
                       key={item.label}
-                      className="flex items-center gap-3 rounded-3xl bg-[#111113] px-4 py-3"
+                      className="flex items-center gap-3 rounded-3xl w-full bg-[#111113] px-4 py-3"
                     >
                       {/* Icon placeholder - SVG will be pasted here */}
                       <div className="flex-shrink-0 w-8 h-10 flex items-center justify-center">
@@ -2152,10 +2247,10 @@ const ECommerce: React.FC = () => {
           className={`relative w-full items-center rounded-3xl shadow-[0_24px_80px_rgba(0,0,0,0.6)] ${elonStep === 4 ? "ring-1 ring-blue-600 animate-pulse" : ""
             } lg:static`}
         >
-          <TaskGrid />
+          <TaskGrid onModalOpenChange={setTaskGridModalOpen} />
         </div>
       </div>
-      {/* Floating Make Turn Button */}
+      {/* Floating Make Turn Button - on mobile: hidden when any modal is open and z-index below modals so it never overlaps; desktop unchanged */}
       <button
         onClick={() => {
           playSound("click");
@@ -2166,12 +2261,14 @@ const ECommerce: React.FC = () => {
           bottom: '24px',
           right: '24px',
         }}
-        className={` rounded-xl bg-gray-900/95 dark:bg-gray-700/95 backdrop-blur-md border border-gray-200/20 dark:border-gray-600/20 flex items-center justify-center transition-all duration-300 shadow-2xl
+        className={`rounded-lg bg-gradient-to-b from-[#F5D0FE] via-[#E9D5FF] to-[#DDD6FE] text-black backdrop-blur-md border border-gray-200/20 dark:border-gray-600/20 flex items-center justify-center transition-all duration-300 shadow-2xl
+          z-[1000] md:z-[9999]
           hover:bg-gray-800/95 dark:hover:bg-gray-600/95 
           hover:scale-105 hover:-translate-y-1
           hover:shadow-[0_20px_50px_rgba(0,0,0,0.4)] hover:shadow-gray-900/60
           active:scale-100 active:translate-y-0
           group relative overflow-hidden
+          ${isAnyModalOpen ? 'max-md:hidden' : ''}
           ${isScrolling
             ? 'px-4 py-3 min-w-[60px] md:min-w-[200px] rounded-full'
             : 'px-6 py-4 min-w-[180px] md:min-w-[200px] flex-col'
@@ -2184,24 +2281,24 @@ const ECommerce: React.FC = () => {
 
 
         {/* Bug count badge */}
-        {(() => {
+        {/* {(() => {
           const bugCount = user?.tasks?.filter((task: any) => task.isBug === true).length || 0;
           return bugCount > 0 ? (
             <span className="absolute -top-2 -right-2 flex h-7 w-7 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white shadow-lg ring-2 ring-white dark:ring-gray-900 z-20">
               {bugCount > 9 ? '9+' : bugCount}
             </span>
           ) : null;
-        })()}
+        })()} */}
 
 
         {isScrolling ? (
-          <span className="font-bold text-white text-lg relative z-10 group-hover:scale-110 transition-transform duration-300">{t("dashboard.makeTurn")}</span>
+          <span className="font-bold text-black text-lg relative z-10 group-hover:scale-110 transition-transform duration-300">{t("dashboard.makeTurn")}</span>
         ) : (
           <>
-            <span className="font-bold text-white text-lg mb-2 relative z-10 group-hover:scale-105 transition-transform duration-300">{t("dashboard.makeTurn")}</span>
-            <div className="flex justify-between items-center w-full px-2 pt-2 border-t border-white/10 relative z-10 group-hover:border-white/20 transition-colors duration-300">
-              <span className="font-medium text-white text-sm">{t("dashboard.income")}</span>
-              <span className={`text-lg font-bold transition-all duration-300 group-hover:scale-110 ${Number(turnAmount) >= 0 ? 'text-green-300 group-hover:text-green-200' : 'text-red-300 group-hover:text-red-200'}`}>${turnAmount}</span>
+            <span className="font-bold text-black text-lg mb-2 relative z-10 group-hover:scale-105 transition-transform duration-300">{t("dashboard.makeTurn")}</span>
+            <div className="flex justify-between items-center w-full px-2 pt-2 border-t border-black/10 relative z-10 group-hover:border-black/20 transition-colors duration-300">
+              <span className="font-medium text-black text-sm">{t("dashboard.income")}&nbsp;&nbsp;</span>
+              <span className={`text-lg font-bold transition-all duration-300 group-hover:scale-110 ${Number(turnAmount) >= 0 ? 'text-green-300 group-hover:text-green-400' : 'text-red-300 group-hover:text-red-400'}`}>${turnAmount}</span>
             </div>
           </>
         )}
@@ -2213,10 +2310,10 @@ const ECommerce: React.FC = () => {
 
 
       {confirmationAction && (
-        <div className="fixed inset-0 z-[999999] flex items-center m-5 justify-center bg-black/50 backdrop-blur-sm">
-          <div className="bg-white dark:bg-boxdark p-6 rounded-xl w-full max-w-sm shadow-lg text-center">
-            <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">Confirm Action</h2>
-            <p className="text-sm text-gray-600 dark:text-gray-300 mb-6">
+        <div className="fixed inset-0 z-[999999] flex items-center justify-center bg-black/50 backdrop-blur-sm px-4 sm:px-0">
+          <div className="bg-white dark:bg-boxdark p-4 sm:p-6 rounded-xl w-full max-w-sm shadow-lg text-center max-h-[90vh] overflow-y-auto">
+            <h2 className="text-base sm:text-lg font-semibold text-gray-800 dark:text-white mb-3 sm:mb-4">Confirm Action</h2>
+            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 mb-4 sm:mb-6">
               Are you sure you want to {confirmationAction === 'skip'
                 ? 'skip the bug fix duration (60 Venture coins)?'
                 : confirmationAction === 'buyout'
@@ -2245,25 +2342,25 @@ const ECommerce: React.FC = () => {
 
       {/* Notification Modal */}
       {isNotificationModalOpen && (
-        <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4 sm:p-0">
           <div
             className="absolute inset-0 bg-black/60 backdrop-blur-md"
             onClick={closeNotificationModal}
           />
-          <div className="relative w-full max-w-5xl rounded-2xl bg-[#1B1B1D96] border border-white/10 p-6 shadow-lg backdrop-blur-sm bg-opacity-70">
+          <div className="relative w-full max-w-5xl rounded-2xl bg-[#1B1B1D96] border border-white/10 p-4 sm:p-6 shadow-lg backdrop-blur-sm bg-opacity-70 max-h-[90vh] overflow-hidden flex flex-col">
             {/* Header */}
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-medium text-white">Logs</h2>
+            <div className="flex items-center justify-between mb-4 sm:mb-6 flex-shrink-0">
+              <h2 className="text-xl sm:text-2xl font-medium text-white">Logs</h2>
               <button
                 onClick={closeNotificationModal}
-                className="text-white hover:text-gray-300 transition-colors"
+                className="text-white hover:text-gray-300 transition-colors flex-shrink-0"
               >
-                <X className="h-6 w-6" />
+                <X className="h-5 w-5 sm:h-6 sm:w-6" />
               </button>
             </div>
 
             {/* Logs List */}
-            <div className="max-h-[500px] overflow-y-auto space-y-3 pr-2">
+            <div className="flex-1 min-h-0 max-h-[60vh] sm:max-h-[500px] overflow-y-auto space-y-2 sm:space-y-3 pr-1 sm:pr-2">
               {isTranslatingNotifications ? (
                 <p className="text-center text-gray-400 py-8">{t("common.loading")}</p>
               ) : translatedNotifications.length === 0 ? (
@@ -2337,10 +2434,10 @@ const ECommerce: React.FC = () => {
       )}
 
       {showSkipBugModal && (
-        <div className="fixed inset-0 z-[99999] flex items-center m-5 lg:m-0 justify-center bg-black/50 backdrop-blur-sm">
-          <div className="bg-white dark:bg-boxdark p-6 rounded-xl w-full max-w-sm shadow-lg text-center">
-            <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-2">Manage Bug</h2>
-            <p className="text-sm text-gray-500 dark:text-gray-300 mb-4">
+        <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/50 backdrop-blur-sm px-4 sm:px-0">
+          <div className="bg-white dark:bg-boxdark p-4 sm:p-6 rounded-xl w-full max-w-sm shadow-lg text-center max-h-[90vh] overflow-y-auto">
+            <h2 className="text-base sm:text-lg font-semibold text-gray-800 dark:text-white mb-2">Manage Bug</h2>
+            <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-300 mb-4">
               Choose how you want to resolve or prevent bugs. Options vary in cost and effect.
             </p>
 
@@ -2383,17 +2480,17 @@ const ECommerce: React.FC = () => {
 
 
       {chatModalOpen && (
-        <div className="fixed m-5 lg:m-0 inset-0 z-[99999] flex items-center justify-center bg-black/40 backdrop-blur-sm">
+        <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/40 backdrop-blur-sm px-4 sm:px-0">
           <motion.div
             initial={{ opacity: 0, scale: 0.95, y: 30 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 30 }}
             transition={{ duration: 0.3 }}
-            className="w-full max-w-lg h-[90vh] max-h-[650px] flex flex-col p-5 rounded-3xl shadow-2xl bg-white dark:bg-[#1b1f23]/70 dark:backdrop-blur-xl border border-gray-300 dark:border-gray-700"
+            className="w-full max-w-lg h-[90vh] max-h-[650px] flex flex-col p-4 sm:p-5 rounded-2xl sm:rounded-3xl shadow-2xl bg-white dark:bg-[#1b1f23]/70 dark:backdrop-blur-xl border border-gray-300 dark:border-gray-700"
           >
             {/* Header */}
-            <div className="flex justify-between items-center mb-3">
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white">{t("modals.aiAdvisor.title")}</h2>
+            <div className="flex justify-between items-center mb-2 sm:mb-3 flex-shrink-0">
+              <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white truncate pr-2">{t("modals.aiAdvisor.title")}</h2>
               <button
                 onClick={() => {
                   setChatModalOpen(false);
@@ -2560,19 +2657,19 @@ const ECommerce: React.FC = () => {
       )}
 
       {showBoostModal && (
-        <div className="fixed inset-0 z-[99999] bg-black/50 backdrop-blur-sm flex items-center justify-center">
-          <div className="bg-white dark:bg-boxdark rounded-xl w-full max-w-md p-6 shadow-lg">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-semibold text-gray-800 dark:text-white">Special Task Speed Boost</h2>
+        <div className="fixed inset-0 z-[99999] bg-black/50 backdrop-blur-sm flex items-center justify-center px-4 sm:px-0">
+          <div className="bg-white dark:bg-boxdark rounded-xl w-full max-w-md p-4 sm:p-6 shadow-lg max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-3 sm:mb-4 gap-2">
+              <h2 className="text-base sm:text-lg font-semibold text-gray-800 dark:text-white truncate">Special Task Speed Boost</h2>
               <button
                 onClick={() => setShowBoostModal(false)}
-                className="text-gray-500 hover:text-gray-700 dark:text-gray-300 font-bold"
+                className="text-gray-500 hover:text-gray-700 dark:text-gray-300 font-bold flex-shrink-0"
               >
                 ×
               </button>
             </div>
 
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-4">
               Auto-complete any 1-turn task instantly. Saves time and opens up bandwidth for higher-value tasks. <br />
               <span className="text-indigo-500 font-medium">Cost: 50 Venture coins</span>
             </p>

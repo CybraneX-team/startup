@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { X, RotateCcw, Rocket, AlertCircle } from "lucide-react";
 import image from '../../../illustrationImage.svg';
@@ -20,8 +20,36 @@ const GameOptionsModal = ({
 }: GameOptionsModalProps) => {
   const { t } = useLanguage();
   const [showConfirm, setShowConfirm] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [shouldRender, setShouldRender] = useState(false);
+  const [confirmAnimating, setConfirmAnimating] = useState(false);
+  const [confirmShouldRender, setConfirmShouldRender] = useState(false);
 
-  if (!isOpen) return null;
+  // Handle modal open/close animations
+  useEffect(() => {
+    if (isOpen) {
+      setShouldRender(true);
+      setTimeout(() => setIsAnimating(true), 10);
+    } else {
+      setIsAnimating(false);
+      const timer = setTimeout(() => setShouldRender(false), 300);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen]);
+
+  // Handle confirmation modal animations
+  useEffect(() => {
+    if (showConfirm) {
+      setConfirmShouldRender(true);
+      setTimeout(() => setConfirmAnimating(true), 10);
+    } else {
+      setConfirmAnimating(false);
+      const timer = setTimeout(() => setConfirmShouldRender(false), 300);
+      return () => clearTimeout(timer);
+    }
+  }, [showConfirm]);
+
+  if (!shouldRender) return null;
 
   const handleConfirmStart = () => {
     onStartNewGame();
@@ -32,8 +60,18 @@ const GameOptionsModal = ({
   return (
     <>
       {/* Main Modal */}
-      <div className="fixed inset-0 z-[3000] flex items-center justify-center bg-black/40 backdrop-blur-sm">
-        <div className="relative w-[90%] max-w-md rounded-2xl bg-white dark:bg-[#1F2937] p-6 shadow-2xl">
+      <div className="fixed inset-0 z-[3000] flex items-center justify-center px-4 sm:px-0">
+        <div 
+          className={`fixed inset-0 bg-black/40 backdrop-blur-sm transition-opacity duration-300 ${
+            isAnimating ? 'opacity-100' : 'opacity-0'
+          }`}
+          onClick={onClose}
+        ></div>
+        <div className={`relative w-full max-w-[90%] sm:max-w-md rounded-2xl bg-white dark:bg-[#1F2937] p-4 sm:p-6 shadow-2xl transition-all duration-300 max-h-[90vh] overflow-y-auto ${
+            isAnimating 
+              ? 'opacity-100 scale-100 translate-y-0' 
+              : 'opacity-0 scale-95 translate-y-4'
+          }`}>
 
           {/* Close Icon */}
           <button
@@ -55,7 +93,7 @@ const GameOptionsModal = ({
           </div>
 
           {/* Heading */}
-          <h2 className="text-xl font-semibold text-center text-gray-800 dark:text-white mb-4">
+          <h2 className="text-lg sm:text-xl font-semibold text-center text-gray-800 dark:text-white mb-3 sm:mb-4">
             {t("modals.gameOptions.title")}
           </h2>
 
@@ -93,9 +131,19 @@ const GameOptionsModal = ({
       </div>
 
       {/* Confirmation Modal */}
-      {showConfirm && (
-        <div className="fixed inset-0 z-[3001] flex items-center justify-center bg-black/40 backdrop-blur-sm">
-          <div className="w-[90%] max-w-sm bg-white dark:bg-[#1F2937] rounded-2xl p-6 shadow-2xl text-center">
+      {confirmShouldRender && (
+        <div className="fixed inset-0 z-[3001] flex items-center justify-center px-4 sm:px-0">
+          <div 
+            className={`fixed inset-0 bg-black/40 backdrop-blur-sm transition-opacity duration-300 ${
+              confirmAnimating ? 'opacity-100' : 'opacity-0'
+            }`}
+            onClick={() => setShowConfirm(false)}
+          ></div>
+          <div className={`w-full max-w-[90%] sm:max-w-sm bg-white dark:bg-[#1F2937] rounded-2xl p-4 sm:p-6 shadow-2xl text-center transition-all duration-300 ${
+              confirmAnimating 
+                ? 'opacity-100 scale-100 translate-y-0' 
+                : 'opacity-0 scale-95 translate-y-4'
+            }`}>
             <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-3">
               {t("modals.gameOptions.areYouSure")}
             </h3>

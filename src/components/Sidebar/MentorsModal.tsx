@@ -222,6 +222,8 @@ const MentorsModal: React.FC<MentorsModalProps> = ({ isOpen, onClose }) => {
   const {user} = useUser()
   const { t } = useLanguage();
   const [mentorsArray, setmentorsArray] = useState<any[]>([]);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [shouldRender, setShouldRender] = useState(false);
   
     useEffect(() => {
       
@@ -242,19 +244,38 @@ const MentorsModal: React.FC<MentorsModalProps> = ({ isOpen, onClose }) => {
         }
       }
     }, [user]);
-  if (!isOpen) return null;
+
+    // Handle modal open/close animations
+    useEffect(() => {
+      if (isOpen) {
+        setShouldRender(true);
+        setTimeout(() => setIsAnimating(true), 10);
+      } else {
+        setIsAnimating(false);
+        const timer = setTimeout(() => setShouldRender(false), 300);
+        return () => clearTimeout(timer);
+      }
+    }, [isOpen]);
+
+  if (!shouldRender) return null;
 
   return (
     <>
       <div className="fixed inset-0 z-[99999] flex items-center justify-center">
         {/* Full screen backdrop */}
         <div 
-          className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+          className={`absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity duration-300 ${
+            isAnimating ? 'opacity-100' : 'opacity-0'
+          }`}
           onClick={onClose}
         ></div>
 
         {/* Modal Container */}
-        <div className="relative w-full max-w-[95vw] sm:max-w-[90vw] md:max-w-[85vw] lg:max-w-screen-xl max-h-[90vh] rounded-2xl bg-[#1B1B1D96] shadow-lg backdrop-blur-sm bg-opacity-70 border border-white/10 overflow-y-auto overflow-x-hidden mx-4">
+        <div className={`relative w-full max-w-[95vw] sm:max-w-[90vw] md:max-w-[85vw] lg:max-w-screen-xl max-h-[90vh] rounded-2xl bg-[#1B1B1D96] shadow-lg backdrop-blur-sm bg-opacity-70 border border-white/10 overflow-y-auto overflow-x-hidden mx-4 transition-all duration-300 ${
+            isAnimating 
+              ? 'opacity-100 scale-100 translate-y-0' 
+              : 'opacity-0 scale-95 translate-y-4'
+          }`}>
           {/* Close button */}
           <button
             onClick={onClose}
@@ -264,15 +285,15 @@ const MentorsModal: React.FC<MentorsModalProps> = ({ isOpen, onClose }) => {
           </button>
 
           {/* Header */}
-          <div className="p-6 sticky top-0 z-40 rounded-2xl">
-            <h2 className="text-2xl font-medium text-gray-800 dark:text-white inline">
+          <div className="p-4 sm:p-6 sticky top-0 z-40 rounded-2xl">
+            <h2 className="text-xl sm:text-2xl font-medium text-gray-800 dark:text-white inline">
               {t("modals.mentors.title")}{" "}
             </h2>
           </div>
 
           {/* Cards */}
           <div className="sm:overflow-x-auto overflow-y-auto">
-            <div className="flex flex-col sm:flex-row gap-4 p-6 lg:w-80 sm:min-w-full items-stretch">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 p-4 sm:p-6 lg:w-80 sm:min-w-full items-stretch">
               {mentorsArray.map((mentor, index) => (
                 <MentorCard
                   key={index}

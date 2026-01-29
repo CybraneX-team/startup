@@ -158,6 +158,8 @@ const InvestorsModal: React.FC<InvestorsModalProps> = ({ isOpen, onClose }) => {
   const [showSignConfirm, setShowSignConfirm] = useState(false);
   const [showBuyoutConfirm, setShowBuyoutConfirm] = useState(false);
   const [translatedSelectedName, setTranslatedSelectedName] = useState("");
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [shouldRender, setShouldRender] = useState(false);
 
   // Translate selected investor name when it changes
   useEffect(() => {
@@ -195,7 +197,19 @@ const InvestorsModal: React.FC<InvestorsModalProps> = ({ isOpen, onClose }) => {
     }
   }, [user]);
 
-  if (!isOpen) return null;
+  // Handle modal open/close animations
+  useEffect(() => {
+    if (isOpen) {
+      setShouldRender(true);
+      setTimeout(() => setIsAnimating(true), 10);
+    } else {
+      setIsAnimating(false);
+      const timer = setTimeout(() => setShouldRender(false), 300);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen]);
+
+  if (!shouldRender) return null;
 
   const signInvestment = async (e: any) => {
     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/makeInvestment`, {
@@ -245,12 +259,18 @@ const InvestorsModal: React.FC<InvestorsModalProps> = ({ isOpen, onClose }) => {
       <div className="fixed inset-0 z-[99999] flex items-center justify-center">
         {/* Full screen backdrop */}
         <div 
-          className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+          className={`absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity duration-300 ${
+            isAnimating ? 'opacity-100' : 'opacity-0'
+          }`}
           onClick={onClose}
         ></div>
 
         {/* Modal Container */}
-        <div className="relative w-full max-w-[95vw] sm:max-w-[90vw] md:max-w-[85vw] lg:max-w-screen-xl max-h-[90vh] rounded-2xl bg-[#1B1B1D96] shadow-lg backdrop-blur-sm bg-opacity-70 border border-white/10 overflow-y-auto overflow-x-hidden mx-4">
+        <div className={`relative w-full max-w-[95vw] sm:max-w-[90vw] md:max-w-[85vw] lg:max-w-screen-xl max-h-[90vh] rounded-2xl bg-[#1B1B1D96] shadow-lg backdrop-blur-sm bg-opacity-70 border border-white/10 overflow-y-auto overflow-x-hidden mx-4 transition-all duration-300 ${
+            isAnimating 
+              ? 'opacity-100 scale-100 translate-y-0' 
+              : 'opacity-0 scale-95 translate-y-4'
+          }`}>
           {/* Close button */}
           <button
             onClick={onClose}
@@ -260,8 +280,8 @@ const InvestorsModal: React.FC<InvestorsModalProps> = ({ isOpen, onClose }) => {
           </button>
 
           {/* Header */}
-          <div className="p-6 sticky top-0 z-40 rounded-2xl">
-            <h2 className="text-2xl font-medium text-gray-800 dark:text-white inline">
+          <div className="p-4 sm:p-6 sticky top-0 z-40 rounded-2xl">
+            <h2 className="text-xl sm:text-2xl font-medium text-gray-800 dark:text-white inline">
               {t("modals.investors.title")}{" "}
             </h2>
             {/* <span className="text-2xl font-medium text-green-500">
@@ -274,7 +294,7 @@ const InvestorsModal: React.FC<InvestorsModalProps> = ({ isOpen, onClose }) => {
 
           {/* Cards */}
           <div className="sm:overflow-x-auto overflow-y-auto">
-            <div className="flex flex-col sm:flex-row gap-4 p-6 lg:w-80 sm:min-w-full items-stretch">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 p-4 sm:p-6 lg:w-80 sm:min-w-full items-stretch">
               {investmentsArray.map((e, i) => {
                 const signed = user?.investmentsMade?.some((inv: any) => inv.name === e.name) ?? false;
 
@@ -300,9 +320,9 @@ const InvestorsModal: React.FC<InvestorsModalProps> = ({ isOpen, onClose }) => {
 
       {/* Confirm Modal */}
       {(showSignConfirm || showBuyoutConfirm) && selectedInvestor && (
-        <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
-          <div className="rounded-2xl bg-[#1B1B1D96] shadow-lg backdrop-blur-sm bg-opacity-70  p-8 w-full max-w-md text-gray-900 dark:text-white relative">
-            <h2 className="text-xl font-semibold mb-2">
+        <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/50 backdrop-blur-sm px-4 sm:px-0">
+          <div className="rounded-2xl bg-[#1B1B1D96] shadow-lg backdrop-blur-sm bg-opacity-70 p-4 sm:p-8 w-full max-w-md text-gray-900 dark:text-white relative max-h-[90vh] overflow-y-auto">
+            <h2 className="text-lg sm:text-xl font-semibold mb-2">
               {showSignConfirm ? (
                 <>
                   {t("modals.investors.makeDeal")}
@@ -357,14 +377,14 @@ const InvestorsModal: React.FC<InvestorsModalProps> = ({ isOpen, onClose }) => {
               </ul>
             </div>
 
-            <div className="flex flex-row gap-4 pt-2 mt-2">
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 pt-2 mt-2">
               <button
                 onClick={() => {
                   setShowBuyoutConfirm(false);
                   setShowSignConfirm(false);
                   setSelectedInvestor(null);
                 }}
-                className="flex-1 rounded-xl border border-gray-500 bg-transparent text-white py-3 font-semibold text-base transition-colors hover:bg-gray-800"
+                className="flex-1 rounded-xl border border-gray-500 bg-transparent text-white py-2.5 sm:py-3 font-semibold text-sm sm:text-base transition-colors hover:bg-gray-800"
               >
                 {t("modals.investors.noCancel")}
               </button>
@@ -379,7 +399,7 @@ const InvestorsModal: React.FC<InvestorsModalProps> = ({ isOpen, onClose }) => {
                   setShowSignConfirm(false);
                   setSelectedInvestor(null);
                 }}
-                className="flex-1 rounded-xl bg-green-500 text-white font-bold py-3 text-base transition-colors hover:bg-green-600"
+                className="flex-1 rounded-xl bg-green-500 text-white font-bold py-2.5 sm:py-3 text-sm sm:text-base transition-colors hover:bg-green-600"
               >
                 {showSignConfirm
                   ? t("modals.mentors.yesSignIt")

@@ -14,7 +14,6 @@ import TurnProgressModal from "@/components/TurnProgressModal";
 import BrainstormTutorial from "@/components/BrainstormTutorial";
 import Image from "next/image";
 
-// import { FixedSizeList as List } from 'react-window';
 
 interface FilterButtonProps {
   label: string;
@@ -103,29 +102,29 @@ const CancelTaskModal: React.FC<CancelTaskModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[3001] flex items-center justify-center bg-black/50 backdrop-blur-[4px]">
-      <div className="relative w-full max-w-md rounded-2xl bg-[#1B1B1D96] border border-white/10 p-6 shadow-lg backdrop-blur-md bg-opacity-80 px-6 py-7 shadow-lg border border-[#32343A] text-white">
+    <div className="fixed inset-0 z-[3001] flex items-center justify-center bg-black/50 backdrop-blur-[4px] px-4 sm:px-0">
+      <div className="relative w-full max-w-md rounded-2xl bg-[#1B1B1D96] border border-white/10 p-4 sm:p-6 shadow-lg backdrop-blur-md bg-opacity-80 sm:px-6 sm:py-7 shadow-lg border border-[#32343A] text-white">
         {/* Close button */}
         <button
           aria-label="Close"
-          className="absolute right-6 top-6 text-gray-400 hover:text-white text-xl"
+          className="absolute right-4 top-4 sm:right-6 sm:top-6 text-gray-400 hover:text-white text-lg sm:text-xl"
           onClick={onCancel}
           tabIndex={0}
         >
           ×
         </button>
         {/* Title */}
-        <h2 className="mb-5 text-[1.25rem] font-semibold text-white leading-tight">
+        <h2 className="mb-4 sm:mb-5 text-lg sm:text-[1.25rem] font-semibold text-white leading-tight">
           {t("modals.cancelTask.title")}
         </h2>
         {/* Task Name */}
-        <h3 className="mb-4 text-base font-semibold text-white leading-tight">
+        <h3 className="mb-3 sm:mb-4 text-sm sm:text-base font-semibold text-white leading-tight">
           {translatedTaskName}
         </h3>
         {/* Divider */}
-        <div className="w-full h-[1px] bg-[#23252B] mb-4" />
+        <div className="w-full h-[1px] bg-[#23252B] mb-3 sm:mb-4" />
         {/* Info Row */}
-        <div className="flex flex-row items-start justify-between w-full mb-7 gap-8">
+        <div className="flex flex-col sm:flex-row items-start justify-between w-full mb-5 sm:mb-7 gap-4 sm:gap-8">
           {/* Metrics */}
           <div className="flex-1 min-w-0">
             <div className="mb-1 text-sm text-gray-400">
@@ -156,16 +155,16 @@ const CancelTaskModal: React.FC<CancelTaskModalProps> = ({
           </div>
         </div>
         {/* Buttons */}
-        <div className="flex flex-row items-center justify-center gap-3 mt-4">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-2 sm:gap-3 mt-4">
           <button
             onClick={onCancel}
-            className="flex-1 rounded-xl bg-[#23252B] text-gray-200 font-semibold py-2.5 transition-colors text-base hover:bg-[#2c2f35]"
+            className="flex-1 rounded-xl bg-[#23252B] text-gray-200 font-semibold py-2.5 transition-colors text-sm sm:text-base hover:bg-[#2c2f35]"
           >
             {t("modals.cancelTask.noCancel")}
           </button>
           <button
             onClick={onConfirm}
-            className="flex-1 rounded-xl bg-gradient-to-r from-emerald-400 to-green-400 text-white font-bold py-2.5 text-base transition-colors hover:from-emerald-500 hover:to-green-500 shadow-sm"
+            className="flex-1 rounded-xl bg-gradient-to-r from-emerald-400 to-green-400 text-white font-bold py-2.5 text-sm sm:text-base transition-colors hover:from-emerald-500 hover:to-green-500 shadow-sm"
           >
             {t("modals.cancelTask.confirm")}
           </button>
@@ -208,14 +207,14 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
 
   if (!isOpen || !task) return null;
   return (
-    <div className="fixed inset-0 z-[3002] flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
-      <div className="w-full max-w-2xl rounded-3xl p-8 shadow-[0_25px_70px_rgba(15,23,42,0.15)] bg-[#1B1B1D96] shadow-lg backdrop-blur-md bg-opacity-80">
-        <div className="mb-6 flex items-start justify-between gap-4">
-          <div>
-            <p className="text-[11px] uppercase tracking-[0.4em] text-gray-500 dark:text-gray-400">
+    <div className="fixed inset-0 z-[3002] flex items-center justify-center bg-black/50 backdrop-blur-sm px-4 sm:px-0">
+      <div className="w-full max-w-2xl rounded-2xl sm:rounded-3xl p-4 sm:p-8 shadow-[0_25px_70px_rgba(15,23,42,0.15)] bg-[#1B1B1D96] shadow-lg backdrop-blur-md bg-opacity-80 max-h-[90vh] overflow-y-auto">
+        <div className="mb-4 sm:mb-6 flex items-start justify-between gap-3 sm:gap-4">
+          <div className="min-w-0 flex-1">
+            <p className="text-[10px] sm:text-[11px] uppercase tracking-[0.4em] text-gray-500 dark:text-gray-400">
               {t("modals.taskDetail.title")}
             </p>
-            <h2 className="mt-1 text-3xl font-semibold text-gray-900 dark:text-white leading-tight">
+            <h2 className="mt-1 text-xl sm:text-3xl font-semibold text-gray-900 dark:text-white leading-tight">
               {translatedTaskName}
             </h2>
             <p className="mt-3 text-sm text-gray-600 dark:text-gray-300">
@@ -224,37 +223,37 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
           </div>
           <button
             onClick={onClose}
-            className="rounded-full border border-gray-200/80 p-2 text-gray-500 hover:border-gray-400 hover:text-gray-900 dark:border-gray-700 dark:text-gray-300"
+            className="rounded-full border border-gray-200/80 p-1.5 sm:p-2 text-gray-500 hover:border-gray-400 hover:text-gray-900 dark:border-gray-700 dark:text-gray-300 flex-shrink-0"
           >
             <X className="h-4 w-4" />
           </button>
         </div>
 
-        <div className="mb-6 grid gap-4 sm:grid-cols-2">
-          <div className="rounded-3xl bg-[#111113] p-4">
-            <p className="text-xs uppercase tracking-[0.35em] text-gray-500 dark:text-gray-400">
+        <div className="mb-4 sm:mb-6 grid gap-3 sm:gap-4 sm:grid-cols-2">
+          <div className="rounded-2xl sm:rounded-3xl bg-[#111113] p-3 sm:p-4">
+            <p className="text-[10px] sm:text-xs uppercase tracking-[0.35em] text-gray-500 dark:text-gray-400">
               {t("modals.taskDetail.turnsRequired")}
             </p>
-            <p className="mt-3 text-4xl font-semibold text-gray-900 dark:text-white">
+            <p className="mt-2 sm:mt-3 text-2xl sm:text-4xl font-semibold text-gray-900 dark:text-white">
               {task.turnsRequired}
             </p>
           </div>
-          <div className="rounded-3xl bg-[#111113] p-4 ">
-            <p className="text-xs uppercase tracking-[0.35em] text-gray-500 dark:text-gray-400">
+          <div className="rounded-2xl sm:rounded-3xl bg-[#111113] p-3 sm:p-4">
+            <p className="text-[10px] sm:text-xs uppercase tracking-[0.35em] text-gray-500 dark:text-gray-400">
               {t("modals.taskDetail.type")}
             </p>
-            <p className="mt-3 text-lg font-semibold text-gray-900 dark:text-white">
+            <p className="mt-2 sm:mt-3 text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
               {task.isBug ? t("modals.taskDetail.bug") : t("modals.taskDetail.task")}
             </p>
           </div>
         </div>
 
         {!isIntermediateMode && user?.difficultyMode === "basic" && hasMetricEffects && (
-          <div className="mb-6 rounded-3xl bg-[#111113] p-5 ">
-            <p className="text-xs uppercase tracking-[0.35em] text-gray-500 dark:text-gray-400 mb-3">
+          <div className="mb-4 sm:mb-6 rounded-2xl sm:rounded-3xl bg-[#111113] p-3 sm:p-5">
+            <p className="text-[10px] sm:text-xs uppercase tracking-[0.35em] text-gray-500 dark:text-gray-400 mb-2 sm:mb-3">
               {t("modals.taskDetail.effects")}
             </p>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-1.5 sm:gap-2">
               {Object.entries(task.metricsImpact)
                 .filter(([, value]) => value !== undefined && value !== 0)
                 .map(([key, value]) => (
@@ -272,11 +271,11 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
           </div>
         )}
 
-        <div className="mb-8 rounded-3xl bg-[#111113] p-5 backdrop-blur-sm bg-opacity-70">
-          <p className="text-xs uppercase tracking-[0.35em] text-gray-500 dark:text-gray-400 mb-3">
+        <div className="mb-6 sm:mb-8 rounded-2xl sm:rounded-3xl bg-[#111113] p-3 sm:p-5 backdrop-blur-sm bg-opacity-70">
+          <p className="text-[10px] sm:text-xs uppercase tracking-[0.35em] text-gray-500 dark:text-gray-400 mb-2 sm:mb-3">
             {t("modals.taskDetail.requiredTeam")}
           </p>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-1.5 sm:gap-2">
             {task.requiredTeamMembers &&
               Object.entries(task.requiredTeamMembers).map(([member, count]) =>
                 count > 0 ? (
@@ -295,16 +294,16 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
           </div>
         </div>
 
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+        <div className="flex flex-col gap-2 sm:gap-3 sm:flex-row sm:items-center">
           <button
             onClick={onAdd}
-            className="flex-1 rounded-full border border-gray-200 px-4 py-3 text-sm font-semibold text-gray-700 transition-all hover:border-gray-300 hover:bg-gray-50 dark:border-gray-700 dark:text-white dark:hover:bg-gray-800"
+            className="flex-1 rounded-full border border-gray-200 px-3 py-2.5 sm:px-4 sm:py-3 text-xs sm:text-sm font-semibold text-gray-700 transition-all hover:border-gray-300 hover:bg-gray-50 dark:border-gray-700 dark:text-white dark:hover:bg-gray-800"
           >
             {t("modals.taskDetail.addToSelection")}
           </button>
           <button
             onClick={onMakeTurn}
-            className="flex-1 rounded-full bg-gradient-to-b from-[#F5D0FE] via-[#E9D5FF] to-[#DDD6FE] hover:from-[#FCE7F3] hover:via-[#F3E8FF] hover:to-[#E9D5FF] transition-all duration-300 hover:shadow-lg hover:scale-105 active:scale-100 px-4 py-3 text-sm font-semibold text-white transition-all hover:bg-gray-800 dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-gray-200"
+            className="flex-1 rounded-full bg-gradient-to-b from-[#F5D0FE] via-[#E9D5FF] to-[#DDD6FE] hover:from-[#FCE7F3] hover:via-[#F3E8FF] hover:to-[#E9D5FF] transition-all duration-300 hover:shadow-lg hover:scale-105 active:scale-100 px-3 py-2.5 sm:px-4 sm:py-3 text-xs sm:text-sm font-semibold text-white transition-all hover:bg-gray-800 dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-gray-200"
           >
             {t("modals.taskDetail.makeTurnNow")}
           </button>
@@ -322,7 +321,7 @@ const FilterButton: React.FC<FilterButtonProps> = ({
 }) => (
   <button
     onClick={onClick}
-    className={`flex items-center rounded-lg px-4 py-2 text-sm font-medium capitalize transition-all duration-200
+    className={`flex items-center rounded-lg px-2.5 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium capitalize transition-all duration-200
       ${isActive
         ? "bg-gray-900 text-white dark:bg-gray-700 dark:text-white shadow-sm"
         : "bg-white text-gray-700 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-750 border border-gray-200 dark:border-gray-700"
@@ -330,7 +329,7 @@ const FilterButton: React.FC<FilterButtonProps> = ({
   >
     <span>{label}</span>
     {count !== undefined && (
-      <span className={`ml-2 rounded px-2 py-0.5 text-xs font-semibold ${isActive
+      <span className={`ml-1.5 sm:ml-2 rounded px-1.5 sm:px-2 py-0.5 text-[10px] sm:text-xs font-semibold ${isActive
         ? "bg-white/20 text-white"
         : "bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300"
         }`}>
@@ -466,14 +465,38 @@ const TaskCard: React.FC<TaskCardProps> = ({
   return (
     <div
       onClick={onToggle}
-      className={`relative w-full cursor-pointer overflow-hidden rounded-2xl bg-[#151516] px-5 py-6 shadow-[0_10px_30px_rgba(15,23,42,0.06)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_40px_rgba(15,23,42,0.09)] ${isSelected ? "ring-2 ring-gray-900/50 dark:ring-gray-100/50" : ""
-        }`}
+      className={`relative w-full cursor-pointer overflow-hidden rounded-2xl px-4 py-4 sm:px-5 sm:py-6 transition-all duration-300 ${
+        isSelected 
+          ? "bg-emerald-50 dark:bg-emerald-900/20 scale-[1.02] shadow-[0_0_10px_rgba(16,185,129,0.3),0_0_60px_rgba(16,185,129,0.15),0_20px_0px_rgba(0,0,0,0.3)]" 
+          : "bg-[#151516] hover:-translate-y-1 hover:shadow-[0_20px_40px_rgba(15,23,42,0.09)]"
+      }`}
     >
-      <div className="flex items-start justify-between gap-3">
-        <div className="flex flex-col gap-2">
+      {/* Green sparkle animation when selected - same as Power Boost */}
+      {isSelected && (
+        <Sparkle
+          flickerSpeed="slowest"
+          color={"darkgreen"}
+          count={15}
+          minSize={4}
+          maxSize={8}
+          overflowPx={0}
+          fadeOutSpeed={15}
+          flicker={false}
+        />
+      )}
+      
+      {/* Content wrapper */}
+      <div className="relative z-10">
+      <div className="flex items-start justify-between gap-2 sm:gap-3">
+        <div className="flex flex-col gap-1 sm:gap-2 flex-1 min-w-0 pr-2">
 
-          <h3 className="text-lg ml-5 font-semibold text-gray-200 leading-snug">
+          <h3 className={`text-base sm:text-lg ml-0 sm:ml-5 font-semibold leading-snug transition-colors duration-300 ${
+            isSelected ? "text-gray-800 dark:text-gray-200" : "text-gray-200"
+          }`}>
             {translatedName}
+            {isSelected && (
+              <Sparkles className="inline-block h-3 w-3 sm:h-4 sm:w-4 ml-2 text-emerald-500 animate-pulse" />
+            )}
           </h3>
         </div>
         <button
@@ -482,30 +505,30 @@ const TaskCard: React.FC<TaskCardProps> = ({
             e.stopPropagation();
             onToggle();
           }}
-          className={`flex h-8 w-8 items-center justify-center rounded-full border transition-all
-            ${isSelected
-              ? "border-gray-900 bg-gray-900 text-white dark:border-gray-100 dark:bg-gray-100 dark:text-gray-900"
-              : "text-gray-400 border-none"
-            }`}
-          style={{ minWidth: "2rem", minHeight: "2rem" }}
+          className={`flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-full border transition-all duration-300 flex-shrink-0 ${
+            isSelected
+              ? " bg-emerald-500 text-white shadow-[0_0_15px_rgba(16,185,129,0.6)] scale-110 ring-2 ring-emerald-300/50"
+              : "text-gray-400 border-none hover:border-gray-500"
+          }`}
+          style={{ minWidth: "1.75rem", minHeight: "1.75rem" }}
         >
-          {isSelected ? <CheckSquare className="h-4 w-4" /> : <Square className="h-4 w-4" />}
+          {isSelected ? <CheckSquare className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> : <Square className="h-3.5 w-3.5 sm:h-4 sm:w-4" />}
         </button>
       </div>
 
       {/* Oval icon buttons section */}
-      <div className="mt-4 flex flex-wrap justify-between items-center gap-3">
-        <div className="flex items-center gap-2">
+      <div className="mt-3 sm:mt-4 flex flex-wrap justify-between items-start sm:items-center gap-2 sm:gap-3">
+        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 flex-1 min-w-0">
           {/* Turns button - white outline oval */}
           <button
             type="button"
             onClick={(e) => e.stopPropagation()}
-            className="flex items-center justify-center gap-1 rounded-full bg-[#232223] px-4 py-2 transition-all"
+            className="flex items-center justify-center gap-1 rounded-full bg-[#232223] px-2.5 py-1.5 sm:px-4 sm:py-2 transition-all flex-shrink-0"
           >
-            <div className="flex items-center justify-center">
+            <div className="flex items-center justify-center scale-75 sm:scale-100">
               <TurnsIcon />
             </div>
-            <span className="text-sm font-semibold text-gray-200">{turnsRequired} Turns</span>
+            <span className="text-xs sm:text-sm font-semibold text-gray-200 whitespace-nowrap">{turnsRequired} Turns</span>
           </button>
 
           {/* Team member buttons with gradients - oval shaped */}
@@ -516,12 +539,12 @@ const TaskCard: React.FC<TaskCardProps> = ({
                   key={index}
                   type="button"
                   onClick={(e) => e.stopPropagation()}
-                  className={`flex items-center justify-center bg-[#232223] gap-2 rounded-full px-4 py-2 transition-all hover:opacity-90 shadow-md`}
+                  className={`flex items-center justify-center bg-[#232223] gap-1 sm:gap-2 rounded-full px-2.5 py-1.5 sm:px-4 sm:py-2 transition-all hover:opacity-90 shadow-md flex-shrink-0`}
                 >
-                  <div className="flex items-center justify-center">
+                  <div className="flex items-center justify-center scale-75 sm:scale-100">
                     {getTeamMemberIcon(member)}
                   </div>
-                  <span className="ml-1 text-sm font-bold text-gray-300">
+                  <span className="ml-0 sm:ml-1 text-xs sm:text-sm font-bold text-gray-300 whitespace-nowrap">
                     {count} &nbsp;
                     {member.toLowerCase() === "ceo"
                       ? member.toUpperCase()
@@ -547,9 +570,9 @@ const TaskCard: React.FC<TaskCardProps> = ({
                     key={idx}
                     type="button"
                     onClick={(e) => e.stopPropagation()}
-                    className="flex items-center justify-center gap-2 rounded-full bg-gray-800 dark:bg-gray-800 px-4 py-2.5 transition-all hover:bg-gray-700 dark:hover:bg-gray-700 border border-gray-700 dark:border-gray-700"
+                    className="flex items-center justify-center gap-1 sm:gap-2 rounded-full bg-gray-800 dark:bg-gray-800 px-2.5 py-1.5 sm:px-4 sm:py-2.5 transition-all hover:bg-gray-700 dark:hover:bg-gray-700 border border-gray-700 dark:border-gray-700 flex-shrink-0"
                   >
-                    <span className="text-sm font-semibold text-white dark:text-white">
+                    <span className="text-xs sm:text-sm font-semibold text-white dark:text-white whitespace-nowrap">
                       {shortName} {isPositive ? "+" : "-"}{displayValue}
                       {symbolToShow(key) ? "%" : ""}
                       {showDollarSign(key) ? "$" : ""}
@@ -559,7 +582,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
               })}
 
         </div>
-        <div className="inline-flex items-center gap-2 pr-1.5 ">
+        <div className="inline-flex items-center gap-2 pr-0 sm:pr-1.5 flex-shrink-0">
           {/* <span className="inline-flex w-fit items-center rounded-full bg-gray-100 px-3 py-1 text-[11px] font-semibold tracking-[0.3em] text-white">
             {isBug ? "BUG" : "TASK"}
           </span> */}
@@ -579,16 +602,17 @@ const TaskCard: React.FC<TaskCardProps> = ({
                 isBug,
               });
             }}
-            className="flex h-6 w-6 items-center justify-center rounded-full text-gray-400"
+            className="flex h-5 w-5 sm:h-6 sm:w-6 items-center justify-center rounded-full text-gray-400"
           >
-            <Info className="h-5 w-5" />
+            <Info className="h-4 w-4 sm:h-5 sm:w-5" />
           </button>
         </div>
       </div>
 
       {showDescription && (
-        <p className="mt-4 text-sm text-gray-600 dark:text-gray-300">{description}</p>
+        <p className="mt-3 sm:mt-4 text-xs sm:text-sm text-gray-600 dark:text-gray-300">{description}</p>
       )}
+      </div>
     </div>
   );
 };
@@ -637,11 +661,11 @@ const BrainstormModal = ({
 
   return (
     <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/50 backdrop-blur-sm px-4 sm:px-0">
-      <div className="relative bg-[#1B1B1D96] border border-white/10 p-6 shadow-lg backdrop-blur-sm bg-opacity-70 w-full max-w-md rounded-2xl p-6">
-        <h2 className="mb-4 text-xl font-semibold text-gray-900 dark:text-white">
+      <div className="relative bg-[#1B1B1D96] border border-white/10 p-4 sm:p-6 shadow-lg backdrop-blur-sm bg-opacity-70 w-full max-w-md rounded-2xl max-h-[90vh] overflow-y-auto">
+        <h2 className="mb-3 sm:mb-4 text-lg sm:text-xl font-semibold text-gray-900 dark:text-white">
           {t("dashboard.brainstormSession")}
         </h2>
-        <p className="mb-6 text-sm text-gray-600 dark:text-gray-400">
+        <p className="mb-4 sm:mb-6 text-xs sm:text-sm text-gray-600 dark:text-gray-400">
           {t("dashboard.brainstormDescription")}
         </p>
 
@@ -720,17 +744,11 @@ const BrainstormModal = ({
   );
 };
 
-const TaskGrid: React.FC = () => {
-  // const [selectedTasks, setSelectedTasks] = useState<Set<number>>(new Set());
-  // ... inside TaskGrid component ...
+interface TaskGridProps {
+  onModalOpenChange?: (open: boolean) => void;
+}
 
-  // ✅ ADD THIS: Filter logic to process tasks based on activeFilters
-
-
-
-  // ... rest of the component
-  // ... rest of the component
-
+const TaskGrid: React.FC<TaskGridProps> = ({ onModalOpenChange }) => {
   const [selectedTasks, setSelectedTasks] = useState<Set<string>>(new Set());
   const [brainstormModalOpen, setBrainstormModalOpen] = useState(false);
   const [powerBoost, setPowerBoost] = useState(false);
@@ -815,6 +833,12 @@ const TaskGrid: React.FC = () => {
     taskId: null,
     task: null,
   });
+
+  // Notify parent when any task-grid modal opens/closes (so e.g. Make Turn button can hide on mobile)
+  useEffect(() => {
+    const open = !!(detailModalTask || brainstormModalOpen || cancelModal.isOpen || showTurnProgressModal);
+    onModalOpenChange?.(open);
+  }, [detailModalTask, brainstormModalOpen, cancelModal.isOpen, showTurnProgressModal, onModalOpenChange]);
 
   useEffect(() => {
     if (!user?.gameId) {
@@ -1210,9 +1234,9 @@ const TaskGrid: React.FC = () => {
       />
 
       <div className="flex flex-col">
-        <div className="flex flex-wrap justify-between gap-2">
+        <div className="flex flex-wrap justify-between gap-2 mb-3 sm:mb-0">
           {!isIntermediateMode ?
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-1.5 sm:gap-2">
               <FilterButton
                 label={t("dashboard.allTasks")}
                 count={user?.tasks?.length}
@@ -1235,7 +1259,7 @@ const TaskGrid: React.FC = () => {
               ))}
               <button
                 onClick={() => setActiveFilters(new Set(["all"]))}
-                className="text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
+                className="text-xs sm:text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 transition-colors px-2 py-1 sm:px-0 sm:py-0"
               >
                 {t("dashboard.resetFilters")}
               </button>

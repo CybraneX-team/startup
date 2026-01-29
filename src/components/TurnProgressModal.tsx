@@ -57,6 +57,8 @@ const TurnProgressModal: React.FC<TurnProgressModalProps> = ({
   const { playSound } = useSound();
   const [translatedNotifications, setTranslatedNotifications] = useState<Array<{ message: string; isPositive: boolean }>>([]);
   const [isTranslating, setIsTranslating] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [shouldRender, setShouldRender] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
@@ -92,7 +94,19 @@ const TurnProgressModal: React.FC<TurnProgressModalProps> = ({
     translateNotifications();
   }, [isOpen, notifications, language]);
 
-  if (!isOpen || !previousState || !currentState) return null;
+  // Handle modal open/close animations
+  useEffect(() => {
+    if (isOpen) {
+      setShouldRender(true);
+      setTimeout(() => setIsAnimating(true), 10);
+    } else {
+      setIsAnimating(false);
+      const timer = setTimeout(() => setShouldRender(false), 300);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen]);
+
+  if (!shouldRender || !previousState || !currentState) return null;
 
   // Get icon for metric
   const getMetricIcon = (key: string) => {
@@ -213,29 +227,39 @@ const TurnProgressModal: React.FC<TurnProgressModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/50 backdrop-blur-sm">
-      <div className="relative w-full max-w-4xl max-h-[90vh] mx-4 my-4 bg-[#1B1B1D96] border rounded-3xl border-white/10 p-6 shadow-lg backdrop-blur-md bg-opacity-90 overflow-hidden flex flex-col border border-gray-200 dark:border-gray-700">
+    <div className="fixed inset-0 z-[99999] flex items-center justify-center px-4 sm:px-0">
+      <div 
+        className={`fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity duration-300 ${
+          isAnimating ? 'opacity-100' : 'opacity-0'
+        }`}
+        onClick={onClose}
+      ></div>
+      <div className={`relative w-full max-w-4xl max-h-[90vh] mx-0 sm:mx-4 my-2 sm:my-4 bg-[#1B1B1D96] border rounded-2xl sm:rounded-3xl border-white/10 p-4 sm:p-6 shadow-lg backdrop-blur-md bg-opacity-90 overflow-hidden flex flex-col border border-gray-200 dark:border-gray-700 transition-all duration-300 ${
+          isAnimating 
+            ? 'opacity-100 scale-100 translate-y-0' 
+            : 'opacity-0 scale-95 translate-y-4'
+        }`}>
         {/* Header */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-gray-100 dark:bg-gray-800">
-              <BarChart3 className="h-5 w-5 text-gray-700 dark:text-gray-300" />
+        <div className="flex items-center justify-between gap-2 flex-shrink-0">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+            <div className="p-1.5 sm:p-2 rounded-lg bg-gray-100 dark:bg-gray-800 flex-shrink-0">
+              <BarChart3 className="h-4 w-4 sm:h-5 sm:w-5 text-gray-700 dark:text-gray-300" />
             </div>
-            <div>
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+            <div className="min-w-0">
+              <h2 className="text-base sm:text-xl font-semibold text-gray-900 dark:text-white truncate">
                 {t("modals.turnProgress.title")} #{turnNumber}
               </h2>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mt-0.5">
+              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-0.5">
                 {t("modals.turnProgress.subtitle")}
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-gray-500 dark:text-gray-400"
+            className="p-1.5 sm:p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-gray-500 dark:text-gray-400 flex-shrink-0"
             aria-label={t("common.close")}
           >
-            <X className="h-5 w-5" />
+            <X className="h-4 w-4 sm:h-5 sm:w-5" />
           </button>
         </div>
 
@@ -267,7 +291,7 @@ const TurnProgressModal: React.FC<TurnProgressModalProps> = ({
             <div className="space-y-3">
               <div className="flex items-center gap-2">
                 <BarChart3 className="h-4 w-4 text-gray-700 dark:text-gray-300" />
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
                   {t("modals.turnProgress.metricsChanges")}
                 </h3>
               </div>
@@ -426,7 +450,7 @@ const TurnProgressModal: React.FC<TurnProgressModalProps> = ({
             <div className="space-y-3">
               <div className="flex items-center gap-2">
                 <Activity className="h-4 w-4 text-gray-700 dark:text-gray-300" />
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
                   {t("modals.turnProgress.activities")}
                 </h3>
               </div>
@@ -475,13 +499,13 @@ const TurnProgressModal: React.FC<TurnProgressModalProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="p-5">
+        <div className="p-3 sm:p-5 flex-shrink-0">
           <button
             onClick={() => {
               playSound("click");
               onClose();
             }}
-            className="w-full py-3 px-6 rounded-full text-black bg-gradient-to-b from-[#F5D0FE] via-[#E9D5FF] to-[#DDD6FE] hover:from-[#FCE7F3] hover:via-[#F3E8FF] hover:to-[#E9D5FF] transition-all duration-300 hover:shadow-lg hover:scale-105 active:scale-100 font-semibold hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors border border-gray-300 dark:border-gray-600"
+            className="w-full py-2.5 sm:py-3 px-4 sm:px-6 rounded-full text-black text-sm sm:text-base bg-gradient-to-b from-[#F5D0FE] via-[#E9D5FF] to-[#DDD6FE] hover:from-[#FCE7F3] hover:via-[#F3E8FF] hover:to-[#E9D5FF] transition-all duration-300 hover:shadow-lg hover:scale-105 active:scale-100 font-semibold hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors border border-gray-300 dark:border-gray-600"
           >
             {t("modals.turnProgress.continue")}
           </button>

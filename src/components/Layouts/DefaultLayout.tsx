@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Header from "@/components/Header";
+import Header2 from "@/components/Header2";
 import { useUser } from "@/context/UserContext";
 import { usePathname } from "next/navigation";
 
@@ -14,6 +15,9 @@ export default function DefaultLayout({
   const { loader } = useUser();
   const pathname = usePathname();
   const isAuthPage = pathname?.startsWith("/auth");
+  const isFormQuestionPage = pathname?.startsWith("/formQuestion");
+  const isModeSelectPage = pathname?.startsWith("/modeSelect");
+  const useHomeNavbar = isAuthPage || isFormQuestionPage || isModeSelectPage;
 
   return (
     <div className="relative flex min-h-screen w-full flex-col bg-[#050509]">
@@ -22,19 +26,27 @@ export default function DefaultLayout({
       )}
 
       {/* Top navigation / header */}
-      <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+      {useHomeNavbar ? (
+        <Header2 />
+      ) : (
+        <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+      )}
 
       {/* Main dashboard area */}
       <main
-        className={`flex-1 w-full px-4 pt-12 ${
-          isAuthPage ? "flex justify-center" : ""
-        }`}
+        className={`flex-1 w-full ${
+          isAuthPage ? "flex justify-center items-center px-4" : "px-4 pt-12"
+        } ${isModeSelectPage ? "flex flex-col items-center" : ""}`}
       >
         <div
           className={`mx-auto ${
             isAuthPage
-              ? "w-full max-w-lg pt-10"
-              : "w-full max-w-[90%] pb-10"
+              ? "w-full max-w-lg"
+              : isFormQuestionPage
+              ? "w-full max-w-full pb-10"
+              : isModeSelectPage
+              ? "w-full max-w-5xl pb-10"
+              : "w-full md:max-w-[90%] max-w-[100%] pb-10"
           }`}
         >
           {children}

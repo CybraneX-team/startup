@@ -10,7 +10,8 @@ import {
   EyeOff,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import Header from "@/components/Header";
+import { motion } from "framer-motion";
+import DefaultLayout from "@/components/Layouts/DefaultLayout";
 import { useUser } from "@/context/UserContext";
 import { toast } from "react-toastify";
 
@@ -28,8 +29,7 @@ const DifficultySelectionPage = () => {
     if (user?.difficultyMode) {
       router.push("/");
     }
-    return;
-  }, [user,router]);
+  }, [user, router]);
 
   const handleSelectDifficulty = async (mode: string) => {
     const token = localStorage.getItem("userToken");
@@ -54,116 +54,127 @@ const DifficultySelectionPage = () => {
       setUser(res);
       setUserState(res);
       setnotificationMessages([...notificationMessages, ...res.message]);
-      toast.success(res.message?.[0]?.message || "Bug bought out 🧹");
+      toast.success(res.message?.[0]?.message || "Mode selected successfully");
     } else {
-      toast.error(res.message || "Could not buyout bug");
+      toast.error(res.message || "Could not select mode");
     }
     router.push("/");
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-900 transition-colors duration-300 dark:bg-[#0F172A] dark:text-white">
-      <Header sidebarOpen={false} setSidebarOpen={() => {}} />
-
-      <main className="mx-auto max-w-7xl px-4 py-24 sm:px-6 lg:px-8">
-        <div className="mb-12 text-center">
-          <h1 className="mb-4 text-4xl font-extrabold tracking-tight sm:text-5xl">
+    <DefaultLayout>
+      <div className="relative z-10 w-full mt-40">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className="mb-12 text-center"
+        >
+          <h1 className="text-3xl font-bold tracking-tight text-gray-100 sm:text-4xl">
             Select Your{" "}
-            <span className="text-indigo-600 dark:text-indigo-400">
-              Challenge
-            </span>
+            <span className="text-primary">Challenge</span>
           </h1>
-          <p className="mx-auto max-w-2xl text-lg text-gray-600 dark:text-slate-400">
-            Choose how you want to experience your startup journey. You can
-            change this later in settings.
+          <p className="mx-auto mt-2 max-w-2xl text-gray-400">
+            Choose how you want to experience your startup journey. You can change this
+            later in settings.
           </p>
-        </div>
+        </motion.div>
 
-        <div className="mx-auto grid max-w-5xl grid-cols-1 gap-8 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
           {/* Basic Mode Card */}
-          <div className="group relative rounded-3xl border border-gray-200 bg-white p-8 shadow-xl transition-all duration-300 hover:border-emerald-500 hover:shadow-2xl dark:border-slate-800 dark:bg-slate-900/50 dark:hover:border-emerald-500">
-            <div className="absolute right-0 top-0 p-6 opacity-10 transition-opacity group-hover:opacity-20">
-              <Rocket size={120} className="text-emerald-500" />
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.1 }}
+            className="group relative rounded-3xl border border-gray-800 bg-[#151516] p-8 shadow-[0_24px_80px_rgba(0,0,0,0.6)] transition-all duration-300 hover:border-primary/50 hover:ring-2 hover:ring-primary/20"
+          >
+            <div className="absolute right-4 top-4 opacity-20 transition-opacity group-hover:opacity-40">
+              <Rocket size={80} className="text-primary" />
             </div>
 
             <div className="mb-6 flex items-center gap-4">
-              <div className="rounded-2xl bg-emerald-100 p-4 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400">
-                <Rocket size={32} />
+              <div className="rounded-2xl border border-primary/30 bg-primary/10 p-3">
+                <Rocket size={28} className="text-primary" />
               </div>
-              <h2 className="text-3xl font-bold">Basic</h2>
+              <h2 className="text-2xl font-bold text-gray-100">Basic</h2>
             </div>
 
-            <p className="mb-8 min-h-[60px] text-gray-600 dark:text-slate-400">
+            <p className="mb-8 min-h-[60px] text-gray-400">
               Ideal for learning the ropes. You can clearly see how each
-              decision impacts your startup's metrics before you act.
+              decision impacts your startup&apos;s metrics before you act.
             </p>
 
             <ul className="mb-8 space-y-4">
-              <li className="flex items-center gap-3 text-sm font-medium text-gray-700 dark:text-slate-300">
-                <Eye className="text-emerald-500" size={18} />{" "}
-                <span className="font-bold">Visible Metric Impacts</span>
+              <li className="flex items-center gap-3 text-sm font-medium text-gray-300">
+                <Eye className="h-5 w-5 shrink-0 text-primary" />
+                <span className="font-semibold text-gray-200">Visible Metric Impacts</span>
               </li>
-              <li className="flex items-center gap-3 text-sm font-medium text-gray-700 dark:text-slate-300">
-                <CheckCircle2 className="text-emerald-500" size={18} /> Clear
-                Decision Outcomes
+              <li className="flex items-center gap-3 text-sm font-medium text-gray-300">
+                <CheckCircle2 className="h-5 w-5 shrink-0 text-primary" />
+                Clear Decision Outcomes
               </li>
-              <li className="flex items-center gap-3 text-sm font-medium text-gray-700 dark:text-slate-300">
-                <CheckCircle2 className="text-emerald-500" size={18} /> Safer
-                Strategic Planning
+              <li className="flex items-center gap-3 text-sm font-medium text-gray-300">
+                <CheckCircle2 className="h-5 w-5 shrink-0 text-primary" />
+                Safer Strategic Planning
               </li>
             </ul>
 
             <button
               onClick={() => handleSelectDifficulty("basic")}
-              className="flex w-full items-center justify-center gap-2 rounded-xl bg-gray-100 py-4 font-bold text-gray-900 transition-all duration-300 group-hover:bg-emerald-600 group-hover:text-white dark:bg-slate-800 dark:text-white"
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-4 font-semibold text-white shadow-lg transition-all hover:bg-primary/90 active:scale-[0.99]"
             >
               Start Journey <ArrowRight size={18} />
             </button>
-          </div>
+          </motion.div>
 
           {/* Intermediate Mode Card */}
-          <div className="group relative rounded-3xl border border-gray-200 bg-white p-8 shadow-xl transition-all duration-300 hover:border-purple-500 hover:shadow-2xl dark:border-slate-800 dark:bg-slate-900/50 dark:hover:border-purple-500">
-            <div className="absolute right-0 top-0 p-6 opacity-10 transition-opacity group-hover:opacity-20">
-              <Skull size={120} className="text-purple-500" />
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.15 }}
+            className="group relative rounded-3xl border border-gray-800 bg-[#151516] p-8 shadow-[0_24px_80px_rgba(0,0,0,0.6)] transition-all duration-300 hover:border-amber-500/50 hover:ring-2 hover:ring-amber-500/20"
+          >
+            <div className="absolute right-4 top-4 opacity-20 transition-opacity group-hover:opacity-40">
+              <Skull size={80} className="text-amber-400" />
             </div>
 
             <div className="mb-6 flex items-center gap-4">
-              <div className="rounded-2xl bg-purple-100 p-4 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400">
-                <Skull size={32} />
+              <div className="rounded-2xl border border-amber-500/30 bg-amber-500/10 p-3">
+                <Skull size={28} className="text-amber-400" />
               </div>
-              <h2 className="text-3xl font-bold">Intermediate</h2>
+              <h2 className="text-2xl font-bold text-gray-100">Intermediate</h2>
             </div>
 
-            <p className="mb-8 min-h-[60px] text-gray-600 dark:text-slate-400">
+            <p className="mb-8 min-h-[60px] text-gray-400">
               For experienced founders. Metric impacts are hidden, meaning you
               must rely on intuition and risk assessment.
             </p>
 
             <ul className="mb-8 space-y-4">
-              <li className="flex items-center gap-3 text-sm font-medium text-gray-700 dark:text-slate-300">
-                <EyeOff className="text-purple-500" size={18} />{" "}
-                <span className="font-bold">Hidden Metric Impacts</span>
+              <li className="flex items-center gap-3 text-sm font-medium text-gray-300">
+                <EyeOff className="h-5 w-5 shrink-0 text-amber-400" />
+                <span className="font-semibold text-gray-200">Hidden Metric Impacts</span>
               </li>
-              <li className="flex items-center gap-3 text-sm font-medium text-gray-700 dark:text-slate-300">
-                <CheckCircle2 className="text-purple-500" size={18} />{" "}
+              <li className="flex items-center gap-3 text-sm font-medium text-gray-300">
+                <CheckCircle2 className="h-5 w-5 shrink-0 text-amber-400" />
                 Unpredictable Outcomes
               </li>
-              <li className="flex items-center gap-3 text-sm font-medium text-gray-700 dark:text-slate-300">
-                <CheckCircle2 className="text-purple-500" size={18} />{" "}
+              <li className="flex items-center gap-3 text-sm font-medium text-gray-300">
+                <CheckCircle2 className="h-5 w-5 shrink-0 text-amber-400" />
                 High-Stakes Decision Making
               </li>
             </ul>
 
             <button
               onClick={() => handleSelectDifficulty("intermediate")}
-              className="flex w-full items-center justify-center gap-2 rounded-xl bg-gray-100 py-4 font-bold text-gray-900 transition-all duration-300 group-hover:bg-purple-600 group-hover:text-white dark:bg-slate-800 dark:text-white"
+              className="flex w-full items-center justify-center gap-2 rounded-xl border border-amber-500/50 bg-amber-500/10 py-4 font-semibold text-amber-400 transition-all hover:bg-amber-500/20 hover:border-amber-500 active:scale-[0.99]"
             >
               Accept Challenge <ArrowRight size={18} />
             </button>
-          </div>
+          </motion.div>
         </div>
-      </main>
-    </div>
+      </div>
+    </DefaultLayout>
   );
 };
 

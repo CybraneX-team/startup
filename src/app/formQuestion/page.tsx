@@ -7,8 +7,6 @@ import countryList from 'react-select-country-list'; // Import for real country 
 import DefaultLayout from '@/components/Layouts/DefaultLayout';
 import { useUser } from "@/context/UserContext";
 import { useRouter } from "next/navigation";
-import Image from 'next/image';
-import formImage from '../../../public/illustrations/business_plan.svg'
 
 const industries = [
   "E-commerce", "SaaS", "Media", "Healthcare", "Education", "Fintech", "Finance",
@@ -208,189 +206,187 @@ export default function StartupBasicsForm() {
     }
   ];
   
+  const selectStyles = {
+    control: (base: object) => ({
+      ...base,
+      borderRadius: '0.75rem',
+      minHeight: '48px',
+      backgroundColor: '#1a1a1b',
+      borderColor: '#1f2937',
+    }),
+    singleValue: (base: object) => ({ ...base, color: '#f3f4f6' }),
+    input: (base: object) => ({ ...base, color: '#f3f4f6' }),
+    placeholder: (base: object) => ({ ...base, color: '#6b7280' }),
+    menu: (base: object) => ({ ...base, backgroundColor: '#151516', border: '1px solid #1f2937', borderRadius: '0.75rem' }),
+    option: (base: object, state: { isFocused?: boolean }) => ({
+      ...base,
+      backgroundColor: state.isFocused ? '#1f2937' : 'transparent',
+      color: '#f3f4f6',
+    }),
+  };
+
   return (
-    <DefaultLayout> 
-      <div className={` ${user?.isAiCustomizationDone ? 
-        'left-[86%] top-[31%]' : 'left-[70%] top-[31%]' } top-[31%] hidden xl:block fixed z-0 pointer-events-none opacity-50`}>
-        <Image
-          src={formImage}
-          width={ user?.isAiCustomizationDone ? 200 :  400}
-          height={ user?.isAiCustomizationDone ? 200 : 400}
-          alt='image'
-        />
-      </div>
-
-      <div className="relative z-10 max-w-5xl">
+    <DefaultLayout>
+      <div className="relative z-10 w-full">
         <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className={`max-w-3xl ${user?.isAiCustomizationDone ? 'mx-auto' : 'mx-0'} p-8 
-            rounded-3xl shadow-xl bg-white dark:bg-[#0f172a] text-[#111827] dark:text-white space-y-6 mt-10`}
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="w-full p-6 sm:p-8 rounded-3xl border border-gray-800 bg-[#151516] shadow-[0_24px_80px_rgba(0,0,0,0.6)] space-y-6 mt-10"
         >
-            <h1 className="text-3xl font-bold text-center">Startup Simulation Setup</h1>
-            <p className="text-center text-gray-600 dark:text-gray-400">
-            Enter your specific data so we can tailor the mentors, goals, and difficulty.
+          <div className="text-center pb-2">
+            <h1 className="text-3xl font-bold text-gray-100">Startup Simulation Setup</h1>
+            <p className="text-gray-400 mt-1">
+              Enter your specific data so we can tailor the mentors, goals, and difficulty.
             </p>
+          </div>
 
-            <div className="space-y-4">
-                <h3 className="font-semibold text-lg border-b pb-2 dark:border-gray-700">1. Core Concept</h3>
-                {[
-                    { label: "Startup Name", icon: <Building2 />, key: "businessName", placeholder: "e.g. QuantumDynamics" },
-                    { label: "Business Location", icon: <MapPin />, key: "businessLocation", type: "country" },
-                    { label: "Industry", icon: <LayoutGrid />, key: "industry", type: "select", options: industries },
-                    { label: "Business Description (Crucial for AI)", icon: <Target />, key: "businessDescription", placeholder: "e.g. Developing stable qubits for banking security..." },
-                    { label: "Business Model", icon: <Target />, key: "businessModel", type: "select", options: ["B2C", "D2C", "B2B", "Marketplace", "SaaS", "DeepTech"] },
-                    { label: "Product / Service", icon: <LayoutGrid />, key: "productType", placeholder: "e.g. Quantum Encryption API" },
-                    { label: "Target Audience", icon: <Users />, key: "targetAudience", placeholder: "e.g. Global Banks" },
-                    { label: "Main Goal", icon: <Flag />, key: "goal", placeholder: "e.g. Secure 5 Pilot Banks" },
-                    
-                ].map(({ label, icon, key, type, placeholder, options }) => (
-                    <div key={key} className="space-y-2">
-                    <label className="font-normal flex items-center gap-2 text-base">
-                        {icon} {label}
-                    </label>
-                    {type === 'country' ? (
-                        <Select
-                            options={countryOptions}
-                            value={countryOptions.find(opt => opt.label === formData.businessLocation)}
-                            onChange={(val) => handleChange('businessLocation', val ? val.label : '')}
-                            placeholder="Select a Country..."
-                            className="text-black"
-                            styles={{
-                              control: (baseStyles) => ({
-                                ...baseStyles,
-                                borderRadius: '0.75rem',
-                                padding: '0.2rem',
-                                backgroundColor: 'rgb(249 250 251)', // Matches bg-gray-50
-                              }),
-                            }}
-                        />
-                    ) : type === 'select' ? (
-                        <select
-                        value={formData[key as keyof typeof formData] || ''}
-                        onChange={(e) => handleChange(key as keyof typeof formData, e.target.value)}
-                        className="w-full p-3 rounded-xl bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 dark:text-white focus:outline-none"
-                        >
-                        <option value="">Select...</option>
-                        {options?.map((opt) => (
-                            <option key={opt} value={opt}>{opt}</option>
-                        ))}
-                        </select>
-                    ) : key === "businessDescription" ? (
-                        <textarea
-                        rows={2}
-                        placeholder={placeholder}
-                        value={formData[key as keyof typeof formData] || ""}
-                        onChange={(e) => handleChange(key as keyof typeof formData, e.target.value)}
-                        className="w-full p-3 rounded-xl bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 dark:text-white focus:outline-none resize-none"
-                        />
-                    ) : (
-                        <input
-                        type="text"
-                        placeholder={placeholder}
-                        value={formData[key as keyof typeof formData] || ''}
-                        onChange={(e) => handleChange(key as keyof typeof formData, e.target.value)}
-                        className="w-full p-3 rounded-xl bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 dark:text-white focus:outline-none"
-                        />
-                    )}
-                    </div>
-                ))}
+          <div className="space-y-4">
+            <h3 className="font-semibold text-lg text-gray-100 border-b border-gray-800 pb-2 flex items-center gap-2">
+              <span className="text-primary">1.</span> Core Concept
+            </h3>
+            {[
+              { label: "Startup Name", icon: <Building2 className="w-4 h-4 text-primary" />, key: "businessName", placeholder: "e.g. QuantumDynamics" },
+              { label: "Business Location", icon: <MapPin className="w-4 h-4 text-primary" />, key: "businessLocation", type: "country" },
+              { label: "Industry", icon: <LayoutGrid className="w-4 h-4 text-primary" />, key: "industry", type: "select", options: industries },
+              { label: "Business Description (Crucial for AI)", icon: <Target className="w-4 h-4 text-primary" />, key: "businessDescription", placeholder: "e.g. Developing stable qubits for banking security..." },
+              { label: "Business Model", icon: <Target className="w-4 h-4 text-primary" />, key: "businessModel", type: "select", options: ["B2C", "D2C", "B2B", "Marketplace", "SaaS", "DeepTech"] },
+              { label: "Product / Service", icon: <LayoutGrid className="w-4 h-4 text-primary" />, key: "productType", placeholder: "e.g. Quantum Encryption API" },
+              { label: "Target Audience", icon: <Users className="w-4 h-4 text-primary" />, key: "targetAudience", placeholder: "e.g. Global Banks" },
+              { label: "Main Goal", icon: <Flag className="w-4 h-4 text-primary" />, key: "goal", placeholder: "e.g. Secure 5 Pilot Banks" },
+            ].map(({ label, icon, key, type, placeholder, options }) => (
+              <div key={key} className="space-y-2">
+                <label className="font-medium flex items-center gap-2 text-sm text-gray-200">
+                  {icon} {label}
+                </label>
+                {type === 'country' ? (
+                  <Select
+                    options={countryOptions}
+                    value={countryOptions.find(opt => opt.label === formData.businessLocation)}
+                    onChange={(val) => handleChange('businessLocation', val ? val.label : '')}
+                    placeholder="Select a Country..."
+                    styles={selectStyles}
+                  />
+                ) : type === 'select' ? (
+                  <select
+                    value={formData[key as keyof typeof formData] || ''}
+                    onChange={(e) => handleChange(key as keyof typeof formData, e.target.value)}
+                    className="w-full p-3 rounded-xl bg-[#1a1a1b] border border-gray-800 text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
+                  >
+                    <option value="">Select...</option>
+                    {options?.map((opt) => (
+                      <option key={opt} value={opt}>{opt}</option>
+                    ))}
+                  </select>
+                ) : key === "businessDescription" ? (
+                  <textarea
+                    rows={2}
+                    placeholder={placeholder}
+                    value={formData[key as keyof typeof formData] || ""}
+                    onChange={(e) => handleChange(key as keyof typeof formData, e.target.value)}
+                    className="w-full p-3 rounded-xl bg-[#1a1a1b] border border-gray-800 text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary resize-none"
+                  />
+                ) : (
+                  <input
+                    type="text"
+                    placeholder={placeholder}
+                    value={formData[key as keyof typeof formData] || ''}
+                    onChange={(e) => handleChange(key as keyof typeof formData, e.target.value)}
+                    className="w-full p-3 rounded-xl bg-[#1a1a1b] border border-gray-800 text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
+                  />
+                )}
+              </div>
+            ))}
+          </div>
+
+          <div className="p-5 rounded-2xl border border-gray-800 bg-[#1a1a1b] space-y-4">
+            <h3 className="font-bold text-lg text-gray-100 flex items-center gap-2">
+              <Wallet className="w-5 h-5 text-primary" /> 2. Financial Snapshot
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="font-medium flex items-center gap-2 text-sm text-gray-200">
+                  <TrendingUp className="w-4 h-4 text-primary" /> Monthly Revenue ($)
+                </label>
+                <input
+                  type="number"
+                  value={formData.startingRevenue || '0'}
+                  onChange={(e) => handleChange("startingRevenue", e.target.value)}
+                  className="w-full p-3 rounded-xl bg-[#151516] border border-gray-800 text-gray-100 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="font-medium flex items-center gap-2 text-sm text-gray-200">
+                  <Users className="w-4 h-4 text-primary" /> User Base
+                </label>
+                <input
+                  type="number"
+                  value={formData.startingUsers || '0'}
+                  onChange={(e) => handleChange("startingUsers", e.target.value)}
+                  className="w-full p-3 rounded-xl bg-[#151516] border border-gray-800 text-gray-100 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
+                />
+              </div>
             </div>
+          </div>
 
-            <div className="p-5 bg-indigo-50 dark:bg-indigo-900/20 rounded-xl border border-indigo-100 dark:border-indigo-800 space-y-4">
-                <h3 className="font-bold text-lg text-indigo-900 dark:text-indigo-200 flex items-center gap-2">
-                    <Wallet className="w-5 h-5"/> 2. Financial Snapshot
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <label className="font-normal flex items-center gap-2 text-sm">
-                        <TrendingUp className="w-4 h-4" /> Monthly Revenue ($)
-                        </label>
-                        <input
-                        type="number"
-                        value={formData.startingRevenue || '0'}
-                        onChange={(e) => handleChange("startingRevenue", e.target.value)}
-                        className="w-full p-3 rounded-xl bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600"
-                        />
-                    </div>
-                    <div className="space-y-2">
-                        <label className="font-normal flex items-center gap-2 text-sm">
-                        <Users className="w-4 h-4" /> User Base
-                        </label>
-                        <input
-                        type="number"
-                        value={formData.startingUsers || '0'}
-                        onChange={(e) => handleChange("startingUsers", e.target.value)}
-                        className="w-full p-3 rounded-xl bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600"
-                        />
-                    </div>
-                </div>
-            </div>
-
-            <button
-                onClick={handleSubmit}
-                className="w-full py-3 mt-4 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-base rounded-xl shadow-md transition-all active:scale-95"
-            >
-                🚀 Launch Simulation
-            </button>
+          <button
+            onClick={handleSubmit}
+            className="w-full py-3.5 mt-4 bg-primary hover:bg-primary/90 text-white font-semibold text-base rounded-xl shadow-lg transition-all active:scale-[0.99]"
+          >
+            Launch Simulation
+          </button>
         </motion.div>
-        
-        <div className="mt-16 mb-8">
-            <h2 className="text-2xl font-bold text-gray-800 dark:text-white">Confused? Just want to get started?</h2>
-            <p className="text-gray-500 dark:text-gray-400 mt-1">Pick one of these ready-to-go startup ideas!</p>
+
+        <div className="mt-14 mb-6 pl-10">
+          <h2 className="text-2xl font-bold text-gray-100">Confused? Just want to get started?</h2>
+          <p className="text-gray-400 mt-1">Pick one of these ready-to-go startup ideas.</p>
         </div>
 
         {!user?.isAiCustomizationDone && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8 max-w-4xl mb-20">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full mb-20">
             {startupTemplates.map((template, idx) => (
-                <motion.div
+              <motion.div
                 key={idx}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => {
-                    setFormData({...initialAnswers, ...template}); 
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  setFormData({ ...initialAnswers, ...template });
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
                 }}
-                className="cursor-pointer p-8 rounded-[2rem] shadow-lg bg-white dark:bg-[#151d2f] hover:border-indigo-500 transition-all border-2 border-transparent dark:border-gray-800"
-                >
-                <div className="flex justify-between items-start mb-4">
-                    <div>
-                        <h3 className="text-2xl font-black mb-1 text-gray-900 dark:text-white">{template.businessName}</h3>
-                        <p className="text-xs font-bold text-indigo-500 uppercase tracking-widest">{template.industry}</p>
-                    </div>
-                    <span className="bg-indigo-100 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-300 text-[10px] font-black px-3 py-1 rounded-full border border-indigo-200 dark:border-indigo-800">
-                        {template.businessModel}
-                    </span>
+                className="cursor-pointer p-6 rounded-3xl border border-gray-800 bg-[#151516] shadow-[0_24px_80px_rgba(0,0,0,0.6)] hover:ring-2 hover:ring-primary/50 hover:border-primary/50 transition-all"
+              >
+                <div className="flex justify-between items-start mb-3">
+                  <div>
+                    <h3 className="text-xl font-bold text-gray-100">{template.businessName}</h3>
+                    <p className="text-xs font-semibold text-primary uppercase tracking-widest mt-0.5">{template.industry}</p>
+                  </div>
+                  <span className="text-[10px] font-bold px-2.5 py-1 rounded-full border border-primary/50 bg-primary/10 text-primary">
+                    {template.businessModel}
+                  </span>
                 </div>
-                
-                <p className="text-sm text-gray-500 dark:text-gray-400 italic mb-4 leading-relaxed line-clamp-2">
-                    &quot;{template.businessDescription}&quot;
+                <p className="text-sm text-gray-400 italic mb-4 leading-relaxed line-clamp-2">
+                  &quot;{template.businessDescription}&quot;
                 </p>
-
-                <div className="flex items-center gap-4 text-[11px] font-bold">
-                    <div className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400">
-                        <Target className="w-3.5 h-3.5" />
-                        <span>{template.goal}</span>
-                    </div>
+                <div className="flex items-center gap-4 text-xs font-medium">
+                  <div className="flex items-center gap-1.5 text-emerald-400">
+                    <Target className="w-3.5 h-3.5" />
+                    <span className="text-gray-300">{template.goal}</span>
+                  </div>
                 </div>
-
-                <div className="mt-6 pt-6 border-t border-gray-100 dark:border-gray-800 flex justify-between items-center">
-                    <div className="flex items-center gap-2">
-                        <div className="p-2 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg">
-                            <TrendingUp className="w-4 h-4 text-emerald-600" />
-                        </div>
-                        <span className="text-xs font-black text-gray-700 dark:text-gray-300">
-                            ${parseInt(template.startingFunding).toLocaleString()} Funding
-                        </span>
+                <div className="mt-5 pt-5 border-t border-gray-800 flex justify-between items-center">
+                  <div className="flex items-center gap-2">
+                    <div className="p-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+                      <TrendingUp className="w-4 h-4 text-emerald-400" />
                     </div>
-                    <button className="text-[10px] font-black uppercase text-indigo-500 hover:text-indigo-400 transition-colors">
-                        Select Template →
-                    </button>
+                    <span className="text-xs font-semibold text-gray-300">
+                      ${parseInt(template.startingFunding).toLocaleString()} Funding
+                    </span>
+                  </div>
+                  <span className="text-xs font-semibold text-primary">Select template →</span>
                 </div>
-                </motion.div>
+              </motion.div>
             ))}
-            </div>
+          </div>
         )}
       </div>
     </DefaultLayout>

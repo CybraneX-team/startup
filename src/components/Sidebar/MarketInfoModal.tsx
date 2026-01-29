@@ -1,5 +1,5 @@
 "use client"
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useLanguage } from "@/context/LanguageContext";
 
 interface MarketInfoModalProps {
@@ -9,17 +9,37 @@ interface MarketInfoModalProps {
 
 const MarketInfoModal = ({ isOpen, onClose }: MarketInfoModalProps) => {
   const { t } = useLanguage();
-  if (!isOpen) return null;
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [shouldRender, setShouldRender] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      setShouldRender(true);
+      setTimeout(() => setIsAnimating(true), 10);
+    } else {
+      setIsAnimating(false);
+      const timer = setTimeout(() => setShouldRender(false), 300);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen]);
+
+  if (!shouldRender) return null;
 
   return (
-    <div className="fixed inset-0 z-[99999] mx-8 my-4 lg:my-0 lg:mx-0 flex items-center justify-center">
+    <div className="fixed inset-0 z-[99999] px-4 sm:mx-8 my-4 lg:my-0 lg:mx-0 flex items-center justify-center">
       {/* Full-screen overlay */}
       <div
-        className="absolute inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-sm"
+        className={`absolute inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-sm transition-opacity duration-300 ${
+          isAnimating ? 'opacity-100' : 'opacity-0'
+        }`}
         onClick={onClose}
       ></div>
 
-      <div className="relative w-full max-w-lg rounded-xl bg-white p-6 shadow-lg dark:bg-[#1A232F] dark:text-white">
+      <div className={`relative w-full max-w-lg rounded-xl bg-white p-6 shadow-lg dark:bg-[#1A232F] dark:text-white transition-all duration-300 ${
+          isAnimating 
+            ? 'opacity-100 scale-100 translate-y-0' 
+            : 'opacity-0 scale-95 translate-y-4'
+        }`}>
         {/* Close button */}
         <button
           onClick={onClose}
@@ -43,23 +63,23 @@ const MarketInfoModal = ({ isOpen, onClose }: MarketInfoModalProps) => {
         </button>
 
         {/* Header section */}
-        <div className="mb-6">
-          <div className="flex items-center gap-4">
-            <h2 className="text-xl font-medium text-gray-700 dark:text-white">
+        <div className="mb-4 sm:mb-6">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-4">
+            <h2 className="text-lg sm:text-xl font-medium text-gray-700 dark:text-white">
               {t("modals.marketInfo.title")}
             </h2>
-            <p className="text-xl font-medium text-green-500">$10 000 000 000</p>
+            <p className="text-base sm:text-xl font-medium text-green-500">$10 000 000 000</p>
           </div>
-          <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+          <p className="mt-2 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
             {t("modals.marketInfo.description")}
           </p>
         </div>
 
         {/* Table headers */}
-        <div className="mb-2 grid grid-cols-3 gap-6">
-          <h3 className="text-base font-medium text-gray-600 dark:text-gray-300">{t("modals.marketInfo.socialStatus")}</h3>
-          <h3 className="text-base font-medium text-gray-600 dark:text-gray-300">{t("modals.marketInfo.clients")}</h3>
-          <h3 className="text-base font-medium text-gray-600 dark:text-gray-300">{t("modals.marketInfo.capital")}</h3>
+        <div className="mb-2 grid grid-cols-3 gap-2 sm:gap-6">
+          <h3 className="text-xs sm:text-base font-medium text-gray-600 dark:text-gray-300">{t("modals.marketInfo.socialStatus")}</h3>
+          <h3 className="text-xs sm:text-base font-medium text-gray-600 dark:text-gray-300">{t("modals.marketInfo.clients")}</h3>
+          <h3 className="text-xs sm:text-base font-medium text-gray-600 dark:text-gray-300">{t("modals.marketInfo.capital")}</h3>
         </div>
 
         {/* Data rows */}
@@ -71,9 +91,9 @@ const MarketInfoModal = ({ isOpen, onClose }: MarketInfoModalProps) => {
         ].map(([label, clients, capital], i) => (
           <div
             key={i}
-            className="mb-2 grid grid-cols-3 gap-6 rounded-lg bg-gray-50 p-3 dark:bg-gray-800"
+            className="mb-2 grid grid-cols-3 gap-2 sm:gap-6 rounded-lg bg-gray-50 p-2 sm:p-3 dark:bg-gray-800"
           >
-            <p className="text-sm text-gray-700 dark:text-gray-100">{label}</p>
+            <p className="text-xs sm:text-sm text-gray-700 dark:text-gray-100">{label}</p>
             <p className="text-sm text-blue-500">{clients}</p>
             <p className="text-sm text-green-500">{capital}</p>
           </div>

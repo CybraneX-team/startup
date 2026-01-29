@@ -33,7 +33,7 @@ export default function RootLayout({
   }, []);
 
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         {/* Google Fonts - Sora */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />

@@ -5,7 +5,7 @@ import { CheckCircle2, Zap, Rocket, Crown, Loader2, ShieldCheck, AlertCircle, Ma
 import { toast } from "react-toastify";
 import { useUser } from "@/context/UserContext";
 import { useRouter } from "next/navigation";
-import Header from "@/components/Header";
+import Header2 from "@/components/Header2";
 
 const plans = [
   {
@@ -157,18 +157,18 @@ const SubscriptionPlansPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-[#0F172A] text-gray-900 dark:text-white transition-colors duration-300">
-      <Header sidebarOpen={false} setSidebarOpen={() => {}} />
+    <div className="min-h-screen bg-[#050509] text-gray-100">
+      <Header2 />
 
-      <main className="mx-auto max-w-7xl px-4 pt-32 pb-20 md:pt-28">
+      <main className="mx-auto max-w-7xl px-4 pt-28 md:pt-32 pb-20">
         <div className="mb-12 md:mb-16 text-center">
-          <h1 className="text-4xl font-extrabold sm:text-6xl">
+          <h1 className="text-4xl font-extrabold sm:text-6xl text-gray-100">
             Choose your{" "}
-            <span className="bg-gradient-to-r from-indigo-500 to-cyan-500 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-primary to-cyan-500 bg-clip-text text-transparent">
               path to glory.
             </span>
           </h1>
-          <p className="mt-4 text-gray-500 dark:text-slate-400 max-w-2xl mx-auto">
+          <p className="mt-4 text-gray-400 max-w-2xl mx-auto">
             Upgrade your experience and dominate the ecosystem with premium tools.
           </p>
         </div>
@@ -182,43 +182,31 @@ const SubscriptionPlansPage = () => {
             return (
               <div
                 key={plan.id}
-                className={`relative flex flex-col rounded-3xl border p-8 transition-all hover:translate-y-[-4px] 
-                  ${
-                    plan.popular
-                      ? "border-indigo-500 bg-white dark:bg-slate-800/50 shadow-xl ring-1 ring-indigo-500/20"
-                      : "border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 shadow-lg"
-                  }`}
+                className={`relative flex flex-col rounded-3xl border border-gray-800 bg-[#151516] p-8 shadow-[0_24px_80px_rgba(0,0,0,0.6)] transition-all hover:translate-y-[-4px]
+                  ${plan.popular ? "ring-2 ring-primary/60 ring-offset-2 ring-offset-[#050509]" : ""}`}
               >
                 <div className="mb-6 flex justify-between">
-                  <div className="rounded-xl bg-gray-100 dark:bg-slate-800 p-3">
+                  <div className="rounded-xl bg-[#1a1a1b] border border-gray-800 p-3">
                     {plan.icon}
                   </div>
                   {isActive && (
-                    <span className="text-emerald-500 dark:text-emerald-400 text-sm font-bold flex items-center gap-1">
+                    <span className="text-emerald-400 text-sm font-bold flex items-center gap-1">
                       <CheckCircle2 size={16} /> Active
                     </span>
                   )}
                 </div>
 
-                <h3 className="text-2xl font-bold">{plan.name}</h3>
+                <h3 className="text-2xl font-bold text-gray-100">{plan.name}</h3>
 
                 <div className="mt-4 flex items-baseline gap-1">
-                  <span className="text-4xl font-bold">₹{plan.price}</span>
-                  <span className="text-gray-500 dark:text-slate-400">
-                    /{plan.duration}
-                  </span>
+                  <span className="text-4xl font-bold text-gray-100">₹{plan.price}</span>
+                  <span className="text-gray-400">/{plan.duration}</span>
                 </div>
 
                 <ul className="mt-8 flex-1 space-y-4">
                   {plan.features.map((f, i) => (
-                    <li
-                      key={i}
-                      className="flex gap-3 text-sm text-gray-600 dark:text-slate-300"
-                    >
-                      <CheckCircle2
-                        className="text-indigo-500 flex-shrink-0"
-                        size={18}
-                      />{" "}
+                    <li key={i} className="flex gap-3 text-sm text-gray-300">
+                      <CheckCircle2 className="text-primary flex-shrink-0" size={18} />
                       {f}
                     </li>
                   ))}
@@ -231,13 +219,12 @@ const SubscriptionPlansPage = () => {
                     className={`w-full rounded-xl py-4 font-bold transition-all flex justify-center items-center gap-2
                       ${
                         isActive
-                          ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-500 cursor-default"
+                          ? "bg-emerald-500/10 text-emerald-400 cursor-default border border-emerald-500/30"
                           : isLocked
-                          ? "bg-gray-200 dark:bg-slate-800 text-gray-500 dark:text-slate-500 cursor-not-allowed"
-                          : "bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-500/25"
+                          ? "bg-[#1a1a1b] text-gray-500 border border-gray-800 cursor-not-allowed"
+                          : "bg-primary hover:bg-primary/90 text-white border border-primary shadow-lg"
                       }
-                      ${isLoading ? "opacity-80 cursor-wait" : ""}
-                      `}
+                      ${isLoading ? "opacity-80 cursor-wait" : ""}`}
                   >
                     {isLoading ? (
                       <>
@@ -252,10 +239,8 @@ const SubscriptionPlansPage = () => {
                       "Get Started"
                     )}
                   </button>
-                  
-                  {/* Non-refundable notice under button */}
                   {!user?.isPurchaseDone && (
-                    <p className="mt-3 text-center text-[10px] font-bold uppercase tracking-widest text-gray-400 dark:text-slate-500">
+                    <p className="mt-3 text-center text-[10px] font-bold uppercase tracking-widest text-gray-500">
                       Non-Refundable
                     </p>
                   )}
@@ -266,52 +251,49 @@ const SubscriptionPlansPage = () => {
         </div>
 
         {/* Footer Info Section */}
-        <div className="mt-20 border-t border-gray-200 dark:border-slate-800 pt-12">
+        <div className="mt-20 border-t border-gray-800 pt-12">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
-            
             {/* Left: Support Info */}
             <div className="space-y-4 text-center md:text-left">
-              <h4 className="text-lg font-bold flex items-center justify-center md:justify-start gap-2">
-                <MessageCircle size={20} className="text-indigo-500" />
+              <h4 className="text-lg font-bold text-gray-100 flex items-center justify-center md:justify-start gap-2">
+                <MessageCircle size={20} className="text-primary" />
                 Need help with your purchase?
               </h4>
-              <p className="text-gray-500 dark:text-slate-400 text-sm max-w-md">
+              <p className="text-gray-400 text-sm max-w-md">
                 If you encountered an issue during payment or haven&apos;t received your coins, contact our support team. We&apos;re here to help!
               </p>
               <div className="flex flex-col sm:flex-row items-center gap-4 pt-2">
-                <a 
-                  href="mailto:support@unicornsimgame.com" 
-                  className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 hover:border-indigo-500 transition-colors text-sm font-medium shadow-sm"
+                <a
+                  href="mailto:support@unicornsimgame.com"
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#151516] border border-gray-800 hover:border-primary transition-colors text-sm font-medium text-gray-100"
                 >
-                  <Mail size={16} className="text-indigo-500" />
+                  <Mail size={16} className="text-primary" />
                   simulatorunicorn@gmail.com
                 </a>
               </div>
             </div>
 
             {/* Right: Policy & Trust */}
-            <div className="space-y-6 bg-gray-100/50 dark:bg-slate-800/30 p-6 rounded-2xl border border-gray-200 dark:border-slate-800">
+            <div className="space-y-6 rounded-3xl border border-gray-800 bg-[#151516] p-6 shadow-[0_24px_80px_rgba(0,0,0,0.6)]">
               <div className="flex items-start gap-3">
-                <AlertCircle size={20} className="text-amber-500 flex-shrink-0 mt-0.5" />
+                <AlertCircle size={20} className="text-amber-400 flex-shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-sm font-bold">Refund Policy</p>
-                  <p className="text-xs text-gray-500 dark:text-slate-400 leading-relaxed">
+                  <p className="text-sm font-bold text-gray-100">Refund Policy</p>
+                  <p className="text-xs text-gray-400 leading-relaxed">
                     All transactions are final. Once Venture Coins are credited to your account, they cannot be refunded or exchanged for cash.
                   </p>
                 </div>
               </div>
-
               <div className="flex items-start gap-3">
-                <ShieldCheck size={20} className="text-emerald-500 flex-shrink-0 mt-0.5" />
+                <ShieldCheck size={20} className="text-emerald-400 flex-shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-sm font-bold">Secure Transactions</p>
-                  <p className="text-xs text-gray-500 dark:text-slate-400 leading-relaxed">
+                  <p className="text-sm font-bold text-gray-100">Secure Transactions</p>
+                  <p className="text-xs text-gray-400 leading-relaxed">
                     Payments are processed via Razorpay with industry-standard encryption. Your financial data is never stored on our servers.
                   </p>
                 </div>
               </div>
             </div>
-
           </div>
         </div>
       </main>

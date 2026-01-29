@@ -1,7 +1,6 @@
 "use client";
 import React, { useState, ChangeEvent, useEffect } from "react";
 import Link from "next/link";
-import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 import DefaultLayout from "@/components/Layouts/DefaultLayout";
 import { useUser } from "@/context/UserContext";
 import { useRouter } from "next/navigation";
@@ -108,18 +107,15 @@ const SignIn: React.FC = () => {
         transition={Bounce}
       />
       <DefaultLayout>
-        <Breadcrumb pageName="Sign In" />
-
-        <div className="flex justify-center w-full">
-          <div className="w-full max-w-lg border border-stroke bg-white p-6 sm:p-10 shadow-default dark:border-strokedark dark:bg-boxdark rounded-xl">
-            <h2 className="mb-8 text-2xl sm:text-3xl font-bold text-center text-black dark:text-white leading-tight">
-              Sign In to <br /> Unicorn Simulator
+        <div className="w-full max-w-md mx-auto border border-gray-800 bg-[#151516] p-6 sm:p-8 shadow-[0_24px_80px_rgba(0,0,0,0.6)] rounded-3xl">
+            <h2 className="mb-8 text-2xl sm:text-3xl font-bold text-center text-gray-100 leading-tight">
+              Sign In
             </h2>
 
             <form onSubmit={handleUserLogin}>
               {/* Email Input */}
               <div className="mb-4">
-                <label className="mb-2.5 block font-medium text-black dark:text-white capitalize">
+                <label className="mb-2.5 block font-medium text-gray-100 capitalize">
                   Email
                 </label>
                 <input
@@ -128,13 +124,13 @@ const SignIn: React.FC = () => {
                   value={usercreds.email}
                   onChange={onChangeInputs}
                   placeholder="Enter your email"
-                  className="w-full rounded-lg border border-stroke bg-transparent py-3 px-4 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                  className="w-full rounded-lg border border-gray-800 bg-[#1a1a1b] py-3 px-4 text-gray-100 placeholder-gray-500 outline-none focus:border-primary focus-visible:shadow-none focus:ring-1 focus:ring-primary"
                 />
               </div>
 
               {/* Password Input with Show/Hide */}
               <div className="mb-4 relative">
-                <label className="mb-2.5 block font-medium text-black dark:text-white capitalize">
+                <label className="mb-2.5 block font-medium text-gray-100 capitalize">
                   Password
                 </label>
                 <div className="relative">
@@ -144,16 +140,16 @@ const SignIn: React.FC = () => {
                     value={usercreds.password}
                     onChange={onChangeInputs}
                     placeholder="Enter your password"
-                    className="w-full rounded-lg border border-stroke bg-transparent py-3 px-4 pr-12 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                    className="w-full rounded-lg border border-gray-800 bg-[#1a1a1b] py-3 px-4 pr-12 text-gray-100 placeholder-gray-500 outline-none focus:border-primary focus-visible:shadow-none focus:ring-1 focus:ring-primary"
                   />
                   <span
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer text-gray-400 hover:text-gray-200 transition-colors"
                   >
                     {showPassword ? (
-                      <EyeOff className="w-5 h-5 text-gray-500" />
+                      <EyeOff className="w-5 h-5" />
                     ) : (
-                      <Eye className="w-5 h-5 text-gray-500" />
+                      <Eye className="w-5 h-5" />
                     )}
                   </span>
                 </div>
@@ -164,7 +160,7 @@ const SignIn: React.FC = () => {
                 <input
                   type="submit"
                   value="Sign In"
-                  className="w-full cursor-pointer rounded-lg border border-primary bg-primary p-4 text-white transition hover:bg-opacity-90"
+                  className="w-full cursor-pointer rounded-lg border border-primary bg-primary p-4 text-white transition hover:bg-opacity-90 font-medium"
                 />
               </div>
 
@@ -172,7 +168,7 @@ const SignIn: React.FC = () => {
               <button 
               type="button"
               onClick={() => signIn("google")}
-              className="flex w-full items-center justify-center gap-3.5 rounded-lg border border-stroke bg-gray p-4 hover:bg-opacity-50 dark:border-strokedark dark:bg-meta-4 dark:hover:bg-opacity-50">
+              className="flex w-full items-center justify-center gap-3.5 rounded-lg border border-gray-800 bg-[#1a1a1b] p-4 hover:bg-[#222223] transition-colors mb-6">
               <span className="h-5 w-5">
               <svg viewBox="0 0 533.5 544.3" xmlns="http://www.w3.org/2000/svg" className="h-full w-full">
                 <path fill="#4285F4" d="M533.5 278.4c0-17.4-1.6-34-4.6-50.2H272v95h147.1c-6.3 34.4-25 63.5-53.4 83v68h86.1c50.2-46.2 79.7-114.2 79.7-195.8z" />
@@ -182,7 +178,7 @@ const SignIn: React.FC = () => {
               </svg>
             </span>
 
-            <span className="text-black dark:text-white font-medium">
+            <span className="text-gray-100 font-medium">
               Sign in with Google
             </span>
           </button>
@@ -190,16 +186,15 @@ const SignIn: React.FC = () => {
 
               {/* Signup Redirect */}
               <div className="mt-6 text-center">
-                <p>
-                  Don’t have an account?{" "}
-                  <Link href="/auth/signup" className="text-primary underline">
+                <p className="text-gray-400">
+                  Don't have an account?{" "}
+                  <Link href="/auth/signup" className="text-primary hover:text-primary/80 underline transition-colors">
                     Sign Up
                   </Link>
                 </p>
               </div>
             </form>
           </div>
-        </div>
       </DefaultLayout>
     </>
   );

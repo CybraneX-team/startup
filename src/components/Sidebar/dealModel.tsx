@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useLanguage } from "@/context/LanguageContext";
 
 interface DealModalProps {
@@ -22,16 +22,37 @@ const DealModal: React.FC<DealModalProps> = ({
   onSign,
 }) => {
   const { t } = useLanguage();
-  if (!isOpen) return null;
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [shouldRender, setShouldRender] = useState(false);
+
+  // Handle modal open/close animations
+  useEffect(() => {
+    if (isOpen) {
+      setShouldRender(true);
+      setTimeout(() => setIsAnimating(true), 10);
+    } else {
+      setIsAnimating(false);
+      const timer = setTimeout(() => setShouldRender(false), 300);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen]);
+
+  if (!shouldRender) return null;
 
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center ">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center px-4 sm:px-0">
       <div
-        className="absolute inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-md"
+        className={`absolute inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-md transition-opacity duration-300 ${
+          isAnimating ? 'opacity-100' : 'opacity-0'
+        }`}
         onClick={onClose}
       ></div>
-      <div className="relative z-10 w-full max-w-md rounded-2xl bg-[#1B1B1D99] p-6 shadow-xl dark:text-white">
-        <h2 className="text-xl font-semibold text-gray-800 mb-2 dark:text-white">
+      <div className={`relative z-10 w-full max-w-md rounded-2xl bg-[#1B1B1D99] p-4 sm:p-6 shadow-xl dark:text-white transition-all duration-300 max-h-[90vh] overflow-y-auto ${
+          isAnimating 
+            ? 'opacity-100 scale-100 translate-y-0' 
+            : 'opacity-0 scale-95 translate-y-4'
+        }`}>
+        <h2 className="text-lg sm:text-xl font-semibold text-gray-800 mb-2 dark:text-white">
           {t("modals.mentors.makeDeal", { name: mentorName })}
         </h2>
 
@@ -71,16 +92,16 @@ const DealModal: React.FC<DealModalProps> = ({
           </div>
         </div>
 
-        <div className="flex gap-4 mt-4">
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 mt-4">
           <button
             onClick={onSign}
-            className="flex-1 rounded-lg bg-green-400 py-2 text-black font-semibold hover:bg-green-500 transition"
+            className="flex-1 rounded-lg bg-green-400 py-2.5 sm:py-2 text-black text-sm sm:text-base font-semibold hover:bg-green-500 transition"
           >
             {t("modals.mentors.yesSignIt")}
           </button>
           <button
             onClick={onClose}
-            className="flex-1 rounded-lg border border-gray-300 py-2 text-gray-700 font-medium hover:bg-gray-100 dark:border-gray-600 dark:text-white dark:hover:bg-gray-800"
+            className="flex-1 rounded-lg border border-gray-300 py-2.5 sm:py-2 text-gray-700 text-sm sm:text-base font-medium hover:bg-gray-100 dark:border-gray-600 dark:text-white dark:hover:bg-gray-800"
           >
             {t("modals.investors.noCancel")}
           </button>

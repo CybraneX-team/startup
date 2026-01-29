@@ -58,7 +58,7 @@ const TooltipModal: React.FC<TooltipModalProps> = ({
       />
       <div
         ref={modalRef}
-        className="fixed z-[99999] w-72 rounded-lg bg-white p-4 shadow-lg dark:bg-boxdark"
+        className="fixed z-[99999] w-[calc(100vw-2rem)] max-w-72 rounded-lg bg-white p-3 sm:p-4 shadow-lg dark:bg-boxdark max-h-[80vh] overflow-y-auto"
         style={{ 
           top: `${position.top}px`, 
           left: `${position.left}px` 
@@ -85,7 +85,7 @@ const TooltipModal: React.FC<TooltipModalProps> = ({
             </svg>
           </button>
         </div>
-        <div className="text-gray-600 dark:text-gray-300">{content}</div>
+        <div className="text-gray-600 dark:text-gray-300 text-sm sm:text-base">{content}</div>
       </div>
     </>
   );

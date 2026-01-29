@@ -44,6 +44,10 @@ const TeamManagementModal = ({ isOpen, onClose }: TeamManagementModalProps) => {
   const [maxEmployees, setMaxEmployees] = useState<number>(0);
   const [totalCount, setTotalCount] = useState<number>(0);
   const [originalTeam, setOriginalTeam] = useState<Employee[]>([]);
+  const [animatingCount, setAnimatingCount] = useState<string | null>(null);
+  const [pressingButton, setPressingButton] = useState<string | null>(null);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [shouldRender, setShouldRender] = useState(false);
 
   useEffect(() => {
     if (isOpen && user) {
@@ -183,6 +187,20 @@ const TeamManagementModal = ({ isOpen, onClose }: TeamManagementModalProps) => {
     }
   }, [user, isOpen]);
 
+  // Handle modal open/close animations
+  useEffect(() => {
+    if (isOpen) {
+      setShouldRender(true);
+      // Trigger animation after render
+      setTimeout(() => setIsAnimating(true), 10);
+    } else {
+      setIsAnimating(false);
+      // Remove from DOM after animation completes
+      const timer = setTimeout(() => setShouldRender(false), 300);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen]);
+
   const getDisplayRoleName = (roleName: string) => {
     const lower = roleName.toLowerCase();
     if (lower === "qa") return "QA";
@@ -201,23 +219,37 @@ const TeamManagementModal = ({ isOpen, onClose }: TeamManagementModalProps) => {
   const increaseCount = (roleName: string) => {
     if (isAdvancedRoleLocked(roleName)) return;
     if (totalCount < maxEmployees) {
+      setAnimatingCount(roleName);
+      setPressingButton(`${roleName}-plus`);
       setTeam((prevTeam) =>
         prevTeam.map((emp) =>
           emp.roleName === roleName ? { ...emp, quantity: emp.quantity + 1 } : emp
         )
       );
       setTotalCount((prev) => prev + 1);
+      
+      // Clear button press animation after 150ms
+      setTimeout(() => setPressingButton(null), 150);
+      // Clear count animation after 400ms
+      setTimeout(() => setAnimatingCount(null), 400);
     }
   };
 
   const decreaseCount = (roleName: string) => {
     if (isAdvancedRoleLocked(roleName)) return;
+    setAnimatingCount(roleName);
+    setPressingButton(`${roleName}-minus`);
     setTeam((prevTeam) =>
       prevTeam.map((emp) =>
         emp.roleName === roleName ? { ...emp, quantity: Math.max(emp.quantity - 1, 0) } : emp
       )
     );
     setTotalCount((prev) => Math.max(prev - 1, 0));
+    
+    // Clear button press animation after 150ms
+    setTimeout(() => setPressingButton(null), 150);
+    // Clear count animation after 400ms
+    setTimeout(() => setAnimatingCount(null), 400);
   };
 
   const totalCost = useMemo(() => {
@@ -304,21 +336,30 @@ const TeamManagementModal = ({ isOpen, onClose }: TeamManagementModalProps) => {
     onClose();
   };
 
-  if (!isOpen) return null;
+  if (!shouldRender) return null;
 
   return (
-    <div className="fixed inset-0 z-[99999] flex items-center justify-center mx-7 lg:mx-0">
-      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose}></div>
+    <div className="fixed inset-0 z-[99999] flex items-center justify-center px-4 md:px-7 lg:px-0">
+      <div 
+        className={`fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity duration-300 ${
+          isAnimating ? 'opacity-100' : 'opacity-0'
+        }`}
+        onClick={onClose}
+      ></div>
 
       <div
-        className="relative w-full max-w-5xl rounded-2xl bg-[#1B1B1D96] border border-white/10 p-6 shadow-lg backdrop-blur-sm bg-opacity-70"
+        className={`relative w-full max-w-5xl rounded-2xl bg-[#1B1B1D96] border border-white/10 p-4 sm:p-6 shadow-lg backdrop-blur-sm bg-opacity-70 transition-all duration-300 max-h-[90vh] overflow-y-auto ${
+          isAnimating 
+            ? 'opacity-100 scale-100 translate-y-0' 
+            : 'opacity-0 scale-95 translate-y-4'
+        }`}
       >
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-semibold text-white">{t("modals.teamManagement.title")}</h2>
+        <div className="flex items-center justify-between mb-4 sm:mb-6">
+          <h2 className="text-lg sm:text-xl font-semibold text-white">{t("modals.teamManagement.title")}</h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-white transition-colors"
+            className="text-gray-400 hover:text-white transition-colors flex-shrink-0"
           >
             <X size={24} />
           </button>
@@ -332,7 +373,7 @@ const TeamManagementModal = ({ isOpen, onClose }: TeamManagementModalProps) => {
             </p>
           </div>
         ) : (
-          <div className=" gap-4 mb-6 grid grid-cols-3 sm:flex-nowrap">
+          <div className="gap-3 sm:gap-4 mb-4 sm:mb-6 grid grid-cols-3">
             {team.map((member, index) => {
               const roleName = member.roleName;
               const isLocked = isAdvancedRoleLocked(member.roleName);
@@ -341,50 +382,81 @@ const TeamManagementModal = ({ isOpen, onClose }: TeamManagementModalProps) => {
               return (
                 <div
                   key={index}
-                  className={`flex-1 min-w-[80px] rounded-xl bg-[#161618] p-4 flex flex-col ${isLocked ? "opacity-50" : ""}`}
+                  className={`flex-1 min-w-0 rounded-xl bg-[#161618] p-3 sm:p-4 flex flex-col ${isLocked ? "opacity-50" : ""}`}
                 >
-                  <div className="flex w-full">
+                  <div className="flex w-full relative">
                     {/* Price on left */}
-                    <div className="text-grey font-light text-md mb-0 mr-2 flex items-start absolute">
+                    <div className="text-grey font-light text-xs sm:text-sm mb-0 mr-2 flex items-start absolute top-0 left-0">
                       ${member.salary}
                     </div>
                     {/* Everything else centered */}
-                    <div className="flex-1 flex flex-col items-center mt-10">
+                    <div className="flex-1 flex flex-col items-center mt-6 sm:mt-10">
                       {/* Icon */}
-                      <div className="mb-3 py-14 flex items-center justify-center h-16">
-                        {getRoleIcon(member.roleName)}
+                      <div className="mb-2 sm:mb-3 py-8 sm:py-14 flex items-center justify-center h-12 sm:h-16">
+                        <div className="scale-75 sm:scale-100">
+                          {getRoleIcon(member.roleName)}
+                        </div>
                       </div>
                       {/* Role Name */}
-                      <div className="text-white text-xl font-medium mb-4 capitalize">
+                      <div className="text-white text-sm sm:text-xl font-medium mb-2 sm:mb-4 capitalize text-center">
                         {getDisplayRoleName(roleName)}
                       </div>
                       {isLocked && (
-                        <div className="mb-3 text-xs text-gray-400">Unlocks at Pre-Seed</div>
+                        <div className="mb-2 sm:mb-3 text-[10px] sm:text-xs text-gray-400 text-center">Unlocks at Pre-Seed</div>
                       )}
                       {/* Quantity Controls */}
-                      <div className="flex items-center gap-3 mt-auto">
+                      <div className="flex items-center gap-2 sm:gap-3 mt-auto">
                         <button
-                          className={`w-10 h-10 rounded-md flex items-center justify-center text-white transition-colors ${isCeo || isLocked || member.quantity <= 0
+                          className={`w-8 h-8 sm:w-10 sm:h-10 rounded-md flex items-center justify-center text-white transition-all duration-200 ease-out ${
+                            pressingButton === `${member.roleName}-minus` 
+                              ? "scale-90 bg-[#2A3F5F] shadow-inner" 
+                              : "scale-100"
+                          } ${isCeo || isLocked || member.quantity <= 0
                               ? "opacity-50 cursor-not-allowed bg-gray-600"
-                              : "bg-[#1C2E5B] hover:bg-[#2A3F5F]"
+                              : "bg-[#1C2E5B] hover:bg-[#2A3F5F] hover:scale-105 hover:shadow-lg active:scale-90"
                             }`}
                           onClick={() => decreaseCount(member.roleName)}
                           disabled={isCeo || isLocked || member.quantity <= 0}
                         >
-                          <Minus size={16} />
+                          <Minus 
+                            size={14} 
+                            className={`sm:w-4 sm:h-4 transition-all duration-200 ${
+                              pressingButton === `${member.roleName}-minus` 
+                                ? "scale-110" 
+                                : "scale-100"
+                            }`} 
+                          />
                         </button>
-                        <span className="text-white font-semibold text-xl min-w-[24px] text-center">
+                        <span 
+                          key={`${member.roleName}-${member.quantity}`}
+                          className={`text-white font-semibold text-lg sm:text-xl min-w-[20px] sm:min-w-[24px] text-center transition-all duration-300 ease-out ${
+                            animatingCount === member.roleName 
+                              ? "scale-125 text-cyan-400 drop-shadow-[0_0_8px_rgba(34,211,238,0.6)]" 
+                              : "scale-100"
+                          }`}
+                        >
                           {member.quantity}
                         </span>
                         <button
-                          className={`w-10 h-10 rounded-md flex items-center justify-center text-white transition-colors ${isCeo || isLocked || totalCount >= maxEmployees
+                          className={`w-8 h-8 sm:w-10 sm:h-10 rounded-md flex items-center justify-center text-white transition-all duration-200 ease-out ${
+                            pressingButton === `${member.roleName}-plus` 
+                              ? "scale-90 bg-[#2A3F5F] shadow-inner" 
+                              : "scale-100"
+                          } ${isCeo || isLocked || totalCount >= maxEmployees
                               ? "opacity-50 cursor-not-allowed bg-gray-600"
-                              : "bg-[#1C2E5B] hover:bg-[#2A3F5F]"
+                              : "bg-[#1C2E5B] hover:bg-[#2A3F5F] hover:scale-105 hover:shadow-lg active:scale-90"
                             }`}
                           onClick={() => increaseCount(member.roleName)}
                           disabled={isCeo || isLocked || totalCount >= maxEmployees}
                         >
-                          <Plus size={16} />
+                          <Plus 
+                            size={14} 
+                            className={`sm:w-4 sm:h-4 transition-all duration-200 ${
+                              pressingButton === `${member.roleName}-plus` 
+                                ? "scale-110 rotate-90" 
+                                : "scale-100 rotate-0"
+                            }`} 
+                          />
                         </button>
                       </div>
                     </div>
@@ -396,11 +468,11 @@ const TeamManagementModal = ({ isOpen, onClose }: TeamManagementModalProps) => {
         )}
 
         {/* Footer */}
-        <div className={`flex items-center ${hasChanges ? 'space-x-96' : 'justify-end'}`}>
+        <div className={`flex flex-col sm:flex-row items-stretch sm:items-center gap-3 ${hasChanges ? 'sm:space-x-4' : ''}`}>
           {/* Total Cost Button - Only show when there are changes */}
           {hasChanges && (
             <button
-              className="flex-1 rounded-3xl bg-[#24303F] hover:bg-[#2A3F5F] py-3 px-4 text-white font-medium transition-colors"
+              className="w-full sm:flex-1 rounded-3xl bg-[#24303F] hover:bg-[#2A3F5F] py-3 px-4 text-white font-medium transition-colors text-sm sm:text-base"
               disabled
             >
               {costDifference > 0 ? '+' : ''}${costDifference}
@@ -409,7 +481,7 @@ const TeamManagementModal = ({ isOpen, onClose }: TeamManagementModalProps) => {
 
           {/* Confirm Button */}
           <button
-            className={`${hasChanges ? 'flex-1' : 'w-full'} rounded-3xl bg-gradient-to-r from-green-400 to-cyan-400 hover:from-green-500 hover:to-cyan-500 py-3 px-4 text-black font-medium transition-all`}
+            className={`${hasChanges ? 'w-full sm:flex-1' : 'w-full'} rounded-3xl bg-gradient-to-r from-green-400 to-cyan-400 hover:from-green-500 hover:to-cyan-500 py-3 px-4 text-black font-medium transition-all text-sm sm:text-base`}
             onClick={handleConfirm}
           >
             {t("modals.teamManagement.confirm")}

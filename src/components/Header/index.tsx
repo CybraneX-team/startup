@@ -2,22 +2,22 @@
 
 import Link from "next/link";
 import DarkModeSwitcher from "./DarkModeSwitcher";
-import DropdownUser from "./DropdownUser";
 import { useUser } from "@/context/UserContext";
 import { useLanguage } from "@/context/LanguageContext";
 import GameSwitchMenu from "./GameSwitchMenu";
 import LanguageSwitcher from "../LanguageSwitcher";
-import { Coins, Trophy, Bell, Crown, Settings, ChevronLeft, InfoIcon } from "lucide-react";
+import { Coins, Trophy, Bell, Crown, Settings, ChevronLeft, InfoIcon, LogOut } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import LeaderboardModal from "../LeaderboardModal";
 import { useNotification } from "@/context/NotificationContext";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import useColorMode from "@/hooks/useColorMode";
 import { useSound } from "@/context/SoundContext";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import TypewriterText from "@/components/TypewriterText/TypewriterText";
 import { translateTaskName } from "@/utils/taskTranslator";
+import { signOut } from "next-auth/react";
 
 const Header = (props: {
   sidebarOpen: string | boolean | undefined | any;
@@ -26,8 +26,10 @@ const Header = (props: {
   useColorMode();
 
   const router = useRouter();
+  const pathname = usePathname();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [chatModalOpen, setChatModalOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const settingsRef = useRef<HTMLDivElement>(null);
 
@@ -45,7 +47,23 @@ const Header = (props: {
       document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const { HeaderDark, user, elonStep, notificationMessages, setUser, setUserState } = useUser();
+  const { HeaderDark, user, userLoaded, elonStep, notificationMessages, setUser, setUserState } = useUser();
+
+  // Auth check logic (moved from DropdownUser)
+  useEffect(() => {
+    const isAuthPage = pathname?.startsWith("/auth");
+    if (userLoaded && user === null && !isAuthPage) {
+      router.push("/home");
+    }
+  }, [user, userLoaded, pathname, router]);
+
+  // Logout function (moved from DropdownUser)
+  function logOut() {
+    localStorage.removeItem("userToken");
+    localStorage.removeItem("userData");
+    setUserState(null);
+    signOut({ callbackUrl: `/home` });
+  }
   const { t, language } = useLanguage();
   const { playSound } = useSound();
   const [isLeaderboardOpen, setIsLeaderboardOpen] = useState(false);
@@ -114,7 +132,7 @@ const Header = (props: {
       <header
         className={`fixed top-0 left-0 right-0 z-[1000] w-full bg-transparent backdrop-blur-md shadow-sm transition-all duration-300`}
       >
-        <div className="flex flex-nowrap items-center justify-between px-3 py-2 md:px-6 md:py-3 gap-2">
+        <div className="flex flex-wrap md:flex-nowrap items-start md:items-center justify-between px-3 py-2 md:px-6 md:py-3 gap-2">
           {/* Left: Back Button & Hamburger */}
           <div className="flex items-center gap-2 shrink-0">
             {/* <button
@@ -138,13 +156,13 @@ const Header = (props: {
               <span className="block w-5 h-0.5 bg-gray-700 dark:bg-gray-300 transition-all"></span>
             </button> */}
 
-            {/* 3. NOTIFICATIONS */}
+            {/* Logs / Notifications pill (always visible) */}
             <button
               onClick={() => {
                 playSound("notification");
                 openNotificationModal();
               }}
-              className="flex ml-20 items-center justify-center px-6 py-2 rounded-full bg-[#1B1B1D] hover:bg-[#353535] transition-colors text-white font-normal text-md"
+              className="flex ml-0 md:ml-20 items-center justify-center px-5 md:px-6 py-2 rounded-full bg-[#1B1B1D] hover:bg-[#353535] transition-colors text-white font-normal text-sm md:text-md"
               title={t("modals.notifications.title")}
             >
               <span className="mr-2 flex items-center justify-center">
@@ -174,120 +192,221 @@ const Header = (props: {
               </span>
               Logs
             </button>
-            {/* 3. ASK AI ADVISOR */}
-            <button
-            onClick={() => {
-              playSound("click");
-              setChatModalOpen(true);
-            }}
-            className="flex w-full items-center justify-center gap-2 rounded-full bg-gray-100/5 px-4 py-2 text-md font-medium text-white shadow-sm ring-1 ring-gray-700/60 backdrop-blur hover:bg-gray-100/10 hover:ring-gray-500 transition duration-200 sm:w-auto sm:min-w-[180px]"
-          >
-            <InfoIcon className="h-4 w-4" />
-            {t("dashboard.askAIAdvisor")}
-          </button>
           </div>
 
+          {/* Desktop controls: Ask AI + coins/leaderboard/upgrade/settings */}
+          <div className="hidden w-full flex-1 items-center justify-between gap-3 md:flex">
+            <button
+              onClick={() => {
+                playSound("click");
+                setChatModalOpen(true);
+              }}
+              className="flex items-center justify-center gap-2 rounded-full bg-gray-100/5 px-4 py-2 text-sm md:text-md font-medium text-white shadow-sm ring-1 ring-gray-700/60 backdrop-blur hover:bg-gray-100/10 hover:ring-gray-500 transition duration-200 min-w-[160px]"
+            >
+              <InfoIcon className="h-4 w-4" />
+              {t("dashboard.askAIAdvisor")}
+            </button>
 
-          {/* Right Controls Container */}
-          <div className="flex flex-nowrap items-center justify-end gap-1.5 sm:gap-3 w-full">
-
-            <div className="flex items-center gap-1.5 px-2 py-1.5 sm:px-3 sm:py-2 rounded-full text-gray-700 dark:text-gray-200 text-xs sm:text-sm font-semibold border border-gray-200">
-              <Coins className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-yellow-500" />
-              <span>{user?.credits}</span>
-              <span className="hidden sm:inline ml-1">
-                {t("header.ventureCoins")}
-              </span>
-            </div>
-            {/* 1. CREDITS / LEADERBOARD */}
-            {elonStep === 6 ? (
-              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full ring-1 ring-yellow-400 bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 font-semibold text-xs sm:text-sm">
-                <Coins className="w-3.5 h-3.5" />
+            <div className="flex flex-nowrap items-center justify-end gap-1.5 sm:gap-3">
+              <div className="flex items-center gap-1.5 px-2 py-1.5 sm:px-3 sm:py-2 rounded-full text-gray-700 dark:text-gray-200 text-xs sm:text-sm font-semibold border border-gray-200">
+                <Coins className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-yellow-500" />
                 <span>{user?.credits}</span>
+                <span className="hidden sm:inline ml-1">
+                  {t("header.ventureCoins")}
+                </span>
               </div>
-            ) : (
-              <>
+
+              {elonStep === 6 ? (
+                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full ring-1 ring-yellow-400 bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 font-semibold text-xs sm:text-sm">
+                  <Coins className="w-3.5 h-3.5" />
+                  <span>{user?.credits}</span>
+                </div>
+              ) : (
                 <button
                   onClick={() => setIsLeaderboardOpen(true)}
                   className="hidden border border-gray-200 lg:flex items-center gap-2 px-5 py-2 rounded-full text-md text-white hover:bg-gray-800 transition-all"
                 >
                   <span>{t("header.leaderboard")}</span>
-                  <svg width="16" height="16" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M1 7.64501V2.85501C1 2.19001 1.385 2.03001 1.855 2.50001L3.15 3.79501C3.345 3.99001 3.665 3.99001 3.855 3.79501L5.645 2.00001C5.84 1.80501 6.16 1.80501 6.35 2.00001L8.145 3.79501C8.34 3.99001 8.66 3.99001 8.85 3.79501L10.145 2.50001C10.615 2.03001 11 2.19001 11 2.85501V7.65001C11 9.15001 10 10.15 8.5 10.15H3.5C2.12 10.145 1 9.02501 1 7.64501Z" stroke="white" stroke-linecap="round" stroke-linejoin="round" />
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 12 12"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M1 7.64501V2.85501C1 2.19001 1.385 2.03001 1.855 2.50001L3.15 3.79501C3.345 3.99001 3.665 3.99001 3.855 3.79501L5.645 2.00001C5.84 1.80501 6.16 1.80501 6.35 2.00001L8.145 3.79501C8.34 3.99001 8.66 3.99001 8.85 3.79501L10.145 2.50001C10.615 2.03001 11 2.19001 11 2.85501V7.65001C11 9.15001 10 10.15 8.5 10.15H3.5C2.12 10.145 1 9.02501 1 7.64501Z"
+                      stroke="white"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
                   </svg>
                 </button>
+              )}
 
+              <Link href="/subscribe">
+                <div
+                  className="flex items-center justify-center px-7 py-2 rounded-full text-white shadow-md transition-all duration-200 cursor-pointer"
+                  style={{
+                    background: "linear-gradient(90deg, #F9C6FF 0%, #C1AEFF 100%)",
+                  }}
+                >
+                  <span className="hidden sm:block text-md text-black font-bold tracking-wide">
+                    Upgrade
+                  </span>
+                </div>
+              </Link>
 
-              </>
-            )}
-
-            {/* 2. UPGRADE BUTTON */}
-            <Link href="/subscribe">
-              <div
-                className="flex items-center justify-center px-7 py-2 rounded-full text-white shadow-md transition-all duration-200 cursor-pointer"
-                style={{
-                  background: "linear-gradient(90deg, #F9C6FF 0%, #C1AEFF 100%)",
-                }}
-              >
-                <span className="hidden sm:block text-md text-black font-bold tracking-wide">
-                  Upgrade
-                </span>
-              </div>
-            </Link>
-
-
-
-            {/* 4. SETTINGS DROPDOWN */}
-            <div className="relative" ref={settingsRef}>
-              <button
-                onClick={e => {
-                  e.stopPropagation();
-                  e.preventDefault();
-                  setIsSettingsOpen(!isSettingsOpen);
-                }}
-                className={`p-2 rounded-lg transition-colors ${isSettingsOpen
+              <div className="relative" ref={settingsRef}>
+                <button
+                  onClick={e => {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    setIsSettingsOpen(!isSettingsOpen);
+                  }}
+                  className={`p-2 rounded-lg transition-colors ${isSettingsOpen
                     ? "bg-indigo-100 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400"
                     : "hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400"
-                  }`}
-              >
-                <Settings className="h-5 w-5" />
-              </button>
-
-              {isSettingsOpen && (
-                <div
-                  className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-100 dark:border-gray-700 p-3 flex flex-col gap-2 z-[1002] animate-in fade-in zoom-in-95 duration-200 origin-top-right"
-                  onClick={e => e.stopPropagation()}
+                    }`}
                 >
-                  <div className="flex items-center justify-between p-2 hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-lg">
-                    <span className="text-sm font-medium text-gray-600 dark:text-gray-300">
-                      Language
-                    </span>
-                    <LanguageSwitcher />
-                  </div>
+                  <Settings className="h-5 w-5" />
+                </button>
 
-                  <div className="flex items-center justify-between p-2 hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-lg">
-                    <span className="text-sm font-medium text-gray-600 dark:text-gray-300">
-                      Theme
-                    </span>
-                    <ul className="flex items-center justify-end m-0 p-0">
-                      <DarkModeSwitcher />
-                    </ul>
-                  </div>
+                {isSettingsOpen && (
+                  <div
+                    className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-100 dark:border-gray-700 p-3 flex flex-col gap-2 z-[1002] animate-in fade-in zoom-in-95 duration-200 origin-top-right"
+                    onClick={e => e.stopPropagation()}
+                  >
+                    <div className="flex items-center justify-between p-2 hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-lg">
+                      <span className="text-sm font-medium text-gray-600 dark:text-gray-300">
+                        Language
+                      </span>
+                      <LanguageSwitcher />
+                    </div>
 
-                  <div className="pt-2 mt-1 border-t border-gray-100 dark:border-gray-700">
-                    <div className="w-full">
-                      <GameSwitchMenu />
+                    <div className="flex items-center justify-between p-2 hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-lg">
+                      <span className="text-sm font-medium text-gray-600 dark:text-gray-300">
+                        Theme
+                      </span>
+                      <ul className="flex items-center justify-end m-0 p-0">
+                        <DarkModeSwitcher />
+                      </ul>
+                    </div>
+
+                    <div className="pt-2 mt-1 border-t border-gray-100 dark:border-gray-700">
+                      <div className="w-full">
+                        <GameSwitchMenu />
+                      </div>
+                    </div>
+
+                    <div className="pt-2 mt-1 border-t border-gray-100 dark:border-gray-700">
+                      <button
+                        onClick={() => {
+                          logOut();
+                          setIsSettingsOpen(false);
+                        }}
+                        className="flex items-center gap-3.5 w-full px-3 py-2.5 text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors duration-200"
+                      >
+                        <LogOut className="h-4 w-4" />
+                        <span>Log Out</span>
+                      </button>
                     </div>
                   </div>
-                </div>
-              )}
-            </div>
-
-            {/* 5. USER PROFILE */}
-            <div className="shrink-0">
-              <DropdownUser />
+                )}
+              </div>
             </div>
           </div>
+
+          {/* Mobile hamburger */}
+          <div className="ml-auto flex items-center gap-2 md:hidden">
+            <button
+              type="button"
+              aria-label="Toggle dashboard menu"
+              onClick={() => setIsMobileMenuOpen(prev => !prev)}
+              className="rounded-full border border-gray-700 bg-[#111111] p-2 text-white hover:bg-[#1f1f1f] transition-colors"
+            >
+              <span
+                className={`block h-0.5 w-5 bg-white transition-transform duration-200 ${isMobileMenuOpen ? "translate-y-1.5 rotate-45" : ""
+                  }`}
+              />
+              <span
+                className={`mt-1 block h-0.5 w-5 bg-white transition-opacity duration-200 ${isMobileMenuOpen ? "opacity-0" : "opacity-100"
+                  }`}
+              />
+              <span
+                className={`mt-1 block h-0.5 w-5 bg-white transition-transform duration-200 ${isMobileMenuOpen ? "-translate-y-1.5 -rotate-45" : ""
+                  }`}
+              />
+            </button>
+          </div>
         </div>
+        {/* Mobile dropdown menu */}
+        {isMobileMenuOpen && (
+          <div className="md:hidden px-3 pb-3">
+            <div className="space-y-2 rounded-2xl border border-gray-800 bg-[#050509] px-4 py-3 shadow-lg">
+              <button
+                onClick={() => {
+                  playSound("click");
+                  setChatModalOpen(true);
+                  setIsMobileMenuOpen(false);
+                }}
+                className="flex w-full items-center justify-between gap-2 rounded-full bg-gray-100/5 px-4 py-2 text-sm font-medium text-white ring-1 ring-gray-700/60 hover:bg-gray-100/10 hover:ring-gray-500 transition"
+              >
+                <span className="flex items-center gap-2">
+                  <InfoIcon className="h-4 w-4" />
+                  {t("dashboard.askAIAdvisor")}
+                </span>
+              </button>
+
+              <div className="flex items-center justify-between rounded-full bg-[#111111] px-4 py-2 text-xs font-semibold text-gray-200 border border-gray-700">
+                <span className="flex items-center gap-2">
+                  <Coins className="w-3.5 h-3.5 text-yellow-500" />
+                  {t("header.ventureCoins")}
+                </span>
+                <span>{user?.credits}</span>
+              </div>
+
+              <button
+                onClick={() => {
+                  setIsLeaderboardOpen(true);
+                  setIsMobileMenuOpen(false);
+                }}
+                className="flex w-full items-center justify-between gap-2 rounded-full bg-gray-100/5 px-4 py-2 text-sm font-medium text-white hover:bg-gray-100/10 transition"
+              >
+                <span className="flex items-center gap-2">
+                  <Trophy className="h-4 w-4" />
+                  {t("header.leaderboard")}
+                </span>
+              </button>
+
+              <button
+                onClick={() => {
+                  router.push("/subscribe");
+                  setIsMobileMenuOpen(false);
+                }}
+                className="flex w-full items-center justify-between gap-2 rounded-full bg-gradient-to-r from-[#F9C6FF] to-[#C1AEFF] px-4 py-2 text-sm font-semibold text-black shadow-md"
+              >
+                <span className="flex items-center gap-2">
+                  <Crown className="h-4 w-4" />
+                  {t("header.upgrade") ?? "Upgrade"}
+                </span>
+              </button>
+
+              <button
+                onClick={() => {
+                  router.push("/settings");
+                  setIsMobileMenuOpen(false);
+                }}
+                className="flex w-full items-center justify-between gap-2 rounded-full bg-gray-100/5 px-4 py-2 text-sm font-medium text-gray-200 hover:bg-gray-100/10 transition"
+              >
+                <span className="flex items-center gap-2">
+                  <Settings className="h-4 w-4" />
+                  {t("header.settings") ?? "Settings"}
+                </span>
+              </button>
+            </div>
+          </div>
+        )}
       </header>
 
       <LeaderboardModal
@@ -296,17 +415,17 @@ const Header = (props: {
       />
 
       {chatModalOpen && (
-        <div className="fixed m-5 lg:m-0 inset-0 z-[99999] flex items-center justify-center bg-black/40 backdrop-blur-sm">
+        <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/40 backdrop-blur-sm px-4 sm:px-0">
           <motion.div
             initial={{ opacity: 0, scale: 0.95, y: 30 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 30 }}
             transition={{ duration: 0.3 }}
-            className="w-full max-w-lg h-[90vh] max-h-[650px] flex flex-col p-5 rounded-3xl shadow-2xl bg-white dark:bg-[#1b1f23]/70 dark:backdrop-blur-xl border border-gray-300 dark:border-gray-700"
+            className="w-full max-w-lg h-[90vh] max-h-[650px] flex flex-col p-4 sm:p-5 rounded-2xl sm:rounded-3xl shadow-2xl bg-white dark:bg-[#1b1f23]/70 dark:backdrop-blur-xl border border-gray-300 dark:border-gray-700"
           >
             {/* Header */}
-            <div className="flex justify-between items-center mb-3">
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white">{t("modals.aiAdvisor.title")}</h2>
+            <div className="flex justify-between items-center mb-2 sm:mb-3 flex-shrink-0">
+              <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white truncate pr-2">{t("modals.aiAdvisor.title")}</h2>
               <button
                 onClick={() => {
                   setChatModalOpen(false);

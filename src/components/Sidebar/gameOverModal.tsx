@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 // import rocketImage from '../../rocket.png';
 import { useUser } from '@/context/UserContext';
 import Image from 'next/image';
@@ -16,6 +16,20 @@ const GameOverModal = () => {
   } = useUser();
 
   const [showConfirm, setShowConfirm] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [confirmAnimating, setConfirmAnimating] = useState(false);
+
+  useEffect(() => {
+    setIsAnimating(true);
+  }, []);
+
+  useEffect(() => {
+    if (showConfirm) {
+      setTimeout(() => setConfirmAnimating(true), 10);
+    } else {
+      setConfirmAnimating(false);
+    }
+  }, [showConfirm]);
 
   const resetTheGame = async () => {
     setloader(true);
@@ -94,8 +108,17 @@ const GameOverModal = () => {
   return (
     <>
       {/* Game Over Modal */}
-      <div className="fixed inset-0 z-99999 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-        <div className="bg-white dark:bg-[#1A232F] dark:border dark:border-blue-500 rounded-3xl p-6 sm:p-8 text-center w-full max-w-sm space-y-6 shadow-xl mx-4">
+      <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4 sm:p-0">
+        <div 
+          className={`fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-300 ${
+            isAnimating ? 'opacity-100' : 'opacity-0'
+          }`}
+        ></div>
+        <div className={`bg-white dark:bg-[#1A232F] dark:border dark:border-blue-500 rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 text-center w-full max-w-sm space-y-4 sm:space-y-6 shadow-xl mx-2 sm:mx-4 transition-all duration-300 ${
+            isAnimating 
+              ? 'opacity-100 scale-100 translate-y-0' 
+              : 'opacity-0 scale-95 translate-y-4'
+          }`}>
           {/* Image */}
           <Image
             src={`/rocket.png`}
@@ -148,8 +171,18 @@ const GameOverModal = () => {
 
       {/* Confirmation Modal */}
       {showConfirm && (
-        <div className="fixed inset-0 z-[999999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-          <div className="bg-white dark:bg-[#1F2937] p-6 rounded-2xl shadow-2xl w-full max-w-xs text-center space-y-4">
+        <div className="fixed inset-0 z-[999999] flex items-center justify-center p-4 sm:p-0">
+          <div 
+            className={`fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity duration-300 ${
+              confirmAnimating ? 'opacity-100' : 'opacity-0'
+            }`}
+            onClick={() => setShowConfirm(false)}
+          ></div>
+          <div className={`bg-white dark:bg-[#1F2937] p-4 sm:p-6 rounded-2xl shadow-2xl w-full max-w-xs text-center space-y-3 sm:space-y-4 transition-all duration-300 ${
+              confirmAnimating 
+                ? 'opacity-100 scale-100 translate-y-0' 
+                : 'opacity-0 scale-95 translate-y-4'
+            }`}>
             <AlertCircle className="mx-auto text-yellow-600 dark:text-yellow-300" size={32} />
             <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
               Are you sure?

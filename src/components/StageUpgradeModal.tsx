@@ -25,6 +25,8 @@ const StageUpgradeModal: React.FC<StageUpgradeModalProps> = ({
   const { playSound } = useSound();
   const [translatedGoal, setTranslatedGoal] = useState(nextGoal);
   const [isTranslating, setIsTranslating] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [shouldRender, setShouldRender] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
@@ -59,7 +61,19 @@ const StageUpgradeModal: React.FC<StageUpgradeModalProps> = ({
     translateGoal();
   }, [isOpen, nextGoal, language]);
 
-  if (!isOpen) return null;
+  // Handle modal open/close animations
+  useEffect(() => {
+    if (isOpen) {
+      setShouldRender(true);
+      setTimeout(() => setIsAnimating(true), 10);
+    } else {
+      setIsAnimating(false);
+      const timer = setTimeout(() => setShouldRender(false), 300);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen]);
+
+  if (!shouldRender) return null;
 
   // Format stage name for display
   const formatStageName = (stage: string): string => {
@@ -79,8 +93,18 @@ const StageUpgradeModal: React.FC<StageUpgradeModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-[999999] flex items-center justify-center bg-black/60 backdrop-blur-sm">
-      <div className="relative w-full max-w-md mx-4 bg-white dark:bg-[#1A232F] rounded-2xl shadow-2xl overflow-hidden border border-gray-200 dark:border-gray-700">
+    <div className="fixed inset-0 z-[999999] flex items-center justify-center bg-black/60 backdrop-blur-sm px-4 sm:px-0">
+      <div 
+        className={`fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-300 ${
+          isAnimating ? 'opacity-100' : 'opacity-0'
+        }`}
+        onClick={onClose}
+      ></div>
+      <div className={`relative w-full max-w-md mx-0 sm:mx-4 bg-white dark:bg-[#1A232F] rounded-2xl shadow-2xl overflow-hidden border border-gray-200 dark:border-gray-700 transition-all duration-300 max-h-[90vh] overflow-y-auto ${
+          isAnimating 
+            ? 'opacity-100 scale-100 translate-y-0' 
+            : 'opacity-0 scale-95 translate-y-4'
+        }`}>
         {/* Close Button */}
         <button
           onClick={onClose}
@@ -111,13 +135,13 @@ const StageUpgradeModal: React.FC<StageUpgradeModalProps> = ({
           </div>
 
           {/* Congratulations Text */}
-          <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-2">
             {t("modals.stageUpgrade.congratulations") || "Congratulations!"}
           </h2>
 
           {/* Stage Transition */}
           <div className="mb-6">
-            <p className="text-lg text-gray-700 dark:text-gray-300 mb-3">
+            <p className="text-base sm:text-lg text-gray-700 dark:text-gray-300 mb-3">
               {t("modals.stageUpgrade.madeItTo") || "You've made it to"} <span className="font-semibold text-gray-900 dark:text-white">{formatStageName(currentStage)}</span> {t("modals.stageUpgrade.round") || "round"}
             </p>
             <div className="flex items-center justify-center gap-3 text-sm">
@@ -156,7 +180,7 @@ const StageUpgradeModal: React.FC<StageUpgradeModalProps> = ({
               playSound("click");
               onClose();
             }}
-            className="w-full py-4 px-6 rounded-xl bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 font-semibold hover:bg-gray-800 dark:hover:bg-gray-200 transition-all duration-300 flex items-center justify-center gap-2 group shadow-lg hover:shadow-xl"
+            className="w-full py-3 sm:py-4 px-4 sm:px-6 rounded-xl bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 text-sm sm:text-base font-semibold hover:bg-gray-800 dark:hover:bg-gray-200 transition-all duration-300 flex items-center justify-center gap-2 group shadow-lg hover:shadow-xl"
           >
             <span>{t("modals.stageUpgrade.letsGrow") || "Let's Grow!"}</span>
             <Rocket className="h-5 w-5 group-hover:translate-y-[-2px] transition-transform duration-300" />
