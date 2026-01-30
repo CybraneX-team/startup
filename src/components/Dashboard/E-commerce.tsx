@@ -938,6 +938,7 @@ const ECommerce: React.FC = () => {
   const [showInvestorsModal, setShowInvestorsModal] = useState(false);
   const [showMentorsModal, setShowMentorsModal] = useState(false);
   const [showFoundersModal, setShowFoundersModal] = useState(false);
+  const [stagesCardCollapsed, setStagesCardCollapsed] = useState(false);
 
   // Load persisted data on mount
   useEffect(() => {
@@ -1346,71 +1347,189 @@ const ECommerce: React.FC = () => {
 
             {/* Progress track + stages */}
             <div className="flex-1 w-full sm:pl-40 sm:pr-44">
-              {/* Mobile: vertical zig-zag timeline */}
-              <div className="mt-4 relative md:hidden">
-                {/* Vertical base track */}
-                <div className="absolute left-1/2 top-0 bottom-0 w-[3px] -translate-x-1/2 rounded-full bg-gradient-to-b from-gray-800 via-gray-800 to-gray-800" />
-
-                {/* Active progress along the track */}
-                {activeStageIndex > -1 && stages.length > 1 && (
-                  <div
-                    className="absolute left-1/2 top-0 w-[3px] -translate-x-1/2 rounded-full bg-gradient-to-b from-[#FAA2FF] via-[#FF8EEE] to-[#7A38FF]"
-                    style={{
-                      height: `${(activeStageIndex / (stages.length - 1)) * 100}%`,
-                    }}
-                  />
-                )}
-
-                {/* Zig-zag stars + labels vertically */}
-                <div className="relative flex flex-col gap-4">
-                  {stages.map((stage, index) => {
-                    const isLocked = index > 1 && !user?.isPurchaseDone;
-                    const isActive = user?.startupStage === stage;
-                    const isCompleted =
-                      activeStageIndex > -1 && index < activeStageIndex;
-                    const alignLeft = index % 2 === 0;
-
-                    return (
-                      <button
-                        key={stage}
-                        type="button"
-                        onClick={(e) => handleStageClick(stage, e)}
-                        onMouseEnter={() => setHoveredStage(stage)}
-                        onMouseLeave={() => setHoveredStage(null)}
-                        className={`relative flex items-center gap-3 text-left focus:outline-none ${
-                          alignLeft
-                            ? "self-start pr-10"
-                            : "self-end pl-10 flex-row-reverse"
-                        }`}
-                        data-tooltip-id="my-tooltip"
-                        data-tooltip-content={
-                          isLocked ? t("dashboard.purchasePlanToPlay") : ""
-                        }
-                        disabled={isLocked}
-                      >
-                        <div className="relative">
-                          <StageStar
-                            isActive={isActive}
-                            isCompleted={isCompleted}
-                            isLocked={isLocked}
-                          />
-                          {isLocked && (
-                            <span className="absolute -right-2 -top-2 flex h-4 w-4 items-center justify-center rounded-full bg-gray-900 text-[10px] text-gray-200">
-                              <Lock size={10} />
-                            </span>
-                          )}
-                        </div>
-                        <span
-                          className={`text-[11px] font-medium ${
-                            isActive ? "text-white" : "text-gray-400"
-                          }`}
+              {/* Mobile: collapsible — collapsed = horizontal bar + prev/current/next; expanded = full zig-zag */}
+              <div className="md:hidden">
+                <motion.div
+                  className="overflow-hidden"
+                  initial={false}
+                  animate={{
+                    maxHeight: stagesCardCollapsed ? 88 : 520,
+                  }}
+                  transition={{
+                    duration: 0.4,
+                    ease: [0.32, 0.72, 0, 1],
+                  }}
+                >
+                  {stagesCardCollapsed ? (
+                    /* Collapsed: 3-stage view (prev/current/next), progress fills from left star to current star */
+                    (() => {
+                      const idx = activeStageIndex < 0 ? 0 : activeStageIndex;
+                      const prevStage = idx > 0 ? stages[idx - 1] : null;
+                      const currentStage = stages[idx];
+                      const nextStage = idx < stages.length - 1 ? stages[idx + 1] : null;
+                      const isLockedPrev = (idx - 1) > 1 && !user?.isPurchaseDone;
+                      const isLockedCurrent = idx > 1 && !user?.isPurchaseDone;
+                      const isLockedNext = (idx + 1) > 1 && !user?.isPurchaseDone;
+                      // For collapsed view: progress from prev (left, 0%) to current (center, 50%)
+                      // If at first stage (no prev), progress is 0; otherwise it's 50%
+                      const collapsedProgress = prevStage ? 50 : 0;
+                      return (
+                        <motion.div
+                          className="relative mt-3 px-3 pb-1"
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          exit={{ opacity: 0 }}
+                          transition={{ duration: 0.25 }}
                         >
-                          {stage.toUpperCase()}
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
+                          {/* Base track — horizontal line spanning left to right */}
+                          <div className="absolute left-3 right-3 top-3 h-[3px] -translate-y-1/2 rounded-full bg-gradient-to-r from-gray-800 via-gray-800 to-gray-800 z-0" />
+                          {/* Active progress — fills from left to center (current stage) */}
+                          <motion.div
+                            className="absolute left-3 top-3 h-[3px] -translate-y-1/2 rounded-full bg-gradient-to-r from-[#FAA2FF] via-[#FF8EEE] to-[#7A38FF] z-0"
+                            initial={false}
+                            animate={{ width: `${collapsedProgress}%` }}
+                            transition={{ duration: 0.35, ease: [0.32, 0.72, 0, 1] }}
+                            style={{ willChange: "width" }}
+                          />
+                          {/* Stars + labels row — same as desktop: items-center justify-between */}
+                          <div className="relative flex items-center justify-between z-50">
+                            {prevStage ? (
+                              <button
+                                type="button"
+                                onClick={(e) => handleStageClick(prevStage, e)}
+                                className="flex flex-col items-center gap-1 focus:outline-none opacity-100 blur-[0.5px] -ml-2 transition-opacity hover:opacity-70 disabled:opacity-40"
+                                disabled={isLockedPrev}
+                              >
+                                <div className="relative scale-90">
+                                  <StageStar isActive={false} isCompleted={idx > 0} isLocked={isLockedPrev} />
+                                </div>
+                                <span className="text-[10px] font-medium text-gray-400">{prevStage.toUpperCase()}</span>
+                              </button>
+                            ) : (
+                              <div className="w-9" />
+                            )}
+                            {currentStage && (
+                              <button
+                                type="button"
+                                onClick={(e) => handleStageClick(currentStage, e)}
+                                className="flex flex-col items-center gap-1 focus:outline-none relative z-10"
+                                disabled={isLockedCurrent}
+                              >
+                                <div className="relative">
+                                  <StageStar isActive={true} isCompleted={false} isLocked={isLockedCurrent} />
+                                </div>
+                                <span className="text-[11px] font-medium text-white">{currentStage.toUpperCase()}</span>
+                              </button>
+                            )}
+                            {nextStage ? (
+                              <button
+                                type="button"
+                                onClick={(e) => handleStageClick(nextStage, e)}
+                                className="flex flex-col items-center gap-1 focus:outline-none opacity-100 blur-[0.5px] -mr-2 transition-opacity hover:opacity-70 disabled:opacity-40"
+                                disabled={isLockedNext}
+                              >
+                                <div className="relative scale-90">
+                                  <StageStar isActive={false} isCompleted={false} isLocked={isLockedNext} />
+                                </div>
+                                <span className="text-[10px] font-medium text-gray-400">{nextStage.toUpperCase()}</span>
+                              </button>
+                            ) : (
+                              <div className="w-9" />
+                            )}
+                          </div>
+                        </motion.div>
+                      );
+                    })()
+                  ) : (
+                    <motion.div
+                      className="mt-4 relative"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ duration: 0.3, ease: [0.32, 0.72, 0, 1] }}
+                    >
+                      {/* Vertical base track */}
+                      <div className="absolute left-1/2 top-0 bottom-0 w-[3px] -translate-x-1/2 rounded-full bg-gradient-to-b from-gray-800 via-gray-800 to-gray-800" />
+                      {/* Active progress along the track */}
+                      {activeStageIndex > -1 && stages.length > 1 && (
+                        <div
+                          className="absolute left-1/2 top-0 w-[3px] -translate-x-1/2 rounded-full bg-gradient-to-b from-[#FAA2FF] via-[#FF8EEE] to-[#7A38FF]"
+                          style={{
+                            height: `${(activeStageIndex / (stages.length - 1)) * 100}%`,
+                          }}
+                        />
+                      )}
+                      {/* Zig-zag stars + labels vertically */}
+                      <div className="relative flex flex-col gap-4 px-10">
+                        {stages.map((stage, index) => {
+                          const isLocked = index > 1 && !user?.isPurchaseDone;
+                          const isActive = user?.startupStage === stage;
+                          const isCompleted =
+                            activeStageIndex > -1 && index < activeStageIndex;
+                          const alignLeft = index % 2 === 0;
+
+                          return (
+                            <button
+                              key={stage}
+                              type="button"
+                              onClick={(e) => handleStageClick(stage, e)}
+                              onMouseEnter={() => setHoveredStage(stage)}
+                              onMouseLeave={() => setHoveredStage(null)}
+                              className={`relative flex items-center gap-3 text-left focus:outline-none ${
+                                alignLeft
+                                  ? "self-start pr-10"
+                                  : "self-end pl-10 flex-row-reverse"
+                              }`}
+                              data-tooltip-id="my-tooltip"
+                              data-tooltip-content={
+                                isLocked ? t("dashboard.purchasePlanToPlay") : ""
+                              }
+                              disabled={isLocked}
+                            >
+                              <div className="relative">
+                                <StageStar
+                                  isActive={isActive}
+                                  isCompleted={isCompleted}
+                                  isLocked={isLocked}
+                                />
+                                {isLocked && (
+                                  <span className="absolute -right-2 -top-2 flex h-4 w-4 items-center justify-center rounded-full bg-gray-900 text-[10px] text-gray-200">
+                                    <Lock size={10} />
+                                  </span>
+                                )}
+                              </div>
+                              <span
+                                className={`text-[11px] font-medium ${
+                                  isActive ? "text-white" : "text-gray-400"
+                                }`}
+                              >
+                                {stage.toUpperCase()}
+                              </span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </motion.div>
+                  )}
+                </motion.div>
+                {/* Minimal collapse/expand toggle — mobile only */}
+                <button
+                  type="button"
+                  onClick={() => setStagesCardCollapsed((c) => !c)}
+                  className="mt-2 flex w-full items-center justify-center gap-1 py-1.5 text-[10px] font-medium uppercase tracking-wider text-gray-500 transition-colors hover:text-gray-400 focus:outline-none"
+                  aria-label={stagesCardCollapsed ? "Expand stages" : "Collapse stages"}
+                >
+                  {stagesCardCollapsed ? (
+                    <>
+                      <span className="inline-block translate-y-px">⋯</span>
+                      <span>Show all stages</span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="inline-block translate-y-px">−</span>
+                      <span>Collapse</span>
+                    </>
+                  )}
+                </button>
               </div>
 
               {/* Desktop / tablet: original horizontal timeline */}
