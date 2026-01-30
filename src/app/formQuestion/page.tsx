@@ -7,9 +7,6 @@ import countryList from 'react-select-country-list'; // Import for real country 
 import DefaultLayout from '@/components/Layouts/DefaultLayout';
 import { useUser } from "@/context/UserContext";
 import { useRouter } from "next/navigation";
-import Image from 'next/image';
-import formImage from '../../../public/illustrations/business_plan.svg'
-import { toast } from 'react-toastify';
 
 const industries = [
   "E-commerce", "SaaS", "Media", "Healthcare", "Education", "Fintech", "Finance",
@@ -24,22 +21,22 @@ const initialAnswers = {
   businessLocation: '',
   targetAudience: '',
   goal: '',
-  businessModel: '',
-  businessDescription: '',
+  businessModel : '',
+  businessDescription: '', 
   startingFunding: '100000',
   startingRevenue: '0',
   startingUsers: '0',
-  northStarMetric: 'userAcquisition'
+  northStarMetric: 'userAcquisition' 
 };
 
 export default function StartupBasicsForm() {
   const [formData, setFormData] = useState(initialAnswers);
   const { user, setUser, setloader, setUserState, setLoaderMessage, userLoaded } = useUser();
-  const router = useRouter();
+  const router = useRouter(); 
 
   // Initialize the country list for the dropdown
   const countryOptions = useMemo(() => countryList().getData(), []);
-
+  
   const handleChange = (key: keyof typeof formData, value: string) => {
     setFormData({ ...formData, [key]: value });
   };
@@ -48,60 +45,50 @@ export default function StartupBasicsForm() {
     if (!userLoaded) return;
     if (!user) {
       router.push("/auth/signin");
-    } else if (user.isAiCustomizationDone && !user.difficultyMode) {
+    } else if (user.isAiCustomizationDone && ! user.difficultyMode) {
       router.push("/modeSelect");
     }
   }, [user, router, userLoaded]);
-
+  
   const handleSubmit = async () => {
     if (!user || !user.gameId) return;
 
-    // --- EXISTING VALIDATIONS ---
+    // --- VALIDATION LOGIC ---
+    // 1. Business Description Word Count (Max 200 words)
     const descriptionWords = formData.businessDescription.trim().split(/\s+/).filter(Boolean);
     if (descriptionWords.length > 200) {
-      toast.info("🚨 Business Description is too long!");
-      return;
-    }
-    if (!formData.businessName || !formData.industry || !formData.businessLocation) {
-      toast.info("Please fill in Name, Industry, and Location.");
-      return;
-    }
-
-    // --- NEW: AI LOCATION VERIFICATION LAYER ---
-    setloader(true);
-    setLoaderMessage("📍 Verifying locations...");
-
-    try {
-      const verifyRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/verifyLocation`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ location: formData.businessLocation }),
-      });
-      const verifyData = await verifyRes.json();
-
-      if (!verifyData.isValid) {
-        toast.info(`🚩 Location Error: ${verifyData.error || "Please enter valid countries or cities."}`);
-        setloader(false);
+        alert("🚨 Business Description is too long! Please keep it under 200 words so the AI stays focused.");
         return;
-      }
+    }
 
-      // If valid, update the formData with the AI-formatted location string
-      const finalLocation = verifyData.formattedLocation;
+    // 2. Location Selection Check
+    if (!formData.businessLocation) {
+        alert("📍 Please select a valid Country from the list.");
+        return;
+    }
 
-      // --- PROCEED TO CUSTOMIZATION ---
-      const messages = [
-        "🔍 Analyzing your financials...",
-        "🌍 Factoring in regional constraints...",
-        "🚀 Preparing your simulation..."
-      ];
+    // 3. Prevent empty required fields
+    if (!formData.businessName || !formData.industry) {
+        alert("Please fill in the core details (Name and Industry) before launching!");
+        return;
+    }
 
-      let index = 0;
+    setloader(true);
+    const messages = [
+      "🔍 Analyzing your financials...",
+      "🌍 Factoring in regional constraints...",
+      "🧠 Calibrating mentors for your industry...",
+      "🚀 Preparing your simulation..."
+    ];
+  
+    let index = 0;
+    setLoaderMessage(messages[index]);
+    const intervalId = setInterval(() => {
+      index = (index + 1) % messages.length;
       setLoaderMessage(messages[index]);
-      const intervalId = setInterval(() => {
-        index = (index + 1) % messages.length;
-        setLoaderMessage(messages[index]);
-      }, 2200);
-
+    }, 2200);
+  
+    try {
       const token = localStorage.getItem("userToken");
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/taskCustomization`, {
         method: "POST",
@@ -111,23 +98,23 @@ export default function StartupBasicsForm() {
         },
         body: JSON.stringify({
           ...formData,
-          businessLocation: finalLocation, // Use verified location
           gameId: user.gameId,
         }),
       });
-
+  
       const data = await res.json();
-      clearInterval(intervalId);
-
       if (res.ok) {
         setUser(data);
         setUserState(data);
-        router.push("/modeSelect");
+        router.push("/modeSelect")
+      } else {
+        console.error("API Error:", data);
       }
     } catch (err) {
-      console.error("Workflow error:", err);
-      toast.error("Something went wrong. Please try again.");
+      console.error("Network error:", err);
     } finally {
+      clearInterval(intervalId);
+      setLoaderMessage("");
       setloader(false);
     }
   };
@@ -189,7 +176,7 @@ export default function StartupBasicsForm() {
       startingUsers: '0',
       northStarMetric: 'userAcquisition'
     },
-    {
+     {
       businessName: "NexusQuantum",
       industry: "Other",
       productType: "Error-Corrected Quantum Processor Unit",
@@ -204,18 +191,18 @@ export default function StartupBasicsForm() {
       northStarMetric: 'userAcquisition'
     },
     {
-      businessName: "VoltCycle",
-      industry: "Mobility",
-      productType: "Solid-state battery electric motorbike",
-      businessLocation: "United States",
-      targetAudience: "Urban eco-commuters",
-      goal: "Secure 500 paid pre-orders via crowdfunding",
-      businessModel: "D2C",
-      businessDescription: "VoltCycle is a hardware startup developing high-performance electric motorbikes with next-gen solid-state battery technology for 3x longer range.",
-      startingFunding: '350000',
-      startingRevenue: '0',
-      startingUsers: '0',
-      northStarMetric: 'userAcquisition'
+        businessName: "VoltCycle",
+        industry: "Mobility",
+        productType: "Solid-state battery electric motorbike",
+        businessLocation: "United States",
+        targetAudience: "Urban eco-commuters",
+        goal: "Secure 500 paid pre-orders via crowdfunding",
+        businessModel: "D2C",
+        businessDescription: "VoltCycle is a hardware startup developing high-performance electric motorbikes with next-gen solid-state battery technology for 3x longer range.",
+        startingFunding: '350000',
+        startingRevenue: '0',
+        startingUsers: '0',
+        northStarMetric: 'userAcquisition'
     }
   ];
   
@@ -238,25 +225,14 @@ export default function StartupBasicsForm() {
     }),
   };
 
-
   return (
     <DefaultLayout>
-      {/* <div className={` ${user?.isAiCustomizationDone ?
-        'left-[86%] top-[31%]' : 'left-[70%] top-[31%]'} top-[31%] hidden xl:block fixed z-0 pointer-events-none opacity-50`}>
-        <Image
-          src={formImage}
-          width={user?.isAiCustomizationDone ? 200 : 400}
-          height={user?.isAiCustomizationDone ? 200 : 400}
-          alt='image'
-        />
-      </div> */}
-
-      <div className="relative z-10 max-w-full">
+      <div className="relative z-10 w-full">
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className={`w-full max-w-full ${user?.isAiCustomizationDone ? 'mx-auto' : 'mx-0'} p-6 sm:p-8 rounded-3xl border border-gray-800 bg-[#151516] shadow-[0_24px_80px_rgba(0,0,0,0.6)] space-y-6 mt-10`}
+          className="w-full p-6 sm:p-8 rounded-3xl border border-gray-800 bg-[#151516] shadow-[0_24px_80px_rgba(0,0,0,0.6)] space-y-6 mt-10"
         >
           <div className="text-center pb-2">
             <h1 className="text-3xl font-bold text-gray-100">Startup Simulation Setup</h1>
@@ -361,7 +337,7 @@ export default function StartupBasicsForm() {
           </button>
         </motion.div>
 
-        <div className="mt-14 mb-6 pl-4 sm:pl-10">
+        <div className="mt-14 mb-6 pl-10">
           <h2 className="text-2xl font-bold text-gray-100">Confused? Just want to get started?</h2>
           <p className="text-gray-400 mt-1">Pick one of these ready-to-go startup ideas.</p>
         </div>

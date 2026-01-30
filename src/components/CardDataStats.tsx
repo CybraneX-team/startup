@@ -744,11 +744,17 @@ const BrainstormModal = ({
   );
 };
 
-interface TaskGridProps {
-  onModalOpenChange?: (open: boolean) => void;
-}
+const TaskGrid: React.FC = () => {
+  // const [selectedTasks, setSelectedTasks] = useState<Set<number>>(new Set());
+  // ... inside TaskGrid component ...
 
-const TaskGrid: React.FC<TaskGridProps> = ({ onModalOpenChange }) => {
+  // ✅ ADD THIS: Filter logic to process tasks based on activeFilters
+
+
+
+  // ... rest of the component
+  // ... rest of the component
+
   const [selectedTasks, setSelectedTasks] = useState<Set<string>>(new Set());
   const [brainstormModalOpen, setBrainstormModalOpen] = useState(false);
   const [powerBoost, setPowerBoost] = useState(false);
@@ -833,12 +839,6 @@ const TaskGrid: React.FC<TaskGridProps> = ({ onModalOpenChange }) => {
     taskId: null,
     task: null,
   });
-
-  // Notify parent when any task-grid modal opens/closes (so e.g. Make Turn button can hide on mobile)
-  useEffect(() => {
-    const open = !!(detailModalTask || brainstormModalOpen || cancelModal.isOpen || showTurnProgressModal);
-    onModalOpenChange?.(open);
-  }, [detailModalTask, brainstormModalOpen, cancelModal.isOpen, showTurnProgressModal, onModalOpenChange]);
 
   useEffect(() => {
     if (!user?.gameId) {

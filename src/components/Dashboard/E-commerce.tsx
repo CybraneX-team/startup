@@ -938,23 +938,6 @@ const ECommerce: React.FC = () => {
   const [showInvestorsModal, setShowInvestorsModal] = useState(false);
   const [showMentorsModal, setShowMentorsModal] = useState(false);
   const [showFoundersModal, setShowFoundersModal] = useState(false);
-  const [taskGridModalOpen, setTaskGridModalOpen] = useState(false);
-
-  // When any modal is open, hide Make Turn button on mobile so it doesn't overlap modals (desktop unchanged)
-  const isAnyModalOpen = !!(
-    confirmationAction ||
-    isNotificationModalOpen ||
-    showSkipBugModal ||
-    chatModalOpen ||
-    showBoostModal ||
-    showStageUpgradeModal ||
-    showTurnProgressModal ||
-    showTeamModal ||
-    showInvestorsModal ||
-    showMentorsModal ||
-    showFoundersModal ||
-    taskGridModalOpen
-  );
 
   // Load persisted data on mount
   useEffect(() => {
@@ -2247,10 +2230,10 @@ const ECommerce: React.FC = () => {
           className={`relative w-full items-center rounded-3xl shadow-[0_24px_80px_rgba(0,0,0,0.6)] ${elonStep === 4 ? "ring-1 ring-blue-600 animate-pulse" : ""
             } lg:static`}
         >
-          <TaskGrid onModalOpenChange={setTaskGridModalOpen} />
+          <TaskGrid />
         </div>
       </div>
-      {/* Floating Make Turn Button - on mobile: hidden when any modal is open and z-index below modals so it never overlaps; desktop unchanged */}
+      {/* Floating Make Turn Button - z-40 on mobile so modals (z-[99999]) always appear on top; desktop keeps z-[9999] */}
       <button
         onClick={() => {
           playSound("click");
@@ -2261,14 +2244,12 @@ const ECommerce: React.FC = () => {
           bottom: '24px',
           right: '24px',
         }}
-        className={`rounded-lg bg-gradient-to-b from-[#F5D0FE] via-[#E9D5FF] to-[#DDD6FE] text-black backdrop-blur-md border border-gray-200/20 dark:border-gray-600/20 flex items-center justify-center transition-all duration-300 shadow-2xl
-          z-[1000] md:z-[9999]
+        className={`z-40 md:z-[9999] rounded-lg bg-gradient-to-b from-[#F5D0FE] via-[#E9D5FF] to-[#DDD6FE] text-black backdrop-blur-md border border-gray-200/20 dark:border-gray-600/20 flex items-center justify-center transition-all duration-300 shadow-2xl
           hover:bg-gray-800/95 dark:hover:bg-gray-600/95 
           hover:scale-105 hover:-translate-y-1
           hover:shadow-[0_20px_50px_rgba(0,0,0,0.4)] hover:shadow-gray-900/60
           active:scale-100 active:translate-y-0
           group relative overflow-hidden
-          ${isAnyModalOpen ? 'max-md:hidden' : ''}
           ${isScrolling
             ? 'px-4 py-3 min-w-[60px] md:min-w-[200px] rounded-full'
             : 'px-6 py-4 min-w-[180px] md:min-w-[200px] flex-col'
@@ -2297,7 +2278,7 @@ const ECommerce: React.FC = () => {
           <>
             <span className="font-bold text-black text-lg mb-2 relative z-10 group-hover:scale-105 transition-transform duration-300">{t("dashboard.makeTurn")}</span>
             <div className="flex justify-between items-center w-full px-2 pt-2 border-t border-black/10 relative z-10 group-hover:border-black/20 transition-colors duration-300">
-              <span className="font-medium text-black text-sm">{t("dashboard.income")}&nbsp;&nbsp;</span>
+              <span className="font-medium text-black text-sm">{t("dashboard.income")}</span>
               <span className={`text-lg font-bold transition-all duration-300 group-hover:scale-110 ${Number(turnAmount) >= 0 ? 'text-green-300 group-hover:text-green-400' : 'text-red-300 group-hover:text-red-400'}`}>${turnAmount}</span>
             </div>
           </>
